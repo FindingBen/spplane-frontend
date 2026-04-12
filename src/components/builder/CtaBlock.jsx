@@ -1,0 +1,78 @@
+// CtaBlock — Full-width CTA button with style, size, and sticky options
+
+const SIZE_CLASSES = {
+  small: 'py-1.5 text-[10px]',
+  medium: 'py-2 text-xs',
+  large: 'py-3 text-sm',
+}
+
+const STYLE_CLASSES = {
+  primary: 'bg-black text-white',
+  secondary: 'bg-white text-black border-2 border-black',
+  danger: 'bg-red-600 text-white',
+  success: 'bg-green-700 text-white',
+}
+
+export const CtaPreview = ({ props = {} }) => {
+  const sizeClass = SIZE_CLASSES[props.size] || SIZE_CLASSES.large
+  const styleClass = STYLE_CLASSES[props.style] || STYLE_CLASSES.primary
+
+  return (
+    <div className={`w-full px-3 py-2 bg-white ${props.sticky ? 'border-t-2 border-gray-200 shadow-lg' : ''}`}>
+      {props.sticky && (
+        <p className="text-[8px] text-gray-400 text-center mb-1 uppercase tracking-wide">Sticky Bar</p>
+      )}
+      <a
+        href={props.link || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`block w-full text-center font-bold rounded-lg ${sizeClass} ${styleClass}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {props.text || 'Buy Now'}
+      </a>
+    </div>
+  )
+}
+
+export const CtaEditor = ({ props = {}, onChange }) => (
+  <>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Button Text</label>
+      <input type="text" value={props.text || ''} onChange={(e) => onChange('text', e.target.value)}
+        placeholder="Buy Now"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+    </div>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Link URL</label>
+      <input type="text" value={props.link || ''} onChange={(e) => onChange('link', e.target.value)}
+        placeholder="https://checkout.shopify.com/..."
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+    </div>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Style</label>
+      <select value={props.style || 'primary'} onChange={(e) => onChange('style', e.target.value)}
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60">
+        <option value="primary">Primary (Black)</option>
+        <option value="secondary">Secondary (White/Outlined)</option>
+        <option value="danger">Danger (Red)</option>
+        <option value="success">Success (Green)</option>
+      </select>
+    </div>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Size</label>
+      <select value={props.size || 'large'} onChange={(e) => onChange('size', e.target.value)}
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60">
+        <option value="small">Small</option>
+        <option value="medium">Medium</option>
+        <option value="large">Large</option>
+      </select>
+    </div>
+    <label className="flex items-center gap-2 cursor-pointer mt-1">
+      <input type="checkbox" checked={props.sticky ?? true}
+        onChange={(e) => onChange('sticky', e.target.checked)}
+        className="w-4 h-4 accent-[#3e6ff4]" />
+      <span className="text-xs text-[#CAC4CF]">Sticky (fixed to bottom)</span>
+    </label>
+  </>
+)

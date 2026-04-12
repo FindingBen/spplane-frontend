@@ -3,6 +3,7 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import Templates from './pages/Templates'
 import Products from './pages/Products'
+import ContentBuilder from './pages/ContentBuilder'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -34,6 +35,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/content/builder" element={<ProtectedRoute>
+          <ContentBuilder />
+        </ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

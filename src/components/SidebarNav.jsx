@@ -1,9 +1,19 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const SidebarNav = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isContentOpen, setIsContentOpen] = useState(false)
+
+  // Auto-open Content if on content pages
+  React.useEffect(() => {
+    if (location.pathname.startsWith('/content')) {
+      setIsContentOpen(true)
+    }
+  }, [location.pathname])
+
+  const isActive = (path) => location.pathname === path
 
   return (
     <nav className="w-full px-4 flex-1 flex flex-col">
@@ -44,17 +54,36 @@ const SidebarNav = () => {
         {isContentOpen && (
           <div className="ml-6 mt-2 space-y-2">
             <button
-              onClick={() => navigate('/content/templates')}
-              className="w-full text-left px-3 py-2 text-sm text-[#CAC4CF] hover:bg-[#3e6ff4]/20 rounded-lg transition-colors duration-200 flex items-center gap-2"
+              onClick={() => navigate('/content/builder')}
+              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                isActive('/content/builder')
+                  ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
+                  : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+              }`}
             >
-              <div className="w-1 h-1 rounded-full bg-[#3e6ff4]"></div>
+              <div className={`w-1 h-1 rounded-full ${isActive('/content/builder') ? 'bg-[#60a5fa]' : 'bg-[#3e6ff4]'}`}></div>
+              Create
+            </button>
+            <button
+              onClick={() => navigate('/content/templates')}
+              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                isActive('/content/templates')
+                  ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
+                  : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+              }`}
+            >
+              <div className={`w-1 h-1 rounded-full ${isActive('/content/templates') ? 'bg-[#60a5fa]' : 'bg-[#3e6ff4]'}`}></div>
               Templates
             </button>
             <button
               onClick={() => navigate('/content/products')}
-              className="w-full text-left px-3 py-2 text-sm text-[#CAC4CF] hover:bg-[#3e6ff4]/20 rounded-lg transition-colors duration-200 flex items-center gap-2"
+              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                isActive('/content/products')
+                  ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
+                  : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+              }`}
             >
-              <div className="w-1 h-1 rounded-full bg-[#3e6ff4]"></div>
+              <div className={`w-1 h-1 rounded-full ${isActive('/content/products') ? 'bg-[#60a5fa]' : 'bg-[#3e6ff4]'}`}></div>
               Products
             </button>
           </div>

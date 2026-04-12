@@ -40,43 +40,43 @@ const Home = () => {
         {/* Main Content Wrapper with Rounded Corners and Padding */}
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col">
           {/* Main Content Area */}
-          <main className="flex-1 flex items-center justify-center p-8 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 flex items-center justify-center p-4 md:p-8 overflow-y-auto overflow-x-hidden">
             <div className="text-center max-w-2xl">
               {/* Welcome Title */}
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
                 Welcome to <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Sendperplane</span>
               </h1>
 
               {/* Subtitle */}
-              <p className="text-lg md:text-xl text-[#CAC4CF] mb-12">
+              <p className="text-sm md:text-lg lg:text-xl text-[#CAC4CF] mb-8 md:mb-12">
                 Your dashboard is ready. Let's get started!
               </p>
 
               {/* Accent Line */}
-              <div className="flex justify-center mb-12">
-                <div className="h-1 w-32 bg-gradient-to-r from-transparent via-[#3e6ff4] to-transparent"></div>
+              <div className="flex justify-center mb-8 md:mb-12">
+                <div className="h-1 w-24 md:w-32 bg-gradient-to-r from-transparent via-[#3e6ff4] to-transparent"></div>
               </div>
 
               {/* Quick Stats or Info (optional) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-6">
-                  <div className="text-3xl font-bold text-[#3e6ff4] mb-2">0</div>
-                  <p className="text-[#CAC4CF] text-sm">Active Campaigns</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+                <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-4 md:p-6">
+                  <div className="text-2xl md:text-3xl font-bold text-[#3e6ff4] mb-2">0</div>
+                  <p className="text-[#CAC4CF] text-xs md:text-sm">Active Campaigns</p>
                 </div>
-                <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-6">
-                  <div className="text-3xl font-bold text-[#3e6ff4] mb-2">0</div>
-                  <p className="text-[#CAC4CF] text-sm">Messages Sent</p>
+                <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-4 md:p-6">
+                  <div className="text-2xl md:text-3xl font-bold text-[#3e6ff4] mb-2">0</div>
+                  <p className="text-[#CAC4CF] text-xs md:text-sm">Messages Sent</p>
                 </div>
-                <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-6">
-                  <div className="text-3xl font-bold text-[#3e6ff4] mb-2">0</div>
-                  <p className="text-[#CAC4CF] text-sm">Total Users</p>
+                <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-4 md:p-6">
+                  <div className="text-2xl md:text-3xl font-bold text-[#3e6ff4] mb-2">0</div>
+                  <p className="text-[#CAC4CF] text-xs md:text-sm">Total Users</p>
                 </div>
               </div>
 
               {/* Logout Button */}
               <button
                 onClick={handleLogout}
-                className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90 text-white font-semibold rounded-lg transition-all duration-200"
+                className="px-4 md:px-6 py-2 md:py-3 text-sm md:text-base bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90 text-white font-semibold rounded-lg transition-all duration-200"
               >
                 Logout
               </button>

@@ -11,7 +11,7 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
   }, [isOpen, onClose])
 
   if (!isOpen || !template) return null
-
+  console.log('TEMMM',template)
   return (
     <>
       {/* Backdrop */}
@@ -27,10 +27,9 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-[#3e6ff4]/20">
+          <div className="flex items-center justify-between p-3 border-b border-[#3e6ff4]/20">
             <div>
               <h2 className="text-2xl font-bold text-white">{template.name}</h2>
-              <p className="text-sm text-[#CAC4CF] mt-1 capitalize">{template.category} Template</p>
             </div>
             <button
               onClick={onClose}
@@ -42,73 +41,27 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
             </button>
           </div>
 
-          {/* Content - Split layout */}
-          <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-            {/* Info Section */}
-            <div className="w-full lg:w-1/3 p-6 border-b lg:border-b-0 lg:border-r border-[#3e6ff4]/20 overflow-y-auto">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-[#CAC4CF] uppercase mb-2">Description</h3>
-                  <p className="text-white">{template.description || 'No description available'}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-semibold text-[#CAC4CF] uppercase mb-2">Components</h3>
-                  <div className="space-y-2">
-                    {template.structure?.components?.map((component, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 p-2 bg-[#111827] rounded"
-                      >
-                        <span className="w-2 h-2 rounded-full bg-[#3e6ff4]"></span>
-                        <span className="text-sm text-white capitalize">
-                          {component.type}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-semibold text-[#CAC4CF] uppercase mb-2">Stats</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 bg-[#111827] rounded">
-                      <p className="text-xs text-[#CAC4CF]">Components</p>
-                      <p className="text-lg font-bold text-[#3e6ff4]">
-                        {template.structure?.components?.length || 0}
-                      </p>
-                    </div>
-                    <div className="p-2 bg-[#111827] rounded">
-                      <p className="text-xs text-[#CAC4CF]">Category</p>
-                      <p className="text-lg font-bold text-[#3e6ff4] capitalize">
-                        {template.category}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Preview Section */}
-            <div className="flex-1 bg-[#111827] flex items-center justify-center p-6 overflow-hidden">
+          {/* Content - Full width preview */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+           
+       
+            <div className="flex-1 bg-[#111827] flex items-center justify-center p-3 overflow-hidden">
               <div className="flex flex-col items-center gap-4 h-full">
-                {/* Mobile Frame */}
-                <div className="flex-1 flex items-center justify-center max-w-sm w-full">
-                  <div className="bg-white rounded-3xl shadow-2xl border-8 border-gray-800 w-full max-w-sm overflow-hidden flex flex-col h-full">
-                    {/* Phone Notch */}
-                    <div className="bg-gray-900 h-6 flex items-center justify-center">
-                      <div className="bg-gray-900 h-5 w-32 rounded-b-2xl"></div>
-                    </div>
-
-                    {/* Phone Screen - Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto bg-white">
-                      <TemplatePreview template={template} />
-                    </div>
-
-                    {/* Phone Home Indicator */}
-                    <div className="bg-gray-900 h-6 flex items-center justify-center">
-                      <div className="h-1 w-32 bg-gray-800 rounded-full"></div>
-                    </div>
+                {/* iPhone 12 Mockup - Flowbite style */}
+                <div className="relative mx-auto border-[14px] bg-gray-900 border-gray-900 rounded-[2.5rem] h-[500px] w-[260px] shadow-2xl">
+                  {/* Left side buttons */}
+                  <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[130px] rounded-s-lg"></div>
+                  <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[170px] rounded-s-lg"></div>
+                  
+                  {/* Right side button */}
+                  <div className="h-[64px] w-[3px] bg-gray-800 absolute -end-[17px] top-[138px] rounded-e-lg"></div>
+                  
+                  {/* Notch */}
+                  <div className="w-[120px] h-[28px] bg-gray-900 rounded-b-[1.25rem] absolute top-0 left-1/2 -translate-x-1/2 z-10"></div>
+                  
+                  {/* Screen content */}
+                  <div className="rounded-[2rem] overflow-hidden w-[232px] h-[472px] bg-white overflow-y-auto flex flex-col">
+                    <TemplatePreview template={template} />
                   </div>
                 </div>
 
@@ -120,16 +73,16 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
           </div>
 
           {/* Footer Actions */}
-          <div className="border-t border-[#3e6ff4]/20 p-6 flex gap-4">
+          <div className="border-t border-[#3e6ff4]/20 p-4 flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors font-medium"
+              className="flex-1 px-3 py-2 bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors font-medium text-sm"
             >
               Cancel
             </button>
             <button
               onClick={() => onConfirm(template)}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity font-medium"
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm"
             >
               Use This Template
             </button>
@@ -142,7 +95,9 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
 
 // Template Preview Component that renders the template structure
 const TemplatePreview = ({ template }) => {
-  if (!template?.structure?.components) {
+  const blocks = template?.structure?.blocks
+
+  if (!blocks?.length) {
     return (
       <div className="p-4 text-center text-gray-500">
         <p>No template content available</p>
@@ -152,95 +107,151 @@ const TemplatePreview = ({ template }) => {
 
   return (
     <div className="w-full">
-      {template.structure.components.map((component, idx) => (
-        <TemplateComponent key={idx} component={component} />
+      {blocks.map((block, idx) => (
+        <TemplateBlock key={idx} block={block} />
       ))}
     </div>
   )
 }
 
-// Component renderer for different template element types
-const TemplateComponent = ({ component }) => {
-  const { type, props = {} } = component
+// Block renderer for template preview — matches ContentBuilder block types
+const TemplateBlock = ({ block }) => {
+  const { type, props = {} } = block
 
   switch (type) {
-    case 'hero':
+    case 'video-hero':
       return (
-        <div className="w-full bg-gradient-to-b from-[#3e6ff4] to-[#1e40af] text-white p-6 text-center">
-          <h1 className="text-2xl font-bold mb-2">{props.title || 'Welcome'}</h1>
-          <p className="text-sm mb-4 text-white/80">{props.subtitle || ''}</p>
-          {props.btnText && (
-            <button className="bg-white text-[#3e6ff4] px-4 py-2 rounded-lg font-semibold">
-              {props.btnText}
-            </button>
+        <div className="w-full relative">
+          {props.fallbackImage ? (
+            <img src={props.fallbackImage} alt={props.title || 'Video'} className="w-full h-36 object-cover" />
+          ) : (
+            <div className="w-full h-36 bg-gray-900 flex items-center justify-center">
+              <div className="w-10 h-10 bg-black/60 rounded-full flex items-center justify-center">
+                <div className="w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[10px] border-l-white ml-1" />
+              </div>
+            </div>
+          )}
+          {props.title && (
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
+              <p className="text-white text-xs font-semibold">{props.title}</p>
+            </div>
           )}
         </div>
       )
 
-    case 'carousel':
+    case 'product-bundle':
       return (
-        <div className="w-full p-4 bg-gradient-to-b from-white to-gray-50">
-          <div className="bg-gray-200 rounded-lg h-40 flex items-center justify-center mb-4">
-            <span className="text-gray-400 text-sm">
-              Carousel ({props.items?.length || 0} items)
-            </span>
+        <div className="w-full px-3 py-3 bg-white">
+          {props.title && <p className="text-xs font-bold text-black mb-1">{props.title}</p>}
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {(props.products || []).map((p, idx) => (
+              <div key={idx} className="flex-shrink-0 w-20 bg-gray-50 rounded border border-gray-200 overflow-hidden">
+                {p.image ? (
+                  <img src={p.image} alt={p.name} className="w-full h-14 object-cover" />
+                ) : (
+                  <div className="w-full h-14 bg-gray-200 flex items-center justify-center">
+                    <span className="text-[9px] text-gray-400">No image</span>
+                  </div>
+                )}
+                <div className="p-1">
+                  <p className="text-[10px] font-semibold text-black truncate">{p.name}</p>
+                  <p className="text-[10px] text-green-700">{p.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {props.bundleCtaText && (
+            <div className="w-full mt-2 py-1.5 bg-black text-white text-[10px] font-bold text-center rounded">{props.bundleCtaText}</div>
+          )}
+        </div>
+      )
+
+    case 'comparison-table':
+      return (
+        <div className="w-full px-3 py-2 bg-white">
+          {props.title && <p className="text-xs font-bold text-black mb-1">{props.title}</p>}
+          <table className="w-full text-[9px]">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="text-left px-1 py-1 text-gray-600">Feature</th>
+                <th className="text-center px-1 py-1 text-green-700">Us</th>
+                <th className="text-center px-1 py-1 text-gray-500">Them</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(props.comparisons || []).map((row, idx) => (
+                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="px-1 py-0.5 text-black">{row.feature}</td>
+                  <td className="px-1 py-0.5 text-green-700 text-center">{row.us}</td>
+                  <td className="px-1 py-0.5 text-gray-500 text-center">{row.competitor}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+
+    case 'inventory-tracker': {
+      const msg = (props.messageTemplate || 'Only {remaining} left in stock!').replace('{remaining}', 3)
+      return (
+        <div className="w-full px-3 py-2 bg-orange-50 flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0" />
+          <p className="text-[10px] font-semibold text-orange-600">{msg}</p>
+        </div>
+      )
+    }
+
+    case 'social-proof':
+      return (
+        <div className="w-full px-3 py-2 bg-white">
+          {props.title && <p className="text-xs font-bold text-black mb-1">{props.title}</p>}
+          {(props.reviews || []).slice(0, 1).map((r, idx) => (
+            <div key={idx} className="bg-gray-50 rounded p-1.5 border border-gray-100">
+              <div className="flex gap-0.5 mb-1">
+                {Array.from({ length: r.rating || 5 }).map((_, i) => (
+                  <span key={i} className="text-yellow-400 text-[10px]">★</span>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-700">"{r.text}"</p>
+              <p className="text-[9px] text-gray-500 mt-0.5 font-semibold">— {r.author}</p>
+            </div>
+          ))}
+        </div>
+      )
+
+    case 'countdown-timer': {
+      return (
+        <div className="w-full px-3 py-2 bg-white">
+          {props.title && <p className="text-[10px] font-bold text-black text-center mb-1">{props.title}</p>}
+          <div className="flex justify-center gap-1">
+            {[{ l: 'Days', v: '03' }, { l: 'Hrs', v: '14' }, { l: 'Min', v: '22' }, { l: 'Sec', v: '--' }].map(({ l, v }) => (
+              <div key={l} className="flex flex-col items-center bg-red-600 text-white rounded px-1.5 py-1 min-w-[28px]">
+                <span className="text-xs font-bold leading-tight">{v}</span>
+                <span className="text-[7px] uppercase">{l}</span>
+              </div>
+            ))}
           </div>
         </div>
       )
+    }
 
-    case 'cta_button':
+    case 'cta': {
+      const sizeClass = props.size === 'small' ? 'py-1' : props.size === 'medium' ? 'py-1.5' : 'py-2'
+      const styleClass = props.style === 'secondary' ? 'bg-white text-black border-2 border-black'
+        : props.style === 'danger' ? 'bg-red-600 text-white'
+        : props.style === 'success' ? 'bg-green-700 text-white'
+        : 'bg-black text-white'
       return (
-        <div className="w-full p-4 text-center">
-          <button
-            className="w-11/12 py-3 rounded-lg font-semibold text-white"
-            style={{
-              backgroundColor: props.color || '#3e6ff4',
-            }}
-          >
-            {props.text || 'Call to Action'}
-          </button>
+        <div className={`w-full px-3 py-2 bg-white ${props.sticky ? 'border-t-2 border-gray-200' : ''}`}>
+          <div className={`w-full text-center font-bold rounded-lg text-xs ${sizeClass} ${styleClass}`}>
+            {props.text || 'Buy Now'}
+          </div>
         </div>
       )
-
-    case 'text':
-      return (
-        <div className="w-full p-4 text-gray-700">
-          <p>{props.content || 'Text content'}</p>
-        </div>
-      )
-
-    case 'image':
-      return (
-        <div className="w-full p-4 bg-gray-100 flex items-center justify-center h-32">
-          {props.url ? (
-            <img src={props.url} alt="Content" className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-gray-400 text-sm">Image placeholder</span>
-          )}
-        </div>
-      )
-
-    case 'form_field':
-      return (
-        <div className="w-full p-4">
-          <input
-            type={props.type || 'text'}
-            placeholder={props.placeholder || 'Enter text'}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            disabled
-          />
-        </div>
-      )
-
-    case 'divider':
-      return <div className="w-full border-b border-gray-200" />
+    }
 
     default:
-      return (
-        <div className="w-full p-4 bg-gray-100 text-gray-500 text-center text-sm">
-          <p>Component type: {type}</p>
-        </div>
-      )
+      return null
   }
 }
 
