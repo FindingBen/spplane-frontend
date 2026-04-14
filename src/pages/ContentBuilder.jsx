@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import axiosInstance from '../service/interceptor/axiosInstance'
+import { saveDraft, publishContent } from '../service/api/content'
 import PreviewComponent from '../components/builder/PreviewComponent'
 import ComponentEditor from '../components/builder/ComponentEditor'
 import Loader from '../components/Loader'
@@ -150,7 +150,7 @@ const ContentBuilder = () => {
     }
     try {
       const [request] = await Promise.all([
-        axiosInstance.post('/api/content/content/', body),
+        saveDraft(body),
         sleep(MIN_LOADER_MS),
       ])
       if (request.status === 201) {
@@ -178,11 +178,10 @@ const ContentBuilder = () => {
         },
         blocks: blocks.map(({ id, ...block }) => block),
       },
-      status: 'published',
     }
     try {
       const [request] = await Promise.all([
-        axiosInstance.post('/api/content/content/', body),
+        publishContent(body),
         sleep(MIN_LOADER_MS),
       ])
       if (request.status === 201) {

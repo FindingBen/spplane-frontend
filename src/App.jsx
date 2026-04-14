@@ -4,6 +4,8 @@ import Home from './pages/Home'
 import Templates from './pages/Templates'
 import Products from './pages/Products'
 import ContentBuilder from './pages/ContentBuilder'
+import CampaignPage from './pages/CampaignPage'
+import AudiencePage from './pages/AudiencePage'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -38,6 +40,22 @@ function App() {
         <Route path="/content/builder" element={<ProtectedRoute>
           <ContentBuilder />
         </ProtectedRoute>} />
+        <Route
+          path="/campaigns"
+          element={
+            <ProtectedRoute>
+              <CampaignPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/audience"
+          element={
+            <ProtectedRoute>
+              <AudiencePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

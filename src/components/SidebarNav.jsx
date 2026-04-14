@@ -28,6 +28,36 @@ const SidebarNav = () => {
         Home
       </button>
 
+      {/* Campaigns */}
+      <button
+        onClick={() => navigate('/campaigns')}
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+          isActive('/campaigns')
+            ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
+            : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+        }`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+        </svg>
+        Campaigns
+      </button>
+
+      {/* Audience */}
+      <button
+        onClick={() => navigate('/audience')}
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+          isActive('/audience')
+            ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
+            : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+        }`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Audience
+      </button>
+
       {/* Content with Dropdown */}
       <div className="mt-4">
         <button

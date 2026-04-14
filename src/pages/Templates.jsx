@@ -78,20 +78,20 @@ const Templates = () => {
         {/* Main Content Wrapper with Rounded Corners and Padding */}
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
           {/* Main Content Area */}
-          <main className="flex-1 flex flex-col p-4 md:p-8 overflow-y-auto overflow-x-hidden">
-            <div className="w-full max-w-6xl mx-auto">
+          <main className="flex-1 flex flex-col p-4 md:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+            <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
               {/* Header */}
-              <div className="mb-4 md:mb-8">
-                <h1 className="text-2xl md:text-4xl font-bold text-white mb-2">
+              <div className="mb-4 md:mb-8 2xl:mb-5">
+                <h1 className="text-2xl md:text-4xl 2xl:text-3xl font-bold text-white mb-2">
                   <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">SMS Templates</span>
                 </h1>
-                <p className="text-sm md:text-lg text-[#CAC4CF]">
+                <p className="text-sm md:text-lg 2xl:text-sm text-[#CAC4CF]">
                   Choose from our predefined templates to create your SMS landing pages
                 </p>
               </div>
 
               {/* Category Filter */}
-              <div className="flex gap-2 mb-4 md:mb-8 flex-wrap">
+              <div className="flex gap-2 mb-4 md:mb-8 2xl:mb-5 flex-wrap">
                 <button
                   onClick={() => handleCategoryFilter('all')}
                   className={`px-2 md:px-4 py-1 md:py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
@@ -144,7 +144,7 @@ const Templates = () => {
 
               {/* Templates Grid */}
               {!loading && filteredTemplates.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
                   {filteredTemplates.map(template => (
                     <div
                       key={template.id}
@@ -152,7 +152,7 @@ const Templates = () => {
                       className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg overflow-hidden hover:border-[#3e6ff4]/60 hover:shadow-lg hover:shadow-[#3e6ff4]/20 transition-all duration-200 cursor-pointer group"
                     >
                       {/* Template Thumbnail */}
-                      <div className="relative h-32 md:h-36 bg-[#111827] overflow-hidden flex items-center justify-center">
+                      <div className="relative h-32 md:h-36 2xl:h-28 bg-[#111827] overflow-hidden flex items-center justify-center">
                         {template.structure?.blocks ? (
                           <div className="absolute inset-0 flex items-center justify-center p-2">
                             <div className="w-24 h-full bg-white rounded overflow-hidden shadow-lg border border-gray-300">
@@ -192,7 +192,7 @@ const Templates = () => {
                         </div>
 
                         {/* Select Button */}
-                        <button className="w-full mt-2 md:mt-4 px-3 md:px-4 py-1.5 md:py-2 bg-[#3e6ff4] hover:bg-[#3e6ff4]/90 text-white rounded-lg text-sm md:text-base font-medium transition-colors group-hover:bg-[#3e6ff4]/90">
+                        <button className="w-full mt-2 md:mt-4 px-3 md:px-4 py-1.5 md:py-2 2xl:py-1.5 bg-[#3e6ff4] hover:bg-[#3e6ff4]/90 text-white rounded-lg text-sm font-medium transition-colors group-hover:bg-[#3e6ff4]/90">
                           Select Template
                         </button>
                       </div>
