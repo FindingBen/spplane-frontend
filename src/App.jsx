@@ -6,6 +6,7 @@ import Products from './pages/Products'
 import ContentBuilder from './pages/ContentBuilder'
 import CampaignPage from './pages/CampaignPage'
 import AudiencePage from './pages/AudiencePage'
+import SmsPage from './pages/SmsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -53,6 +54,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AudiencePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sms"
+          element={
+            <ProtectedRoute>
+              <SmsPage />
             </ProtectedRoute>
           }
         />
