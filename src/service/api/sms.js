@@ -36,17 +36,6 @@ export async function getSmsPages() {
   return res.data
 }
 
-export async function createSmsPage({ sms, source_content, public_slug, content_snapshot, page_status = 'draft' }) {
-  const res = await axiosInstance.post(`${BASE}/sms-pages/`, {
-    sms,
-    ...(source_content && { source_content }),
-    public_slug,
-    content_snapshot,
-    page_status,
-  })
-  return res.data
-}
-
 export async function deleteSmsPage(id) {
   await axiosInstance.delete(`${BASE}/sms-pages/${id}/`)
 }
@@ -56,29 +45,6 @@ export async function deleteSmsPage(id) {
 export async function getSmsPageActions(pageId) {
   const res = await axiosInstance.get(`${BASE}/sms-page-actions/`, {
     params: { page: pageId },
-  })
-  return res.data
-}
-
-export async function createSmsPageAction({
-  page,
-  action_key,
-  label,
-  action_type,
-  target_url = '',
-  target_value = '',
-  position = 0,
-  metadata = {},
-}) {
-  const res = await axiosInstance.post(`${BASE}/sms-page-actions/`, {
-    page,
-    action_key,
-    label,
-    action_type,
-    target_url,
-    target_value,
-    position,
-    metadata,
   })
   return res.data
 }

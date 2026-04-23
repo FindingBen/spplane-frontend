@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import { getSmsList, createSms, deleteSms, createSmsPage } from '../service/api/sms'
+import { getSmsList, createSms, deleteSms } from '../service/api/sms'
 import { getContents } from '../service/api/campaign'
 import { getContactLists } from '../service/api/segments'
 
@@ -399,12 +399,7 @@ export default function SmsPage() {
     setSubmitting(true)
     try {
       const newSms = await createSms({ contact_list, sender, body, status: 'draft' })
-      await createSmsPage({
-        sms: newSms.id,
-        source_content: selectedContent?.id ?? null,
-        public_slug: generateSlug(),
-        content_snapshot: selectedContent?.structure ?? {},
-      })
+      
       setSmsList(prev => [newSms, ...prev])
       setShowModal(false)
     } catch {
