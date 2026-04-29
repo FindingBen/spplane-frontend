@@ -7,6 +7,8 @@ import ContentBuilder from './pages/ContentBuilder'
 import CampaignPage from './pages/CampaignPage'
 import AudiencePage from './pages/AudiencePage'
 import SmsPage from './pages/SmsPage'
+import SmsSendingPage from './pages/SmsSendingPage'
+import SmsPageContent from './pages/SmsPageContent'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -65,7 +67,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/sms/:smsId/sending"
+          element={
+            <ProtectedRoute>
+              <SmsSendingPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/sms/page/:slug" element={<SmsPageContent />} />
       </Routes>
     </BrowserRouter>
   )

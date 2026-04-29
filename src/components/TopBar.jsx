@@ -1,5 +1,6 @@
 import UserDropdown from './UserDropdown'
 import SearchBar from './SearchBar'
+import WalletCreditsPill from './WalletCreditsPill'
 import noBgLogo from '../assets/noBgLogo.png'
 
 const TopBar = () => {
@@ -18,8 +19,11 @@ const TopBar = () => {
       {/* Search Bar - Center */}
       <SearchBar />
       
-      {/* User Dropdown - Right side */}
-      <UserDropdown />
+      {/* User Actions - Right side */}
+      <div className="flex items-center gap-3">
+        <WalletCreditsPill />
+        <UserDropdown />
+      </div>
     </nav>
   )
 }

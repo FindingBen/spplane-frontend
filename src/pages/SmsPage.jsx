@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { getSmsList, createSms, deleteSms } from '../service/api/sms'
-import { getContents } from '../service/api/campaign'
+import { getCampaigns } from '../service/api/campaign'
 import { getContactLists } from '../service/api/segments'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -74,21 +75,25 @@ function SectionLabel({ number, children, note }) {
 
 // ── Create SMS Modal ──────────────────────────────────────────────────────────
 
-const INIT_FORM = { content: '', contactList: '', sender: '', body: '' }
+const INIT_FORM = { campaign: '', contactList: '', sender: '', body: '' }
+const PERSONALIZATION_TOKENS = [
+  { label: 'First Name', token: '{{first_name}}' },
+  { label: 'Page Link', token: '{{page_link}}' },
+]
 
 function CreateSmsModal({ onClose, onCreate, submitting }) {
   const [form, setForm] = useState(INIT_FORM)
   const [errors, setErrors] = useState({})
-  const [contents, setContents] = useState([])
+  const [campaigns, setCampaigns] = useState([])
   const [contactLists, setContactLists] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
-      getContents().catch(() => []),
+      getCampaigns().catch(() => []),
       getContactLists().catch(() => []),
     ]).then(([c, cl]) => {
-      setContents(c)
+      setCampaigns(c)
       setContactLists(cl)
     }).finally(() => setLoading(false))
   }, [])
@@ -97,6 +102,7 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
 
   const validate = () => {
     const e = {}
+    if (!form.campaign) e.campaign = 'Please select a campaign.'
     if (!form.contactList) e.contactList = 'Please select a contact list.'
     if (!form.sender.trim()) e.sender = 'Sender is required.'
     if (!form.body.trim()) e.body = 'SMS body is required.'
@@ -104,16 +110,26 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
     return e
   }
 
+  const appendToken = (token) => {
+    const suffix = form.body && !form.body.endsWith(' ') ? ` ${token}` : token
+    field('body', `${form.body}${suffix}`.trim())
+    setErrors(p => ({ ...p, body: '' }))
+  }
+
+  const insertTemplate = () => {
+    field('body', 'Hello {{first_name}}, tap here: {{page_link}}')
+    setErrors(p => ({ ...p, body: '' }))
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
-    const selectedContent = contents.find(c => String(c.id) === String(form.content))
     onCreate({
+      campaign: form.campaign,
       contact_list: form.contactList,
       sender: form.sender.trim(),
       body: form.body.trim(),
-      selectedContent,
     })
   }
 
@@ -148,11 +164,11 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
         {/* Modal body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto max-h-[76vh]">
 
-          {/* ① Content */}
+          {/* ① Campaign */}
           <div>
-            <SectionLabel number="1" note="Optional">Campaign Content</SectionLabel>
+            <SectionLabel number="1">Campaign</SectionLabel>
             <p className="text-xs text-[#CAC4CF]/60 mb-3">
-              Attach content to generate a trackable landing page for each recipient.
+              Select a campaign to connect the content link page used by <code className="text-[#60a5fa]">{'{{page_link}}'}</code>.
             </p>
             {loading ? (
               <div className="flex items-center gap-2 bg-[#111827] border border-[#3e6ff4]/30 rounded-lg px-4 py-2.5">
@@ -160,15 +176,20 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
                 <span className="text-[#CAC4CF]/50 text-sm">Loading...</span>
               </div>
             ) : (
-              <select value={form.content} onChange={e => field('content', e.target.value)} className={selectCls}>
-                <option value="">No content attached</option>
-                {contents.map(c => (
+              <select
+                value={form.campaign}
+                onChange={e => { field('campaign', e.target.value); setErrors(p => ({ ...p, campaign: '' })) }}
+                className={selectCls}
+              >
+                <option value="">Select a campaign...</option>
+                {campaigns.map(c => (
                   <option key={c.id} value={c.id}>
-                    #{c.id}{c.title ? ` — ${c.title}` : ''}
+                    {c.name ? `${c.name}` : `Campaign #${c.id}`}
                   </option>
                 ))}
               </select>
             )}
+            {errors.campaign && <p className="text-red-400 text-xs mt-1">{errors.campaign}</p>}
           </div>
 
           {/* Divider */}
@@ -206,10 +227,29 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
           {/* ③ SMS Body */}
           <div>
             <SectionLabel number="3">SMS Message</SectionLabel>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              {PERSONALIZATION_TOKENS.map(({ label, token }) => (
+                <button
+                  key={token}
+                  type="button"
+                  onClick={() => appendToken(token)}
+                  className="px-2.5 py-1 rounded-full border border-[#3e6ff4]/30 bg-[#3e6ff4]/10 text-[#93c5fd] text-xs font-medium hover:bg-[#3e6ff4]/20 hover:border-[#3e6ff4]/60 transition-colors"
+                >
+                  + {label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={insertTemplate}
+                className="px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-medium hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors"
+              >
+                Use Template
+              </button>
+            </div>
             <textarea
               rows={5}
               maxLength={1600}
-              placeholder="Type your SMS message here..."
+              placeholder="Hello {{first_name}}, tap here: {{page_link}}"
               value={form.body}
               onChange={e => { field('body', e.target.value); setErrors(p => ({ ...p, body: '' })) }}
               className={`${inputCls} resize-none leading-relaxed`}
@@ -217,7 +257,7 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
             <div className="flex items-center justify-between mt-1.5">
               {errors.body
                 ? <p className="text-red-400 text-xs">{errors.body}</p>
-                : <span className="text-xs text-[#CAC4CF]/40">Max 1600 characters</span>}
+                : <span className="text-xs text-[#CAC4CF]/40">Use <code className="text-[#93c5fd]">{'{{first_name}}'}</code> and <code className="text-[#93c5fd]">{'{{page_link}}'}</code> tokens. Max 1600 characters.</span>}
               <div className="flex items-center gap-2 text-xs text-[#CAC4CF]/50 shrink-0">
                 {form.body.length > 0 && (
                   <span className="text-[#60a5fa]/70 bg-[#3e6ff4]/10 px-2 py-0.5 rounded-full">
@@ -278,8 +318,9 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
 
 // ── SMS Row Card ──────────────────────────────────────────────────────────────
 
-function SmsCard({ sms, onDelete }) {
+function SmsCard({ sms, onDelete, onSend }) {
   const segs = smsSegments(sms.body)
+  const canSend = sms.status === 'draft' || sms.status === 'scheduled'
   return (
     <div className="bg-[#1f2937] border border-[#3e6ff4]/20 rounded-xl p-5 flex flex-col gap-3 hover:border-[#3e6ff4]/40 transition-all duration-200">
       {/* Top row */}
@@ -319,6 +360,18 @@ function SmsCard({ sms, onDelete }) {
 
       {/* Meta row */}
       <div className="flex items-center gap-4 text-xs text-[#CAC4CF]/50 border-t border-[#3e6ff4]/10 pt-2.5">
+        {canSend && (
+          <button
+            onClick={() => onSend(sms)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-2.5 py-1.5 text-[#60a5fa] hover:bg-[#3e6ff4]/20 hover:border-[#3e6ff4]/60 transition-colors"
+            title="Review cost and send"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+            Send
+          </button>
+        )}
         {sms.sender && (
           <div className="flex items-center gap-1.5">
             <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,6 +427,7 @@ function EmptyState({ tab, onCreateClick }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function SmsPage() {
+  const navigate = useNavigate()
   const [smsList, setSmsList] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -395,10 +449,10 @@ export default function SmsPage() {
 
   useEffect(() => { fetchSms() }, [])
 
-  const handleCreate = async ({ contact_list, sender, body, selectedContent }) => {
+  const handleCreate = async ({ campaign, contact_list, sender, body }) => {
     setSubmitting(true)
     try {
-      const newSms = await createSms({ contact_list, sender, body, status: 'draft' })
+      const newSms = await createSms({ campaign, contact_list, sender, body, status: 'draft' })
       
       setSmsList(prev => [newSms, ...prev])
       setShowModal(false)
@@ -416,6 +470,10 @@ export default function SmsPage() {
     } catch {
       // silent — user can retry
     }
+  }
+
+  const handleGoToSending = (sms) => {
+    navigate(`/sms/${sms.id}/sending`, { state: { sms } })
   }
 
   // Compute stats
@@ -511,7 +569,7 @@ export default function SmsPage() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 2xl:gap-3">
                   {filtered.map(sms => (
-                    <SmsCard key={sms.id} sms={sms} onDelete={handleDelete} />
+                    <SmsCard key={sms.id} sms={sms} onDelete={handleDelete} onSend={handleGoToSending} />
                   ))}
                 </div>
               )}

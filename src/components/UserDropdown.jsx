@@ -29,14 +29,20 @@ const UserDropdown = () => {
       {/* Dropdown Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#23253a]/50 border border-[#3e6ff4]/30 hover:bg-[#23253a] transition-colors duration-200"
+        className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#3e6ff4]/20 to-[#60a5fa]/20 border text-[#dbeafe] shadow-[0_0_0_1px_rgba(62,111,244,0.1)] transition-all duration-200 cursor-pointer ${
+          isOpen
+            ? 'border-[#60a5fa]/80 from-[#3e6ff4]/30 to-[#60a5fa]/30'
+            : 'border-[#3e6ff4]/40 hover:border-[#60a5fa]/70 hover:from-[#3e6ff4]/30 hover:to-[#60a5fa]/30'
+        }`}
+        title="Open profile menu"
+        aria-label="Open profile menu"
       >
-        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] flex items-center justify-center text-white text-xs font-semibold">
+        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] flex items-center justify-center text-white text-xs font-semibold shadow-[0_0_8px_rgba(96,165,250,0.45)]">
           U
         </div>
-        <span className="text-[#CAC4CF] text-xs font-medium hidden sm:inline">Profile</span>
+        <span className="text-[11px] uppercase tracking-wide text-[#bfdbfe]/90 hidden sm:inline">Profile</span>
         <svg
-          className={`w-4 h-4 text-[#CAC4CF] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-[#bfdbfe]/90 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

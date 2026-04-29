@@ -10,7 +10,7 @@ export async function saveDraft({ template, structure }) {
 
 // Body: { template, structure, status: 'published' }
 export async function publishContent({ template, structure }) {
-  const response = await axiosInstance.post('/api/content/v1', {
+  const response = await axiosInstance.post('/api/content/v1/', {
     template,
     structure,
     status: 'published',
