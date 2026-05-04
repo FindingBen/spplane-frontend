@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import SetPassword from './pages/SetPassword'
+import CustomersPage from './pages/CustomersPage'
 import Home from './pages/Home'
 import Templates from './pages/Templates'
 import Products from './pages/Products'
@@ -60,6 +61,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AudiencePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute>
+              <CustomersPage />
             </ProtectedRoute>
           }
         />

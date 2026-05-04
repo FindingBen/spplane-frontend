@@ -58,6 +58,21 @@ const SidebarNav = () => {
         Audience
       </button>
 
+      {/* Customers */}
+      <button
+        onClick={() => navigate('/customers')}
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+          isActive('/customers')
+            ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
+            : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+        }`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        Customers
+      </button>
+
       {/* SMS */}
       <button
         onClick={() => navigate('/sms')}
