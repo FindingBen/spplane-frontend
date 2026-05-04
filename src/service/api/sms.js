@@ -2,7 +2,7 @@ import axios from 'axios'
 import axiosInstance from '../interceptor/axiosInstance'
 
 const BASE = '/api/sms'
-const API_URL = 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_URL
 
 // ── SMS ───────────────────────────────────────────────────────────────────────
 

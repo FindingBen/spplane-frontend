@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { jwtDecode } from "jwt-decode";
 import { tokenService } from "../token/tokenService";
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Create ONE instance
 const axiosInstance = axios.create({
