@@ -36,3 +36,21 @@ export async function register(email, password, user_type) {
 
   return data
 }
+
+export async function shopifyCompleteSetup(setup_token, password) {
+  const response = await fetch(`${API_URL}/api/accounts/shopify/complete-setup/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ setup_token, password }),
+  })
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Setup failed')
+  }
+
+  return data
+}
