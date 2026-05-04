@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../service/api/auth'
 import { tokenService } from '../service/token/tokenService'
 
@@ -125,9 +125,9 @@ export default function Login() {
       </a>
       <p className="text-sm text-gray-400">
         Don't have an account?{" "}
-        <a href="#register" className="text-[#3e6ff4] font-semibold hover:underline">
+        <Link to="/register" className="text-[#3e6ff4] font-semibold hover:underline">
           Register
-        </a>
+        </Link>
       </p>
     </div>
 
