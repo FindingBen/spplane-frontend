@@ -53,6 +53,13 @@ export async function deleteContact(id) {
   await axiosInstance.delete(`${CONTACTS_BASE}/${id}/`)
 }
 
+// ── Shopify Import ──────────────────────────────────────────────────────────
+
+export async function importShopifyCustomers() {
+  const response = await axiosInstance.post('/api/contacts/customers/import/', {})
+  return response.data
+}
+
 // ── Segment Memberships ───────────────────────────────────────────────────────
 
 export async function addContactToSegment(segmentId, contact) {

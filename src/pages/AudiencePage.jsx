@@ -8,6 +8,7 @@ import {
   getContacts,
   addContactToSegment,
   removeContactFromSegment,
+  importShopifyCustomers,
 } from '../service/api/segments'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -268,6 +269,22 @@ const AudiencePage = () => {
   const [error, setError] = useState('')
   const [membersError, setMembersError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importMsg, setImportMsg] = useState('')
+
+  const handleShopifyImport = async () => {
+    setImporting(true)
+    setImportMsg('')
+    try {
+      const data = await importShopifyCustomers()
+      setImportMsg(data?.message ?? 'Customers imported successfully.')
+    } catch (err) {
+      const msg = err?.response?.data?.error ?? 'Import failed. Please try again.'
+      setImportMsg(msg)
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const fetchSegments = async () => {
     setLoading(true)
@@ -522,16 +539,47 @@ const AudiencePage = () => {
                   </h1>
                   <p className="text-sm md:text-base text-[#CAC4CF]">Manage your contact segments and recipient lists.</p>
                 </div>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start sm:self-auto"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  New Segment
-                </button>
+                <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
+                  <button
+                    onClick={handleShopifyImport}
+                    disabled={importing}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {importing ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                    )}
+                    {importing ? 'Importing…' : 'Import from Shopify'}
+                  </button>
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    New Segment
+                  </button>
+                </div>
               </div>
+
+              {/* Import feedback */}
+              {importMsg && (
+                <div className={`mb-5 flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm border ${importMsg.toLowerCase().includes('fail') || importMsg.toLowerCase().includes('error') || importMsg.toLowerCase().includes('not connected') ? 'bg-red-500/10 border-red-500/40 text-red-400' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'}`}>
+                  <span>{importMsg}</span>
+                  <button onClick={() => setImportMsg('')} className="shrink-0 p-1 hover:opacity-70 transition-opacity">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
 
               {/* Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 md:mb-8 2xl:mb-5">
