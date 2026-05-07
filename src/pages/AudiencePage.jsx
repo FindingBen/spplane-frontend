@@ -7,8 +7,7 @@ import {
   deleteContactList,
   getContacts,
   addContactToSegment,
-  removeContactFromSegment,
-  importShopifyCustomers,
+  removeContactFromSegment
 } from '../service/api/segments'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -272,19 +271,6 @@ const AudiencePage = () => {
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState('')
 
-  const handleShopifyImport = async () => {
-    setImporting(true)
-    setImportMsg('')
-    try {
-      const data = await importShopifyCustomers()
-      setImportMsg(data?.message ?? 'Customers imported successfully.')
-    } catch (err) {
-      const msg = err?.response?.data?.error ?? 'Import failed. Please try again.'
-      setImportMsg(msg)
-    } finally {
-      setImporting(false)
-    }
-  }
 
   const fetchSegments = async () => {
     setLoading(true)
@@ -540,23 +526,7 @@ const AudiencePage = () => {
                   <p className="text-sm md:text-base text-[#CAC4CF]">Manage your contact segments and recipient lists.</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
-                  <button
-                    onClick={handleShopifyImport}
-                    disabled={importing}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {importing ? (
-                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                      </svg>
-                    )}
-                    {importing ? 'Importing…' : 'Import from Shopify'}
-                  </button>
+            
                   <button
                     onClick={() => setShowCreateModal(true)}
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity"

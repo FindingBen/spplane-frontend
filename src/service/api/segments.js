@@ -56,7 +56,7 @@ export async function deleteContact(id) {
 // ── Shopify Import ──────────────────────────────────────────────────────────
 
 export async function importShopifyCustomers() {
-  const response = await axiosInstance.post('/api/contacts/customers/import/', {})
+  const response = await axiosInstance.post('/api/shopify/customers/import/', {})
   return response.data
 }
 

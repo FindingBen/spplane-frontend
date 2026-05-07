@@ -5,6 +5,7 @@ import {
   getContacts,
   createContact,
   deleteContact,
+  importShopifyCustomers
 } from '../service/api/segments'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -52,6 +53,143 @@ const SOURCE_OPTS = [
 
 const inputCls  = 'w-full bg-[#111827] border border-[#3e6ff4]/30 text-white rounded-lg px-3 py-2.5 text-sm placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4] transition-colors'
 const selectCls = 'w-full bg-[#111827] border border-[#3e6ff4]/30 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#3e6ff4] transition-colors'
+const PAGE_SIZE = 10
+
+const getVisiblePages = (currentPage, totalPages) => {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1)
+  }
+
+  const pages = [1]
+  const start = Math.max(2, currentPage - 1)
+  const end = Math.min(totalPages - 1, currentPage + 1)
+
+  if (start > 2) pages.push('start-ellipsis')
+  for (let page = start; page <= end; page += 1) pages.push(page)
+  if (end < totalPages - 1) pages.push('end-ellipsis')
+  pages.push(totalPages)
+
+  return pages
+}
+
+const humanizeKey = (value = '') => value
+  .replace(/[._-]+/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .replace(/\b\w/g, (char) => char.toUpperCase())
+
+const flattenErrorDetails = (value, path = '') => {
+  if (value == null || value === '') return []
+
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    const text = String(value)
+    return [path ? `${humanizeKey(path)}: ${text}` : text]
+  }
+
+  if (Array.isArray(value)) {
+    if (!value.length) return []
+
+    if (value.every((item) => item == null || ['string', 'number', 'boolean'].includes(typeof item))) {
+      const text = value.filter((item) => item != null && item !== '').map(String).join(', ')
+      return text ? [path ? `${humanizeKey(path)}: ${text}` : text] : []
+    }
+
+    return value.flatMap((item) => flattenErrorDetails(item, path))
+  }
+
+  if (typeof value === 'object') {
+    return Object.entries(value).flatMap(([key, nestedValue]) => {
+      if (['error', 'message', 'detail', 'status', 'code'].includes(key)) {
+        return []
+      }
+
+      const nextPath = ['errors', 'details'].includes(key)
+        ? path
+        : (path ? `${path} ${key}` : key)
+
+      return flattenErrorDetails(nestedValue, nextPath)
+    })
+  }
+
+  return []
+}
+
+const buildImportErrorNotice = (err) => {
+  const payload = err?.response?.data
+  const headline = payload?.error || payload?.detail || payload?.message || err?.message || 'Shopify import failed.'
+  const details = [...new Set(flattenErrorDetails(payload).filter((detail) => detail !== headline))].slice(0, 6)
+
+  let description = 'We could not finish importing customers from Shopify.'
+  if (err?.response?.status === 400) {
+    description = 'Shopify returned validation problems. Review the details below and retry the import.'
+  } else if ([401, 403].includes(err?.response?.status)) {
+    description = 'Your Shopify connection may need to be reauthorized before another import can run.'
+  } else if (details.length > 0) {
+    description = 'Review the issues below, fix what applies in Shopify, and retry the import.'
+  }
+
+  return { headline, description, details }
+}
+
+function ImportErrorBanner({ notice, retrying, onRetry, onDismiss }) {
+  return (
+    <div className="mb-5 overflow-hidden rounded-2xl border border-red-500/35 bg-[radial-gradient(circle_at_top_left,_rgba(248,113,113,0.18),_rgba(127,29,29,0.08)_24%,_rgba(17,24,39,0.92)_60%)] shadow-[0_20px_40px_rgba(0,0,0,0.28)]">
+      <div className="flex flex-col gap-4 p-4 md:flex-row md:items-start md:justify-between">
+        <div className="flex gap-3 min-w-0">
+          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-red-400/30 bg-red-500/12 text-red-300">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+            </svg>
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-semibold text-red-100">Shopify Import Failed</p>
+              <span className="rounded-full border border-red-400/25 bg-red-500/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.18em] text-red-200/80">
+                Needs Attention
+              </span>
+            </div>
+
+            <p className="mt-1 text-sm font-medium text-white">{notice.headline}</p>
+            <p className="mt-1 text-xs leading-5 text-red-100/75">{notice.description}</p>
+
+            {notice.details.length > 0 && (
+              <div className="mt-3 rounded-xl border border-white/8 bg-black/15 px-3 py-2.5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-red-100/55">Import Details</p>
+                <ul className="mt-2 space-y-2">
+                  {notice.details.map((detail, index) => (
+                    <li key={`${detail}-${index}`} className="flex gap-2 text-xs leading-5 text-red-50/90">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-red-300" />
+                      <span>{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 self-end md:self-start">
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
+          >
+            Dismiss
+          </button>
+          <button
+            type="button"
+            onClick={onRetry}
+            disabled={retrying}
+            className="rounded-xl border border-red-300/25 bg-red-500/14 px-3 py-2 text-xs font-semibold text-red-100 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {retrying ? 'Retrying…' : 'Retry Import'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ── Create Customer Modal ─────────────────────────────────────────────────────
 
@@ -148,10 +286,28 @@ export default function CustomersPage() {
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [importErrorNotice, setImportErrorNotice] = useState(null)
   const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [importing, setImporting] = useState(false)
+
+  const filtered = contacts.filter(c => {
+    const q = search.toLowerCase()
+    return (
+      c.phone?.toLowerCase().includes(q) ||
+      c.first_name?.toLowerCase().includes(q) ||
+      c.last_name?.toLowerCase().includes(q)
+    )
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const pageStartIndex = (currentPage - 1) * PAGE_SIZE
+  const paginatedContacts = filtered.slice(pageStartIndex, pageStartIndex + PAGE_SIZE)
+  const pageEndIndex = Math.min(pageStartIndex + PAGE_SIZE, filtered.length)
+  const visiblePages = getVisiblePages(currentPage, totalPages)
 
   const fetchContacts = async () => {
     setLoading(true)
@@ -167,6 +323,10 @@ export default function CustomersPage() {
   }
 
   useEffect(() => { fetchContacts() }, [])
+  useEffect(() => { setCurrentPage(1) }, [search])
+  useEffect(() => {
+    setCurrentPage(prev => Math.min(prev, totalPages))
+  }, [totalPages])
 
   const handleCreate = async (form) => {
     setSubmitting(true)
@@ -179,6 +339,7 @@ export default function CustomersPage() {
         source: form.source,
       })
       setContacts(prev => [created, ...prev])
+      setCurrentPage(1)
     } finally {
       setSubmitting(false)
     }
@@ -195,14 +356,19 @@ export default function CustomersPage() {
     }
   }
 
-  const filtered = contacts.filter(c => {
-    const q = search.toLowerCase()
-    return (
-      c.phone?.toLowerCase().includes(q) ||
-      c.first_name?.toLowerCase().includes(q) ||
-      c.last_name?.toLowerCase().includes(q)
-    )
-  })
+  const handleShopifyImport = async () => {
+    setImporting(true)
+    setImportErrorNotice(null)
+    try {
+      await importShopifyCustomers()
+      await fetchContacts()
+      setCurrentPage(1)
+    } catch (err) {
+      setImportErrorNotice(buildImportErrorNotice(err))
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const subscribedCount = contacts.filter(c => c.status === 'subscribed').length
   const shopifyCount    = contacts.filter(c => c.source === 'shopify').length
@@ -224,16 +390,41 @@ export default function CustomersPage() {
                   </h1>
                   <p className="text-sm md:text-base text-[#CAC4CF]">All imported and manually added contacts.</p>
                 </div>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start sm:self-auto"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  New Customer
-                </button>
+                <div className='flex flex-row gap-2'>
+                  <button
+                    onClick={handleShopifyImport}
+                    disabled={importing}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {importing ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                    )}
+                    {importing ? 'Importing…' : 'Import from Shopify'}
+                  </button>
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors"
+                  >
+                    Create
+                  </button>
+                </div>
               </div>
+
+              {importErrorNotice && (
+                <ImportErrorBanner
+                  notice={importErrorNotice}
+                  retrying={importing}
+                  onRetry={handleShopifyImport}
+                  onDismiss={() => setImportErrorNotice(null)}
+                />
+              )}
 
               {/* Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 md:mb-8 2xl:mb-5">
@@ -281,7 +472,10 @@ export default function CustomersPage() {
                   type="text"
                   placeholder="Search by name or phone…"
                   value={search}
-                  onChange={e => setSearch(e.target.value)}
+                  onChange={e => {
+                    setSearch(e.target.value)
+                    setCurrentPage(1)
+                  }}
                   className="w-full pl-9 pr-4 py-2.5 bg-[#1f2937] border border-[#3e6ff4]/20 text-white rounded-xl text-sm placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4] transition-colors"
                 />
               </div>
@@ -333,14 +527,14 @@ export default function CustomersPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#3e6ff4]/10">
-                      {filtered.map((c, idx) => {
+                      {paginatedContacts.map((c, idx) => {
                         const displayName = [c.first_name, c.last_name].filter(Boolean).join(' ') || '—'
                         const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join('').toUpperCase() || c.phone?.slice(-2)
                         return (
-                          <tr key={c.id} className="hover:bg-[#3e6ff4]/5 transition-colors">
+                          <tr key={c.id} className="hover:bg-[#3e6ff4]/5 transition-colors text-left">
                             <td className="py-3.5 px-4">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={avatarStyle(idx)}>
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={avatarStyle(pageStartIndex + idx)}>
                                   {initials}
                                 </div>
                                 <span className="text-white font-medium">{displayName}</span>
@@ -395,9 +589,67 @@ export default function CustomersPage() {
               )}
 
               {filtered.length > 0 && (
-                <p className="text-xs text-[#CAC4CF]/50 mt-3">
-                  {filtered.length} of {contacts.length} customer{contacts.length !== 1 ? 's' : ''}
-                </p>
+                <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#CAC4CF]/60">
+                    <span>
+                      Showing <span className="font-semibold text-white">{pageStartIndex + 1}-{pageEndIndex}</span> of <span className="font-semibold text-white">{filtered.length}</span> customer{filtered.length !== 1 ? 's' : ''}
+                    </span>
+                    {filtered.length !== contacts.length && (
+                      <span className="rounded-full border border-[#3e6ff4]/20 bg-[#3e6ff4]/8 px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-[#60a5fa]">
+                        Filtered from {contacts.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {totalPages > 1 && (
+                    <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="inline-flex items-center gap-2 rounded-xl border border-[#3e6ff4]/20 bg-[#111827]/70 px-3 py-2 text-xs font-medium text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Prev
+                      </button>
+
+                      <div className="hidden items-center gap-1.5 sm:flex">
+                        {visiblePages.map((page, index) => (
+                          page === 'start-ellipsis' || page === 'end-ellipsis' ? (
+                            <span key={`${page}-${index}`} className="px-2 text-xs text-[#CAC4CF]/40">...</span>
+                          ) : (
+                            <button
+                              key={page}
+                              type="button"
+                              onClick={() => setCurrentPage(page)}
+                              className={`h-9 min-w-9 rounded-xl px-3 text-xs font-semibold transition-colors ${currentPage === page ? 'bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white shadow-[0_10px_24px_rgba(62,111,244,0.28)]' : 'border border-[#3e6ff4]/20 bg-[#111827]/70 text-[#CAC4CF] hover:border-[#3e6ff4]/40 hover:text-white'}`}
+                            >
+                              {page}
+                            </button>
+                          )
+                        ))}
+                      </div>
+
+                      <div className="rounded-xl border border-[#3e6ff4]/20 bg-[#111827]/70 px-3 py-2 text-xs font-medium text-[#CAC4CF] sm:hidden">
+                        Page <span className="text-white">{currentPage}</span> / <span className="text-white">{totalPages}</span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="inline-flex items-center gap-2 rounded-xl border border-[#3e6ff4]/20 bg-[#111827]/70 px-3 py-2 text-xs font-medium text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Next
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </main>
