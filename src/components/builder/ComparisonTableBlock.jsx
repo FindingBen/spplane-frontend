@@ -1,30 +1,34 @@
 // ComparisonTableBlock — Feature comparison table (us vs. competitor)
 
-export const ComparisonTablePreview = ({ props = {} }) => (
-  <div className="w-full px-3 py-3 bg-white">
-    {props.title && <h3 className="text-xs font-bold text-black mb-2">{props.title}</h3>}
-    <div className="w-full overflow-hidden rounded border border-gray-200">
-      <table className="w-full text-[9px]">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="text-left px-2 py-1 text-gray-600 font-semibold w-1/3">Feature</th>
-            <th className="text-center px-2 py-1 text-green-700 font-semibold w-1/3">Us</th>
-            <th className="text-center px-2 py-1 text-gray-500 font-semibold w-1/3">Them</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(props.comparisons || []).map((row, idx) => (
-            <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-              <td className="px-2 py-1 text-black font-medium">{row.feature}</td>
-              <td className="px-2 py-1 text-green-700 text-center">{row.us}</td>
-              <td className="px-2 py-1 text-gray-500 text-center">{row.competitor}</td>
+export const ComparisonTablePreview = ({ props = {}, variant = 'builder' }) => {
+  const isPublic = variant === 'public'
+
+  return (
+    <div className={isPublic ? 'w-full px-5 py-5 bg-white' : 'w-full px-3 py-3 bg-white'}>
+      {props.title && <h3 className={isPublic ? 'text-lg font-bold text-black text-left mb-3' : 'text-xs font-bold text-black mb-2'}>{props.title}</h3>}
+      <div className={isPublic ? 'w-full overflow-hidden rounded-2xl border border-gray-200 shadow-sm' : 'w-full overflow-hidden rounded border border-gray-200'}>
+        <table className={isPublic ? 'w-full text-xs' : 'w-full text-[9px]'}>
+          <thead>
+            <tr className="bg-gray-100">
+              <th className={isPublic ? 'text-left px-3 py-2.5 text-gray-600 font-semibold w-1/3' : 'text-left px-2 py-1 text-gray-600 font-semibold w-1/3'}>Feature</th>
+              <th className={isPublic ? 'text-center px-3 py-2.5 text-green-700 font-semibold w-1/3' : 'text-center px-2 py-1 text-green-700 font-semibold w-1/3'}>Us</th>
+              <th className={isPublic ? 'text-center px-3 py-2.5 text-gray-500 font-semibold w-1/3' : 'text-center px-2 py-1 text-gray-500 font-semibold w-1/3'}>Them</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {(props.comparisons || []).map((row, idx) => (
+              <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                <td className={isPublic ? 'px-3 py-3 text-black font-medium text-left align-top' : 'px-2 py-1 text-black font-medium'}>{row.feature}</td>
+                <td className={isPublic ? 'px-3 py-3 text-green-700 text-center align-top' : 'px-2 py-1 text-green-700 text-center'}>{row.us}</td>
+                <td className={isPublic ? 'px-3 py-3 text-gray-500 text-center align-top' : 'px-2 py-1 text-gray-500 text-center'}>{row.competitor}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export const ComparisonTableEditor = ({ props = {}, onChange }) => {
   const comparisons = props.comparisons || []

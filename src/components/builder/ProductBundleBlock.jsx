@@ -1,39 +1,43 @@
 // ProductBundleBlock — Horizontal product cards with bundle CTA
 
-export const ProductBundlePreview = ({ props = {} }) => (
-  <div className="w-full px-3 py-3 bg-white">
-    {props.title && <h3 className="text-xs font-bold text-black mb-0.5">{props.title}</h3>}
-    {props.subtitle && <p className="text-[10px] text-gray-500 mb-2">{props.subtitle}</p>}
-    <div className="flex gap-2 overflow-x-auto pb-1">
-      {(props.products || []).map((product, idx) => (
-        <div key={idx} className="flex-shrink-0 w-24 bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
-          {product.image ? (
-            <img src={product.image} alt={product.name} className="w-full h-16 object-cover" />
-          ) : (
-            <div className="w-full h-16 bg-gray-200 flex items-center justify-center">
-              <span className="text-[9px] text-gray-400">No image</span>
+export const ProductBundlePreview = ({ props = {}, variant = 'builder' }) => {
+  const isPublic = variant === 'public'
+
+  return (
+    <div className={isPublic ? 'w-full px-5 py-5 bg-white' : 'w-full px-3 py-3 bg-white'}>
+      {props.title && <h3 className={isPublic ? 'text-lg font-bold text-black text-left mb-1' : 'text-xs font-bold text-black mb-0.5'}>{props.title}</h3>}
+      {props.subtitle && <p className={isPublic ? 'text-sm text-gray-500 text-left mb-4' : 'text-[10px] text-gray-500 mb-2'}>{props.subtitle}</p>}
+      <div className={isPublic ? 'flex gap-3 overflow-x-auto pb-2' : 'flex gap-2 overflow-x-auto pb-1'}>
+        {(props.products || []).map((product, idx) => (
+          <div key={idx} className={isPublic ? 'flex-shrink-0 w-36 bg-gray-50 rounded-2xl overflow-hidden border border-gray-200 shadow-sm' : 'flex-shrink-0 w-24 bg-gray-50 rounded-lg overflow-hidden border border-gray-200'}>
+            {product.image ? (
+              <img src={product.image} alt={product.name} className={isPublic ? 'w-full h-28 object-cover' : 'w-full h-16 object-cover'} />
+            ) : (
+              <div className={isPublic ? 'w-full h-28 bg-gray-200 flex items-center justify-center' : 'w-full h-16 bg-gray-200 flex items-center justify-center'}>
+                <span className={isPublic ? 'text-xs text-gray-400' : 'text-[9px] text-gray-400'}>No image</span>
+              </div>
+            )}
+            <div className={isPublic ? 'p-3 text-left' : 'p-1'}>
+              <p className={isPublic ? 'text-sm font-semibold text-black truncate' : 'text-[10px] font-semibold text-black truncate'}>{product.name}</p>
+              <p className={isPublic ? 'text-sm text-green-700 font-semibold mt-1' : 'text-[10px] text-green-700 font-medium'}>{product.price}</p>
             </div>
-          )}
-          <div className="p-1">
-            <p className="text-[10px] font-semibold text-black truncate">{product.name}</p>
-            <p className="text-[10px] text-green-700 font-medium">{product.price}</p>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
+      {props.bundleCtaText && (
+        <a
+          href={props.bundleCtaLink || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={isPublic ? 'block w-full mt-4 py-3.5 bg-black text-white text-sm font-bold text-center rounded-2xl' : 'block w-full mt-2 py-2 bg-black text-white text-[10px] font-bold text-center rounded-lg'}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {props.bundleCtaText}
+        </a>
+      )}
     </div>
-    {props.bundleCtaText && (
-      <a
-        href={props.bundleCtaLink || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block w-full mt-2 py-2 bg-black text-white text-[10px] font-bold text-center rounded-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {props.bundleCtaText}
-      </a>
-    )}
-  </div>
-)
+  )
+}
 
 export const ProductBundleEditor = ({ props = {}, onChange }) => {
   const products = props.products || []

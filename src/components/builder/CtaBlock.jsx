@@ -13,20 +13,29 @@ const STYLE_CLASSES = {
   success: 'bg-green-700 text-white',
 }
 
-export const CtaPreview = ({ props = {} }) => {
-  const sizeClass = SIZE_CLASSES[props.size] || SIZE_CLASSES.large
+const PUBLIC_SIZE_CLASSES = {
+  small: 'py-3 text-sm',
+  medium: 'py-3.5 text-base',
+  large: 'py-4 text-base',
+}
+
+export const CtaPreview = ({ props = {}, variant = 'builder' }) => {
+  const isPublic = variant === 'public'
+  const sizeClass = isPublic
+    ? (PUBLIC_SIZE_CLASSES[props.size] || PUBLIC_SIZE_CLASSES.large)
+    : (SIZE_CLASSES[props.size] || SIZE_CLASSES.large)
   const styleClass = STYLE_CLASSES[props.style] || STYLE_CLASSES.primary
 
   return (
-    <div className={`w-full px-3 py-2 bg-white ${props.sticky ? 'border-t-2 border-gray-200 shadow-lg' : ''}`}>
-      {props.sticky && (
+    <div className={`w-full bg-white ${isPublic ? 'px-5 py-4' : 'px-3 py-2'} ${props.sticky ? 'border-t-2 border-gray-200 shadow-lg' : ''}`}>
+      {props.sticky && !isPublic && (
         <p className="text-[8px] text-gray-400 text-center mb-1 uppercase tracking-wide">Sticky Bar</p>
       )}
       <a
         href={props.link || '#'}
         target="_blank"
         rel="noopener noreferrer"
-        className={`block w-full text-center font-bold rounded-lg ${sizeClass} ${styleClass}`}
+        className={`block w-full text-center font-bold ${isPublic ? 'rounded-2xl' : 'rounded-lg'} ${sizeClass} ${styleClass}`}
         onClick={(e) => e.stopPropagation()}
       >
         {props.text || 'Buy Now'}

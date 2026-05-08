@@ -1,20 +1,21 @@
 // InventoryTrackerBlock — Live stock count from Shopify (simulated in builder)
 
-export const InventoryTrackerPreview = ({ props = {} }) => {
+export const InventoryTrackerPreview = ({ props = {}, variant = 'builder' }) => {
   const sampleRemaining = 3
   const isUrgent = sampleRemaining <= (props.urgencyThreshold || 5)
   const message = isUrgent
     ? (props.urgencyMessage || 'Last {remaining} available - order now!').replace('{remaining}', sampleRemaining)
     : (props.messageTemplate || 'Only {remaining} left in stock!').replace('{remaining}', sampleRemaining)
+  const isPublic = variant === 'public'
 
   return (
-    <div className={`w-full px-3 py-2 ${isUrgent ? 'bg-red-50' : 'bg-orange-50'}`}>
-      <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isUrgent ? 'bg-red-500' : 'bg-orange-400'} animate-pulse`} />
-        <p className={`text-[10px] font-semibold ${isUrgent ? 'text-red-600' : 'text-orange-600'}`}>{message}</p>
+    <div className={`${isPublic ? 'w-full px-5 py-4 border-y' : 'w-full px-3 py-2'} ${isUrgent ? 'bg-red-50 border-red-100' : 'bg-orange-50 border-orange-100'}`}>
+      <div className={isPublic ? 'flex items-start gap-3' : 'flex items-center gap-2'}>
+        <div className={`${isPublic ? 'w-2.5 h-2.5 mt-1' : 'w-2 h-2'} rounded-full flex-shrink-0 ${isUrgent ? 'bg-red-500' : 'bg-orange-400'} animate-pulse`} />
+        <p className={`${isPublic ? 'text-sm leading-6' : 'text-[10px]'} font-semibold ${isUrgent ? 'text-red-600' : 'text-orange-600'}`}>{message}</p>
       </div>
       {props.shopifyProductId && (
-        <p className="text-[9px] text-gray-400 mt-0.5 truncate">ID: {props.shopifyProductId}</p>
+        <p className={isPublic ? 'text-xs text-gray-400 mt-2 truncate text-left' : 'text-[9px] text-gray-400 mt-0.5 truncate'}>ID: {props.shopifyProductId}</p>
       )}
     </div>
   )

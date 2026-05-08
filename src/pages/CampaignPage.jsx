@@ -102,7 +102,7 @@ function CreateCampaignModal({ onClose, onCreate, submitting }) {
                 <option value="">None</option>
                 {contents.map(c => (
                   <option key={c.id} value={c.id}>
-                    #{c.id}{c.title ? ` — ${c.title}` : ''}
+                    {c.name || c.title || `Content #${c.id}`}
                   </option>
                 ))}
               </select>

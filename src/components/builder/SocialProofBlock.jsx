@@ -1,26 +1,30 @@
 // SocialProofBlock — Customer reviews with star ratings
 
-export const SocialProofPreview = ({ props = {} }) => (
-  <div className="w-full px-3 py-3 bg-white">
-    {props.title && <h3 className="text-xs font-bold text-black mb-2">{props.title}</h3>}
-    <div className="space-y-2">
-      {(props.reviews || []).map((review, idx) => (
-        <div key={idx} className="bg-gray-50 rounded-lg p-2 border border-gray-100">
-          <div className="flex items-center gap-0.5 mb-1">
-            {Array.from({ length: review.rating || 0 }).map((_, i) => (
-              <span key={i} className="text-yellow-400 text-[11px]">★</span>
-            ))}
-            {Array.from({ length: 5 - (review.rating || 0) }).map((_, i) => (
-              <span key={i} className="text-gray-300 text-[11px]">★</span>
-            ))}
+export const SocialProofPreview = ({ props = {}, variant = 'builder' }) => {
+  const isPublic = variant === 'public'
+
+  return (
+    <div className={isPublic ? 'w-full px-5 py-5 bg-white' : 'w-full px-3 py-3 bg-white'}>
+      {props.title && <h3 className={isPublic ? 'text-lg font-bold text-black text-left mb-3' : 'text-xs font-bold text-black mb-2'}>{props.title}</h3>}
+      <div className={isPublic ? 'space-y-3' : 'space-y-2'}>
+        {(props.reviews || []).map((review, idx) => (
+          <div key={idx} className={isPublic ? 'bg-gray-50 rounded-2xl p-4 border border-gray-100 text-left shadow-sm' : 'bg-gray-50 rounded-lg p-2 border border-gray-100'}>
+            <div className={isPublic ? 'flex items-center gap-1 mb-2' : 'flex items-center gap-0.5 mb-1'}>
+              {Array.from({ length: review.rating || 0 }).map((_, i) => (
+                <span key={i} className={isPublic ? 'text-yellow-400 text-base' : 'text-yellow-400 text-[11px]'}>★</span>
+              ))}
+              {Array.from({ length: 5 - (review.rating || 0) }).map((_, i) => (
+                <span key={i} className={isPublic ? 'text-gray-300 text-base' : 'text-gray-300 text-[11px]'}>★</span>
+              ))}
+            </div>
+            <p className={isPublic ? 'text-sm text-gray-700 leading-6' : 'text-[10px] text-gray-700 leading-relaxed'}>"{review.text}"</p>
+            <p className={isPublic ? 'text-xs text-gray-500 mt-3 font-semibold' : 'text-[9px] text-gray-500 mt-1 font-semibold'}>— {review.author}</p>
           </div>
-          <p className="text-[10px] text-gray-700 leading-relaxed">"{review.text}"</p>
-          <p className="text-[9px] text-gray-500 mt-1 font-semibold">— {review.author}</p>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export const SocialProofEditor = ({ props = {}, onChange }) => {
   const reviews = props.reviews || []
