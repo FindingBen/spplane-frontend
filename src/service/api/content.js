@@ -10,17 +10,11 @@ function buildContentFormData({ template, structure, status, uploads = {} }) {
     formData.append('status', status)
   }
 
-  if (uploads.heroImage) {
-    formData.append('hero-image', uploads.heroImage)
-  }
-
-  if (uploads.heroVideo) {
-    formData.append('hero-video', uploads.heroVideo)
-  }
-
-  if (uploads.heroVideoPoster) {
-    formData.append('hero-video__poster', uploads.heroVideoPoster)
-  }
+  Object.entries(uploads).forEach(([fieldName, file]) => {
+    if (file) {
+      formData.append(fieldName, file)
+    }
+  })
 
   return formData
 }

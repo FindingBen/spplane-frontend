@@ -27,6 +27,66 @@ const hasUploadData = (uploads = {}) => Boolean(
   || uploads.heroVideoPosterPreviewUrl
 )
 
+const BLOCK_UPLOAD_CONFIG = {
+  'video-hero': [
+    { uploadKey: 'heroVideoFile', propKey: 'videoUrl', fieldPrefix: 'video-file' },
+    { uploadKey: 'heroImageFile', propKey: 'fallbackImage', fieldPrefix: 'image-file' },
+    { uploadKey: 'heroVideoPosterFile', propKey: 'posterImage', fieldPrefix: 'poster-image-file' },
+  ],
+}
+
+const getUploadFieldName = (blockId, fieldPrefix) => `${fieldPrefix}-${blockId}`
+
+const serializeBlockForSubmission = (block, uploads = {}) => {
+  const uploadConfig = BLOCK_UPLOAD_CONFIG[block.type]
+
+  if (!uploadConfig) {
+    return block
+  }
+
+  const { uploadFields: _ignoredUploadFields, ...nextProps } = block.props ?? {}
+  const nextUploadFields = {}
+
+  uploadConfig.forEach(({ uploadKey, propKey, fieldPrefix }) => {
+    if (!uploads[uploadKey]) {
+      return
+    }
+
+    nextProps[propKey] = ''
+    nextUploadFields[propKey] = {
+      uploadField: getUploadFieldName(block.id, fieldPrefix),
+    }
+  })
+
+  if (Object.keys(nextUploadFields).length > 0) {
+    nextProps.uploadFields = nextUploadFields
+  }
+
+  return {
+    ...block,
+    props: nextProps,
+  }
+}
+
+const collectUploadsForSubmission = (blocks, blockUploads) => blocks.reduce((uploads, block) => {
+  const blockUploadConfig = BLOCK_UPLOAD_CONFIG[block.type]
+  const currentBlockUploads = blockUploads[block.id]
+
+  if (!blockUploadConfig || !currentBlockUploads) {
+    return uploads
+  }
+
+  blockUploadConfig.forEach(({ uploadKey, fieldPrefix }) => {
+    const file = currentBlockUploads[uploadKey]
+
+    if (file) {
+      uploads[getUploadFieldName(block.id, fieldPrefix)] = file
+    }
+  })
+
+  return uploads
+}, {})
+
 const ContentBuilder = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -214,19 +274,17 @@ const ContentBuilder = () => {
       description: metadata.description,
       smsExclusiveOffer: metadata.smsExclusiveOffer,
     },
-    blocks: blocks.map(({ id, ...block }) => block),
+    blocks: blocks.map((block) => {
+      const { id: _ID, ...serializedBlock } = serializeBlockForSubmission(
+        block,
+        blockUploads[block.id],
+      )
+
+      return serializedBlock
+    }),
   })
 
-  const buildUploads = () => {
-    const heroBlock = blocks.find((block) => block.type === 'video-hero' && blockUploads[block.id])
-    const heroUploads = heroBlock ? blockUploads[heroBlock.id] : null
-
-    return {
-      heroImage: heroUploads?.heroImageFile ?? null,
-      heroVideo: heroUploads?.heroVideoFile ?? null,
-      heroVideoPoster: heroUploads?.heroVideoPosterFile ?? null,
-    }
-  }
+  const buildUploads = () => collectUploadsForSubmission(blocks, blockUploads)
 
   const submitContent = async (submitRequest, message) => {
     setLoadingMessage(message)
