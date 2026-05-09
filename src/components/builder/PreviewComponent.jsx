@@ -6,12 +6,12 @@ import { SocialProofPreview } from './SocialProofBlock'
 import { CountdownTimerPreview } from './CountdownTimerBlock'
 import { CtaPreview } from './CtaBlock'
 
-const PreviewComponent = ({ component, variant = 'builder' }) => {
+const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
   const { type, props = {} } = component
 
   switch (type) {
     case 'video-hero':
-      return <VideoHeroPreview props={props} variant={variant} />
+      return <VideoHeroPreview props={props} uploads={uploads} variant={variant} />
     case 'product-bundle':
       return <ProductBundlePreview props={props} variant={variant} />
     case 'comparison-table':

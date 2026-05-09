@@ -1,19 +1,21 @@
 // VideoHeroBlock — Video hero with fallback image and play overlay
 
-export const VideoHeroPreview = ({ props = {}, variant = 'builder' }) => {
+export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder' }) => {
   const isPublic = variant === 'public'
+  const previewImage = uploads.heroVideoPosterPreviewUrl || uploads.heroImagePreviewUrl || props.fallbackImage
+  const emptyStateLabel = uploads.heroVideoFileName ? `Selected video: ${uploads.heroVideoFileName}` : 'No preview image set'
 
   return (
     <div className="w-full relative bg-white">
-      {props.fallbackImage ? (
+      {previewImage ? (
         <img
-          src={props.fallbackImage}
+          src={previewImage}
           alt={props.title || 'Video'}
           className={isPublic ? 'w-full h-72 object-cover' : 'w-full h-40 object-cover'}
         />
       ) : (
         <div className={isPublic ? 'w-full h-72 bg-gray-900 flex items-center justify-center' : 'w-full h-40 bg-gray-900 flex items-center justify-center'}>
-          <span className={isPublic ? 'text-sm text-gray-400' : 'text-xs text-gray-400'}>No preview image set</span>
+          <span className={isPublic ? 'text-sm text-gray-400 px-4 text-center' : 'text-[10px] text-gray-400 px-2 text-center'}>{emptyStateLabel}</span>
         </div>
       )}
       <div className="absolute inset-0 flex items-center justify-center">
@@ -34,7 +36,7 @@ export const VideoHeroPreview = ({ props = {}, variant = 'builder' }) => {
   )
 }
 
-export const VideoHeroEditor = ({ props = {}, onChange }) => (
+export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadChange }) => (
   <>
     <div>
       <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Video URL</label>
@@ -47,6 +49,27 @@ export const VideoHeroEditor = ({ props = {}, onChange }) => (
       />
     </div>
     <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Video File</label>
+      <input
+        type="file"
+        accept="video/*"
+        onChange={(e) => onUploadChange('heroVideoFile', e.target.files?.[0] ?? null)}
+        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
+      />
+      {uploads.heroVideoFileName && (
+        <div className="mt-2 flex items-center justify-between gap-2 text-xs text-[#CAC4CF]">
+          <span className="truncate">{uploads.heroVideoFileName}</span>
+          <button
+            type="button"
+            onClick={() => onUploadChange('heroVideoFile', null)}
+            className="text-[#60a5fa] hover:text-white transition-colors"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+    </div>
+    <div>
       <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Title</label>
       <input
         type="text"
@@ -54,6 +77,27 @@ export const VideoHeroEditor = ({ props = {}, onChange }) => (
         onChange={(e) => onChange('title', e.target.value)}
         className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
       />
+    </div>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Hero Image Upload</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => onUploadChange('heroImageFile', e.target.files?.[0] ?? null)}
+        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
+      />
+      {uploads.heroImagePreviewUrl && (
+        <div className="mt-2 space-y-2">
+          <img src={uploads.heroImagePreviewUrl} alt="Hero upload preview" className="w-full h-24 object-cover rounded border border-[#3e6ff4]/20" />
+          <button
+            type="button"
+            onClick={() => onUploadChange('heroImageFile', null)}
+            className="text-xs text-[#60a5fa] hover:text-white transition-colors"
+          >
+            Clear hero image
+          </button>
+        </div>
+      )}
     </div>
     <div>
       <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Fallback Image URL</label>
@@ -64,6 +108,27 @@ export const VideoHeroEditor = ({ props = {}, onChange }) => (
         placeholder="https://..."
         className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
       />
+    </div>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Poster Image Upload</label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => onUploadChange('heroVideoPosterFile', e.target.files?.[0] ?? null)}
+        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
+      />
+      {uploads.heroVideoPosterPreviewUrl && (
+        <div className="mt-2 space-y-2">
+          <img src={uploads.heroVideoPosterPreviewUrl} alt="Poster upload preview" className="w-full h-24 object-cover rounded border border-[#3e6ff4]/20" />
+          <button
+            type="button"
+            onClick={() => onUploadChange('heroVideoPosterFile', null)}
+            className="text-xs text-[#60a5fa] hover:text-white transition-colors"
+          >
+            Clear poster image
+          </button>
+        </div>
+      )}
     </div>
     <div className="flex flex-col gap-2">
       {['autoplay', 'muted', 'loop'].map((flag) => (

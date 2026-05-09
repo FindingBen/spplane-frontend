@@ -6,7 +6,7 @@ import { SocialProofEditor } from './SocialProofBlock'
 import { CountdownTimerEditor } from './CountdownTimerBlock'
 import { CtaEditor } from './CtaBlock'
 
-const ComponentEditor = ({ component, onUpdate }) => {
+const ComponentEditor = ({ component, uploads, onUpdate, onUploadChange }) => {
   const { type, props = {} } = component
 
   const onChange = (key, value) => {
@@ -22,7 +22,9 @@ const ComponentEditor = ({ component, onUpdate }) => {
         </div>
       </div>
 
-      {type === 'video-hero' && <VideoHeroEditor props={props} onChange={onChange} />}
+      {type === 'video-hero' && (
+        <VideoHeroEditor props={props} uploads={uploads} onChange={onChange} onUploadChange={onUploadChange} />
+      )}
       {type === 'product-bundle' && <ProductBundleEditor props={props} onChange={onChange} />}
       {type === 'comparison-table' && <ComparisonTableEditor props={props} onChange={onChange} />}
       {type === 'inventory-tracker' && <InventoryTrackerEditor props={props} onChange={onChange} />}

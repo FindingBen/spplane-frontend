@@ -1,17 +1,38 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import { saveDraft, publishContent } from '../service/api/content'
+import { saveDraft as saveDraftContent, publishContent } from '../service/api/content'
 import PreviewComponent from '../components/builder/PreviewComponent'
 import ComponentEditor from '../components/builder/ComponentEditor'
 import Loader from '../components/Loader'
+
+const revokePreviewUrl = (url) => {
+  if (typeof url === 'string' && url.startsWith('blob:')) {
+    URL.revokeObjectURL(url)
+  }
+}
+
+const revokeUploadPreviewUrls = (uploads = {}) => {
+  revokePreviewUrl(uploads.heroImagePreviewUrl)
+  revokePreviewUrl(uploads.heroVideoPosterPreviewUrl)
+}
+
+const hasUploadData = (uploads = {}) => Boolean(
+  uploads.heroImageFile
+  || uploads.heroImagePreviewUrl
+  || uploads.heroVideoFile
+  || uploads.heroVideoFileName
+  || uploads.heroVideoPosterFile
+  || uploads.heroVideoPosterPreviewUrl
+)
 
 const ContentBuilder = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const [templateId, setTemplateId] = useState(null)
   const [blocks, setBlocks] = useState([])
+  const [blockUploads, setBlockUploads] = useState({})
   const [metadata, setMetadata] = useState({
     name: 'My Landing Page',
     description: '',
@@ -20,6 +41,7 @@ const ContentBuilder = () => {
   const [selectedBlockId, setSelectedBlockId] = useState(null)
   const [loading, setLoading] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('Processing...')
+  const blockUploadsRef = useRef(blockUploads)
 
   // Initialize from template or blank
   useEffect(() => {
@@ -32,9 +54,20 @@ const ContentBuilder = () => {
     } else {
       setBlocks([])
     }
+    setBlockUploads((currentUploads) => {
+      Object.values(currentUploads).forEach(revokeUploadPreviewUrls)
+      return {}
+    })
   }, [location.state])
-  console.log('BLOCKS',blocks)
-  console.log('TEM',templateId)
+
+  useEffect(() => {
+    blockUploadsRef.current = blockUploads
+  }, [blockUploads])
+
+  useEffect(() => () => {
+    Object.values(blockUploadsRef.current).forEach(revokeUploadPreviewUrls)
+  }, [])
+
   const addBlock = (type) => {
     const newBlock = {
       id: Math.max(...blocks.map((b) => b.id), -1) + 1,
@@ -47,6 +80,12 @@ const ContentBuilder = () => {
 
   const removeBlock = (id) => {
     setBlocks(blocks.filter((b) => b.id !== id))
+    setBlockUploads((currentUploads) => {
+      const nextUploads = { ...currentUploads }
+      revokeUploadPreviewUrls(nextUploads[id])
+      delete nextUploads[id]
+      return nextUploads
+    })
     setSelectedBlockId(null)
   }
 
@@ -54,6 +93,41 @@ const ContentBuilder = () => {
     setBlocks(
       blocks.map((b) => (b.id === id ? { ...b, props: { ...b.props, ...updates } } : b))
     )
+  }
+
+  const updateBlockUploads = (id, key, file) => {
+    setBlockUploads((currentUploads) => {
+      const currentBlockUploads = currentUploads[id] ?? {}
+      const nextBlockUploads = { ...currentBlockUploads }
+
+      if (key === 'heroImageFile') {
+        revokePreviewUrl(currentBlockUploads.heroImagePreviewUrl)
+        nextBlockUploads.heroImageFile = file
+        nextBlockUploads.heroImagePreviewUrl = file ? URL.createObjectURL(file) : ''
+      }
+
+      if (key === 'heroVideoFile') {
+        nextBlockUploads.heroVideoFile = file
+        nextBlockUploads.heroVideoFileName = file?.name ?? ''
+      }
+
+      if (key === 'heroVideoPosterFile') {
+        revokePreviewUrl(currentBlockUploads.heroVideoPosterPreviewUrl)
+        nextBlockUploads.heroVideoPosterFile = file
+        nextBlockUploads.heroVideoPosterPreviewUrl = file ? URL.createObjectURL(file) : ''
+      }
+
+      if (!hasUploadData(nextBlockUploads)) {
+        const remainingUploads = { ...currentUploads }
+        delete remainingUploads[id]
+        return remainingUploads
+      }
+
+      return {
+        ...currentUploads,
+        [id]: nextBlockUploads,
+      }
+    })
   }
 
   const reorderBlocks = (fromIndex, toIndex) => {
@@ -132,68 +206,55 @@ const ContentBuilder = () => {
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   const MIN_LOADER_MS = 1500
 
-  const saveDraft = async () => {
-    setLoadingMessage('Saving draft...')
+  const buildStructure = () => ({
+    version: '1',
+    type: 'sms-landing-page',
+    metadata: {
+      name: metadata.name,
+      description: metadata.description,
+      smsExclusiveOffer: metadata.smsExclusiveOffer,
+    },
+    blocks: blocks.map(({ id, ...block }) => block),
+  })
+
+  const buildUploads = () => {
+    const heroBlock = blocks.find((block) => block.type === 'video-hero' && blockUploads[block.id])
+    const heroUploads = heroBlock ? blockUploads[heroBlock.id] : null
+
+    return {
+      heroImage: heroUploads?.heroImageFile ?? null,
+      heroVideo: heroUploads?.heroVideoFile ?? null,
+      heroVideoPoster: heroUploads?.heroVideoPosterFile ?? null,
+    }
+  }
+
+  const submitContent = async (submitRequest, message) => {
+    setLoadingMessage(message)
     setLoading(true)
     const body = {
       template: templateId ?? 3,
-      structure: {
-        version: '1',
-        type: 'sms-landing-page',
-        metadata: {
-          name: metadata.name,
-          description: metadata.description,
-          smsExclusiveOffer: metadata.smsExclusiveOffer,
-        },
-        blocks: blocks.map(({ id, ...block }) => block),
-      },
+      structure: buildStructure(),
+      uploads: buildUploads(),
     }
+
     try {
       const [request] = await Promise.all([
-        saveDraft(body),
+        submitRequest(body),
         sleep(MIN_LOADER_MS),
       ])
       if (request.status === 201) {
         navigate('/dashboard')
       }
     } catch (error) {
-      // handle error
+      console.error('Error saving content:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const publish = async () => {
-    setLoadingMessage('Publishing...')
-    setLoading(true)
-    const body = {
-      template: templateId ?? 3,
-      structure: {
-        version: '1',
-        type: 'sms-landing-page',
-        metadata: {
-          name: metadata.name,
-          description: metadata.description,
-          smsExclusiveOffer: metadata.smsExclusiveOffer,
-        },
-        blocks: blocks.map(({ id, ...block }) => block),
-      },
-    }
-    try {
-      const [request] = await Promise.all([
-        publishContent(body),
-        sleep(MIN_LOADER_MS),
-      ])
-      if (request.status === 201) {
-        navigate('/dashboard')
-      }
-    } catch (error) {
-      // handle error
-      console.error('Error publishing content:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const handleSaveDraft = () => submitContent(saveDraftContent, 'Saving draft...')
+
+  const handlePublish = () => submitContent(publishContent, 'Publishing...')
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827]">
@@ -213,7 +274,7 @@ const ContentBuilder = () => {
             </div>
             <div className="flex gap-2 md:gap-3">
               <button
-                onClick={saveDraft}
+                onClick={handleSaveDraft}
                 disabled={loading || blocks.length === 0}
                 title={blocks.length === 0 ? 'Add at least one block before saving' : undefined}
                 className="px-3 md:px-4 py-1.5 md:py-2 text-sm bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
@@ -221,7 +282,7 @@ const ContentBuilder = () => {
                 Save Draft
               </button>
               <button
-                onClick={publish}
+                onClick={handlePublish}
                 disabled={loading || blocks.length === 0}
                 title={blocks.length === 0 ? 'Add at least one block before publishing' : undefined}
                 className="px-3 md:px-4 py-1.5 md:py-2 text-sm bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
@@ -295,7 +356,7 @@ const ContentBuilder = () => {
                           selectedBlockId === block.id ? 'ring-2 ring-blue-500' : ''
                         }`}
                       >
-                        <PreviewComponent component={block} />
+                        <PreviewComponent component={block} uploads={blockUploads[block.id]} />
                         {selectedBlockId === block.id && (
                           <div className="absolute top-1 right-1 flex gap-1">
                             {idx > 0 && (
@@ -335,7 +396,9 @@ const ContentBuilder = () => {
                 {selectedBlockId !== null ? (
                   <ComponentEditor
                     component={blocks.find((b) => b.id === selectedBlockId)}
+                    uploads={blockUploads[selectedBlockId]}
                     onUpdate={(updates) => updateBlock(selectedBlockId, updates)}
+                    onUploadChange={(key, file) => updateBlockUploads(selectedBlockId, key, file)}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
