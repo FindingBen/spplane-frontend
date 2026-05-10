@@ -242,6 +242,19 @@ const TemplateBlock = ({ block }) => {
         </div>
       )
 
+    case 'image':
+      return (
+        <div className="w-full bg-white px-3 py-3">
+          {props.image ? (
+            <img src={props.image} alt={props.alt || 'Image'} className="w-full h-auto" />
+          ) : (
+            <div className="flex min-h-24 items-center justify-center bg-gray-100">
+              <span className="text-[10px] text-gray-400">Image block</span>
+            </div>
+          )}
+        </div>
+      )
+
     case 'cta': {
       const sizeClass = props.size === 'small' ? 'py-1' : props.size === 'medium' ? 'py-1.5' : 'py-2'
       const styleClass = props.style === 'secondary' ? 'bg-white text-black border-2 border-black'

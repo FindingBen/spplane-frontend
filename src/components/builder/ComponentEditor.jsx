@@ -6,6 +6,7 @@ import { SocialProofEditor } from './SocialProofBlock'
 import { CountdownTimerEditor } from './CountdownTimerBlock'
 import { CtaEditor } from './CtaBlock'
 import { TextBlockEditor } from './TextBlock'
+import { ProductImageEditor } from './ProductImageBlock'
 
 const ComponentEditor = ({ component, uploads, onUpdate, onUploadChange }) => {
   const { type, props = {} } = component
@@ -33,6 +34,7 @@ const ComponentEditor = ({ component, uploads, onUpdate, onUploadChange }) => {
       {type === 'countdown-timer' && <CountdownTimerEditor props={props} onChange={onChange} />}
       {type === 'cta' && <CtaEditor props={props} onChange={onChange} />}
       {type === 'text' && <TextBlockEditor props={props} onChange={onChange} />}
+      {type === 'image' && <ProductImageEditor props={props} uploads={uploads} onChange={onChange} onUploadChange={onUploadChange} />}
     </div>
   )
 }

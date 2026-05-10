@@ -6,6 +6,7 @@ import { SocialProofPreview } from './SocialProofBlock'
 import { CountdownTimerPreview } from './CountdownTimerBlock'
 import { CtaPreview } from './CtaBlock'
 import { TextBlockPreview } from './TextBlock'
+import { ProductImagePreview } from './ProductImageBlock'
 
 const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
   const { type, props = {} } = component
@@ -27,6 +28,8 @@ const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
       return <CtaPreview props={props} variant={variant} />
     case 'text':
       return <TextBlockPreview props={props} variant={variant} />
+    case 'image':
+      return <ProductImagePreview props={props} uploads={uploads} variant={variant} />
     default:
       return null
   }

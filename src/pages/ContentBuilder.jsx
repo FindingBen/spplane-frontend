@@ -14,12 +14,15 @@ const revokePreviewUrl = (url) => {
 }
 
 const revokeUploadPreviewUrls = (uploads = {}) => {
+  revokePreviewUrl(uploads.imagePreviewUrl)
   revokePreviewUrl(uploads.heroImagePreviewUrl)
   revokePreviewUrl(uploads.heroVideoPosterPreviewUrl)
 }
 
 const hasUploadData = (uploads = {}) => Boolean(
-  uploads.heroImageFile
+  uploads.imageFile
+  || uploads.imagePreviewUrl
+  || uploads.heroImageFile
   || uploads.heroImagePreviewUrl
   || uploads.heroVideoFile
   || uploads.heroVideoFileName
@@ -28,6 +31,9 @@ const hasUploadData = (uploads = {}) => Boolean(
 )
 
 const BLOCK_UPLOAD_CONFIG = {
+  image: [
+    { uploadKey: 'imageFile', propKey: 'image', fieldPrefix: 'image-file' },
+  ],
   'video-hero': [
     { uploadKey: 'heroVideoFile', propKey: 'videoUrl', fieldPrefix: 'video-file' },
     { uploadKey: 'heroImageFile', propKey: 'fallbackImage', fieldPrefix: 'image-file' },
@@ -249,8 +255,14 @@ const mapGeneratedComponentToBlock = (component = {}, payload = {}) => {
     case 'social-proof':
     case 'countdown-timer':
     case 'text':
+    case 'image':
       return {
         type: component.type,
+        props: component?.props ?? {},
+      }
+    case 'product-image':
+      return {
+        type: 'image',
         props: component?.props ?? {},
       }
     default:
@@ -519,6 +531,12 @@ const ContentBuilder = () => {
       const currentBlockUploads = currentUploads[id] ?? {}
       const nextBlockUploads = { ...currentBlockUploads }
 
+      if (key === 'imageFile') {
+        revokePreviewUrl(currentBlockUploads.imagePreviewUrl)
+        nextBlockUploads.imageFile = file
+        nextBlockUploads.imagePreviewUrl = file ? URL.createObjectURL(file) : ''
+      }
+
       if (key === 'heroImageFile') {
         revokePreviewUrl(currentBlockUploads.heroImagePreviewUrl)
         nextBlockUploads.heroImageFile = file
@@ -618,6 +636,11 @@ const ContentBuilder = () => {
       case 'text':
         return {
           text: 'Add supporting details, delivery information, or extra context for your offer here.',
+        }
+      case 'image':
+        return {
+          image: 'https://via.placeholder.com/800x1000',
+          alt: 'Product image',
         }
       default:
         return {}
@@ -731,6 +754,7 @@ const ContentBuilder = () => {
                   { type: 'social-proof', label: 'Social Proof', icon: '⭐' },
                   { type: 'countdown-timer', label: 'Countdown Timer', icon: '⏱️' },
                   { type: 'text', label: 'Text Block', icon: '📝' },
+                  { type: 'image', label: 'Image Block', icon: '🖼️' },
                   { type: 'cta', label: 'CTA Button', icon: '🛒' },
                 ].map((block) => (
                   <button

@@ -292,6 +292,18 @@ const TemplateCardBlock = ({ block }) => {
           <p className="line-clamp-2 text-[8px] leading-snug text-gray-600">{props.text || 'Text block'}</p>
         </div>
       )
+    case 'image':
+      return (
+        <div className="w-full px-1 py-1 bg-white flex-shrink-0">
+          {props.image ? (
+            <img src={props.image} alt={props.alt || 'Image'} className="w-full h-auto" />
+          ) : (
+            <div className="flex h-8 items-center justify-center bg-gray-100">
+              <span className="text-[8px] text-gray-400">Image</span>
+            </div>
+          )}
+        </div>
+      )
     case 'cta':
       return (
         <div className="w-full p-1 flex-shrink-0">
