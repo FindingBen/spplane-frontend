@@ -286,6 +286,12 @@ const TemplateCardBlock = ({ block }) => {
           </div>
         </div>
       )
+    case 'text':
+      return (
+        <div className="w-full px-1 py-1 bg-white flex-shrink-0">
+          <p className="line-clamp-2 text-[8px] leading-snug text-gray-600">{props.text || 'Text block'}</p>
+        </div>
+      )
     case 'cta':
       return (
         <div className="w-full p-1 flex-shrink-0">

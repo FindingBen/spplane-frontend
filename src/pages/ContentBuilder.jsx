@@ -248,6 +248,7 @@ const mapGeneratedComponentToBlock = (component = {}, payload = {}) => {
     case 'inventory-tracker':
     case 'social-proof':
     case 'countdown-timer':
+    case 'text':
       return {
         type: component.type,
         props: component?.props ?? {},
@@ -614,6 +615,10 @@ const ContentBuilder = () => {
           style: 'primary',
           size: 'large',
         }
+      case 'text':
+        return {
+          text: 'Add supporting details, delivery information, or extra context for your offer here.',
+        }
       default:
         return {}
     }
@@ -725,6 +730,7 @@ const ContentBuilder = () => {
                   { type: 'inventory-tracker', label: 'Inventory Tracker', icon: '📉' },
                   { type: 'social-proof', label: 'Social Proof', icon: '⭐' },
                   { type: 'countdown-timer', label: 'Countdown Timer', icon: '⏱️' },
+                  { type: 'text', label: 'Text Block', icon: '📝' },
                   { type: 'cta', label: 'CTA Button', icon: '🛒' },
                 ].map((block) => (
                   <button

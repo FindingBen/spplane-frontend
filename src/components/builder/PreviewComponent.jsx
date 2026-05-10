@@ -5,6 +5,7 @@ import { InventoryTrackerPreview } from './InventoryTrackerBlock'
 import { SocialProofPreview } from './SocialProofBlock'
 import { CountdownTimerPreview } from './CountdownTimerBlock'
 import { CtaPreview } from './CtaBlock'
+import { TextBlockPreview } from './TextBlock'
 
 const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
   const { type, props = {} } = component
@@ -24,6 +25,8 @@ const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
       return <CountdownTimerPreview props={props} variant={variant} />
     case 'cta':
       return <CtaPreview props={props} variant={variant} />
+    case 'text':
+      return <TextBlockPreview props={props} variant={variant} />
     default:
       return null
   }

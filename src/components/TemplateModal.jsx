@@ -235,6 +235,13 @@ const TemplateBlock = ({ block }) => {
       )
     }
 
+    case 'text':
+      return (
+        <div className="w-full bg-white px-3 py-3">
+          <p className="whitespace-pre-line text-[10px] leading-relaxed text-gray-700">{props.text || 'Text block'}</p>
+        </div>
+      )
+
     case 'cta': {
       const sizeClass = props.size === 'small' ? 'py-1' : props.size === 'medium' ? 'py-1.5' : 'py-2'
       const styleClass = props.style === 'secondary' ? 'bg-white text-black border-2 border-black'
