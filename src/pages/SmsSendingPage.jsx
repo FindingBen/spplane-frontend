@@ -92,7 +92,7 @@ export default function SmsSendingPage() {
         <Header />
 
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-4xl mx-auto">
               <div className="flex items-center justify-between gap-3 mb-6">
                 <div>

@@ -40,10 +40,10 @@ const Home = () => {
         {/* Main Content Wrapper with Rounded Corners and Padding */}
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col">
           {/* Main Content Area */}
-          <main className="flex-1 flex items-center justify-center p-4 md:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 flex items-center justify-center p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="text-center max-w-2xl 2xl:max-w-xl">
               {/* Welcome Title */}
-              <h1 className="text-3xl md:text-5xl lg:text-6xl 2xl:text-4xl font-bold text-white mb-6">
+              <h1 className="text-3xl md:text-4xl xl:text-5xl 2xl:text-4xl font-bold text-white mb-6">
                 Welcome to <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Sendperplane</span>
               </h1>
 

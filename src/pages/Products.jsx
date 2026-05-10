@@ -4,6 +4,7 @@ import TopBar from '../components/TopBar'
 import { getShopifyProducts, importShopifyProducts } from '../service/api/products'
 
 const PRODUCT_FETCH_LIMIT = 50
+const PRODUCTS_PER_PAGE = 10
 
 const STATUS_BADGE = {
   active: 'border border-emerald-500/25 bg-emerald-500/10 text-emerald-300',
@@ -130,9 +131,24 @@ const formatPrice = (value, currencyCode = 'USD') => {
   }
 }
 
+const pickFeaturedImage = (product, media = [], variants = []) => pickFirstString(
+  product?.featured_image_url,
+  product?.featuredImage?.url,
+  product?.featuredImage?.src,
+  product?.image?.src,
+  product?.image_url,
+  media[0]?.preview_image_url,
+  media[0]?.source_url,
+  media[0]?.image?.url,
+  media[0]?.src,
+  variants[0]?.featured_image_url,
+  variants[0]?.featuredImage?.url,
+  variants[0]?.image?.src,
+)
+
 const normalizeProduct = (product, index) => {
   const variants = toNodes(product?.variants)
-  const images = toNodes(product?.images)
+  const images = toNodes(product?.media)
   const priceRange = product?.priceRange || product?.price_range || {}
   const minVariantPrice = priceRange?.minVariantPrice || priceRange?.min_variant_price || {}
   const variantInventoryValues = variants
@@ -144,12 +160,19 @@ const normalizeProduct = (product, index) => {
   const vendor = pickFirstString(product?.vendor, product?.brand) || 'Unknown vendor'
   const productType = pickFirstString(product?.productType, product?.product_type, product?.category) || 'General'
   const status = String(product?.status || product?.published_status || 'unknown').toLowerCase()
-  const priceValue = minVariantPrice?.amount ?? product?.price ?? product?.min_price ?? variants[0]?.price
+  const priceValue = minVariantPrice?.amount
+    ?? product?.price
+    ?? product?.min_price
+    ?? product?.price_amount
+    ?? variants[0]?.price
+    ?? variants[0]?.price_amount
+  const featuredImg = pickFeaturedImage(product, images, variants)
   const currencyCode = pickFirstString(
     minVariantPrice?.currencyCode,
     minVariantPrice?.currency_code,
     product?.currency,
     variants[0]?.currency,
+    variants[0]?.currencyCode,
   ) || 'USD'
   const inventoryCount = getNumber(
     product?.totalInventory,
@@ -160,6 +183,8 @@ const normalizeProduct = (product, index) => {
     ? variantInventoryValues.reduce((total, value) => total + value, 0)
     : null)
 
+
+
   return {
     id: product?.id || product?.admin_graphql_api_id || product?.shopify_id || handle || `product-${index}`,
     title,
@@ -167,22 +192,18 @@ const normalizeProduct = (product, index) => {
     vendor,
     productType,
     status,
-    imageUrl: pickFirstString(
-      product?.image?.src,
-      product?.image?.url,
-      product?.image?.originalSrc,
-      product?.featuredImage?.url,
-      product?.featuredImage?.src,
-      product?.featured_image?.src,
-      product?.featured_image?.url,
-      images[0]?.src,
-      images[0]?.url,
-      images[0]?.originalSrc,
-    ),
+    featuredImg,
     price: formatPrice(priceValue, currencyCode),
     inventoryCount,
-    variantCount: getNumber(product?.variantsCount, product?.variants_count, product?.total_variants) ?? variants.length,
-    updatedAt: formatDate(product?.updatedAt || product?.updated_at || product?.published_at || product?.created_at),
+    variantCount: getNumber(product?.variantsCount, product?.variants_count, product?.variant_count, product?.total_variants) ?? variants.length,
+    updatedAt: formatDate(
+      product?.updatedAt
+      || product?.updated_at
+      || product?.shopify_updated_at
+      || product?.published_at
+      || product?.created_at
+      || product?.shopify_created_at,
+    ),
   }
 }
 
@@ -194,7 +215,7 @@ const buildImportNotice = (payload, tone = 'success') => {
       description: payload?.error || payload?.detail || payload?.message || 'We could not import products from Shopify.',
     }
   }
-
+ 
   const importedCount = getNumber(
     payload?.imported_count,
     payload?.imported,
@@ -238,63 +259,83 @@ function NoticeBanner({ notice, onDismiss }) {
   )
 }
 
-function ProductCard({ product }) {
-  const statusBadge = STATUS_BADGE[product.status] || STATUS_BADGE.unknown
-  const inventoryLabel = product.inventoryCount == null ? 'Inventory unavailable' : `${product.inventoryCount} in stock`
-
+function ProductTable({ products }) {
+  console.log(products)
   return (
-    <article className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937]/70 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-      <div className="relative h-48 bg-[#111827]">
-        {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.2),_rgba(17,24,39,0.96)_55%)] text-[#60a5fa]">
-            <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 7h18M7 3v4m10-4v4m-9 8h8m-8 4h5M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-        )}
-        <div className="absolute left-3 top-3">
-          <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${statusBadge}`}>
-            {product.status}
-          </span>
-        </div>
-      </div>
+    <div className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937]/70 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+      <div className="overflow-x-auto">
+        <table className="min-w-[920px] w-full text-left">
+          <thead className="bg-white/[0.03]">
+            <tr className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">
+              <th scope="col" className="px-4 py-3.5 font-medium">Product</th>
+              <th scope="col" className="px-4 py-3.5 font-medium">Status</th>
+              <th scope="col" className="px-4 py-3.5 font-medium">Type</th>
+              <th scope="col" className="px-4 py-3.5 font-medium">Price</th>
+              <th scope="col" className="px-4 py-3.5 font-medium">Inventory</th>
+              <th scope="col" className="px-4 py-3.5 font-medium">Updated</th>
+            </tr>
+          </thead>
 
-      <div className="space-y-4 p-4">
-        <div>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-base font-semibold text-white line-clamp-2">{product.title}</h2>
-              <p className="mt-1 text-sm text-[#CAC4CF]">{product.vendor}</p>
-            </div>
-            <p className="text-sm font-semibold text-[#60a5fa]">{product.price}</p>
-          </div>
-          {product.handle && (
-            <p className="mt-2 truncate text-xs text-[#CAC4CF]/65">/{product.handle}</p>
-          )}
-        </div>
+          <tbody className="divide-y divide-white/5">
+            {products.map((product) => {
+              const statusBadge = STATUS_BADGE[product.status] || STATUS_BADGE.unknown
+              const inventoryValue = product.inventoryCount == null ? '—' : product.inventoryCount.toLocaleString()
 
-        <dl className="grid grid-cols-2 gap-3 text-sm">
-          <div className="rounded-xl border border-white/6 bg-black/10 px-3 py-2.5">
-            <dt className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Type</dt>
-            <dd className="mt-1 text-white">{product.productType}</dd>
-          </div>
-          <div className="rounded-xl border border-white/6 bg-black/10 px-3 py-2.5">
-            <dt className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Variants</dt>
-            <dd className="mt-1 text-white">{product.variantCount || 0}</dd>
-          </div>
-          <div className="rounded-xl border border-white/6 bg-black/10 px-3 py-2.5">
-            <dt className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Inventory</dt>
-            <dd className="mt-1 text-white">{inventoryLabel}</dd>
-          </div>
-          <div className="rounded-xl border border-white/6 bg-black/10 px-3 py-2.5">
-            <dt className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Updated</dt>
-            <dd className="mt-1 text-white">{product.updatedAt}</dd>
-          </div>
-        </dl>
+              return (
+                <tr key={product.id} className="transition-colors hover:bg-white/[0.03]">
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-[#111827]">
+                        {product.featuredImg ? (
+                          <img src={product.featuredImg} alt={product.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.2),_rgba(17,24,39,0.96)_55%)] text-[#60a5fa]">
+                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 7h18M7 3v4m10-4v4m-9 8h8m-8 4h5M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-white">{product.title}</p>
+                        <p className="mt-1 truncate text-xs text-[#CAC4CF]">{product.vendor}</p>
+                        {product.handle && (
+                          <p className="mt-1 truncate text-xs text-[#CAC4CF]/60">/{product.handle}</p>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-3.5 align-middle">
+                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${statusBadge}`}>
+                      {product.status}
+                    </span>
+                  </td>
+
+                  <td className="px-4 py-3.5 align-middle">
+                    <p className="text-sm text-white">{product.productType}</p>
+                  </td>
+
+                  <td className="px-4 py-3.5 align-middle">
+                    <p className="text-sm font-semibold text-[#60a5fa]">{product.price}</p>
+                  </td>
+
+                  <td className="px-4 py-3.5 align-middle">
+                    <p className="text-sm text-white">{inventoryValue}</p>
+                    <p className="mt-1 text-xs text-[#CAC4CF]/60">{product.variantCount || 0} variants</p>
+                  </td>
+
+                  <td className="px-4 py-3.5 align-middle">
+                    <p className="text-sm text-white">{product.updatedAt}</p>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
-    </article>
+    </div>
   )
 }
 
@@ -302,6 +343,7 @@ export default function Products() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
   const [error, setError] = useState('')
   const [importing, setImporting] = useState(false)
   const [importNotice, setImportNotice] = useState(null)
@@ -344,6 +386,10 @@ export default function Products() {
     }
   }, [search, refreshTick])
 
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, refreshTick])
+  console.log(products)
   const handleImport = async () => {
     setImporting(true)
     setImportNotice(null)
@@ -360,8 +406,16 @@ export default function Products() {
   }
 
   const totalProducts = products.length
+  const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCTS_PER_PAGE))
+  const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE
+  const pageEnd = pageStart + PRODUCTS_PER_PAGE
+  const visibleProducts = products.slice(pageStart, pageEnd)
   const activeProducts = products.filter((product) => product.status === 'active').length
   const vendorCount = new Set(products.map((product) => product.vendor).filter((vendor) => vendor && vendor !== 'Unknown vendor')).size
+
+  useEffect(() => {
+    setCurrentPage((page) => Math.min(page, totalPages))
+  }, [totalPages])
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827]">
@@ -371,11 +425,11 @@ export default function Products() {
         <Header />
 
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-7xl mx-auto">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <h1 className="text-2xl md:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                  <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
                     <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Products</span>
                   </h1>
                   <p className="text-sm md:text-base text-[#CAC4CF]">
@@ -436,9 +490,18 @@ export default function Products() {
                 />
               </div>
 
-              <p className="mb-5 text-xs text-[#CAC4CF]/70">
-                Search runs against `/api/shopify/products/` and returns the first {PRODUCT_FETCH_LIMIT} matches.
-              </p>
+             
+
+              {!loading && products.length > 0 && (
+                <div className="mb-5 flex flex-col gap-2 text-sm text-[#CAC4CF] sm:flex-row sm:items-center sm:justify-between">
+                  <p>
+                    Showing {pageStart + 1}-{Math.min(pageEnd, totalProducts)} of {totalProducts.toLocaleString()} products
+                  </p>
+                  <p>
+                    Page {currentPage} of {totalPages}
+                  </p>
+                </div>
+              )}
 
               {error && (
                 <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
@@ -493,11 +556,47 @@ export default function Products() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
-                </div>
+                <>
+                  <ProductTable products={visibleProducts} />
+
+                  {totalPages > 1 && (
+                    <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Previous
+                      </button>
+
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                          <button
+                            key={pageNumber}
+                            type="button"
+                            onClick={() => setCurrentPage(pageNumber)}
+                            className={`h-9 min-w-9 rounded-lg border px-3 text-sm font-semibold transition-colors ${pageNumber === currentPage
+                              ? 'border-[#3e6ff4] bg-[#3e6ff4] text-white'
+                              : 'border-white/10 bg-white/5 text-[#CAC4CF] hover:bg-white/10 hover:text-white'
+                              }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setCurrentPage((page) => Math.min(page + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </main>

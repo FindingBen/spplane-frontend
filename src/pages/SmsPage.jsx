@@ -490,7 +490,7 @@ export default function SmsPage() {
       <div className="flex flex-1 overflow-hidden">
         <Header />
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
 
               {/* Page Header */}

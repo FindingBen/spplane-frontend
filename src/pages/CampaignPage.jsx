@@ -362,13 +362,13 @@ const CampaignPage = () => {
         <Header />
 
         <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
 
               {/* Page Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8 2xl:mb-5">
                 <div>
-                  <h1 className="text-2xl md:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                  <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
                     <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Campaigns</span>
                   </h1>
                   <p className="text-sm md:text-base text-[#CAC4CF]">
