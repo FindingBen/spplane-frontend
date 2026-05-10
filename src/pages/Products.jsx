@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { getShopifyProducts, importShopifyProducts } from '../service/api/products'
@@ -259,7 +260,103 @@ function NoticeBanner({ notice, onDismiss }) {
   )
 }
 
-function ProductTable({ products }) {
+function ProductGenerationModal({ product, isOpen, onClose, onConfirm }) {
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined
+    }
+
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEsc)
+
+    return () => document.removeEventListener('keydown', handleEsc)
+  }, [isOpen, onClose])
+
+  if (!isOpen || !product) {
+    return null
+  }
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div
+          className="w-full max-w-2xl overflow-hidden rounded-[28px] border border-[#3e6ff4]/25 bg-[#111827] shadow-[0_32px_80px_rgba(0,0,0,0.45)]"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="border-b border-white/10 px-6 py-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#60a5fa]/80">Generate Content</p>
+            <h2 className="mt-2 text-2xl font-bold text-white">Continue with this product?</h2>
+            <p className="mt-2 max-w-xl text-sm text-[#CAC4CF]">
+              We will open the content builder, generate a landing page structure from this product, and keep the result fully editable.
+            </p>
+          </div>
+
+          <div className="grid gap-5 px-6 py-6 md:grid-cols-[140px_minmax(0,1fr)]">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#1f2937]">
+              {product.featuredImg ? (
+                <img src={product.featuredImg} alt={product.title} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full min-h-[140px] items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.2),_rgba(17,24,39,0.96)_55%)] text-[#60a5fa]">
+                  <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 7h18M7 3v4m10-4v4m-9 8h8m-8 4h5M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-lg font-semibold text-white">{product.title}</p>
+              <div className="mt-4 grid gap-3 text-sm text-[#CAC4CF] sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Vendor</p>
+                  <p className="mt-2 font-medium text-white">{product.vendor}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Starting Price</p>
+                  <p className="mt-2 font-medium text-white">{product.price}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Status</p>
+                  <p className="mt-2 font-medium capitalize text-white">{product.status}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Handle</p>
+                  <p className="mt-2 truncate font-medium text-white">{product.handle || 'No handle'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col-reverse gap-3 border-t border-white/10 px-6 py-4 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => onConfirm(product)}
+              className="rounded-xl border border-[#3e6ff4]/40 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Continue to Builder
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function ProductTable({ products, selectedProductId, onGenerateProduct }) {
   console.log(products)
   return (
     <div className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937]/70 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
@@ -269,10 +366,11 @@ function ProductTable({ products }) {
             <tr className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">
               <th scope="col" className="px-4 py-3.5 font-medium">Product</th>
               <th scope="col" className="px-4 py-3.5 font-medium">Status</th>
-              <th scope="col" className="px-4 py-3.5 font-medium">Type</th>
+             
               <th scope="col" className="px-4 py-3.5 font-medium">Price</th>
               <th scope="col" className="px-4 py-3.5 font-medium">Inventory</th>
               <th scope="col" className="px-4 py-3.5 font-medium">Updated</th>
+              <th scope="col" className="px-4 py-3.5 font-medium">Action</th>
             </tr>
           </thead>
 
@@ -313,9 +411,7 @@ function ProductTable({ products }) {
                     </span>
                   </td>
 
-                  <td className="px-4 py-3.5 align-middle">
-                    <p className="text-sm text-white">{product.productType}</p>
-                  </td>
+                 
 
                   <td className="px-4 py-3.5 align-middle">
                     <p className="text-sm font-semibold text-[#60a5fa]">{product.price}</p>
@@ -329,6 +425,18 @@ function ProductTable({ products }) {
                   <td className="px-4 py-3.5 align-middle">
                     <p className="text-sm text-white">{product.updatedAt}</p>
                   </td>
+                  <td className="px-4 py-3.5 align-middle">
+                    <button
+                      type="button"
+                      onClick={() => onGenerateProduct(product)}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${selectedProductId === product.id
+                        ? 'border-[#3e6ff4] bg-[#3e6ff4]/15 text-[#60a5fa]'
+                        : 'border-white/10 bg-white/5 text-[#CAC4CF] hover:bg-white/10 hover:text-white'
+                        }`}
+                    >
+                      {selectedProductId === product.id ? 'Generate' : 'Choose'}
+                    </button>
+                  </td>
                 </tr>
               )
             })}
@@ -340,6 +448,7 @@ function ProductTable({ products }) {
 }
 
 export default function Products() {
+  const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -348,6 +457,9 @@ export default function Products() {
   const [importing, setImporting] = useState(false)
   const [importNotice, setImportNotice] = useState(null)
   const [refreshTick, setRefreshTick] = useState(0)
+  const [productId, setProductId] = useState(null)
+  const [modalProduct, setModalProduct] = useState(null)
+
 
   useEffect(() => {
     let isDisposed = false
@@ -405,6 +517,37 @@ export default function Products() {
     }
   }
 
+  const handleOpenGenerateModal = (product) => {
+    if (!product) {
+      return
+    }
+
+    setProductId(product.id)
+    setModalProduct(product)
+  }
+
+  const handleCloseGenerateModal = () => {
+    setModalProduct(null)
+  }
+
+  const handleConfirmGenerate = (product) => {
+    if (!product) {
+      return
+    }
+
+    navigate('/content/builder', {
+      state: {
+        productGeneration: {
+          productId: product.id,
+          productTitle: product.title,
+          productHandle: product.handle,
+          productVendor: product.vendor,
+          featuredImg: product.featuredImg,
+        },
+      },
+    })
+  }
+
   const totalProducts = products.length
   const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCTS_PER_PAGE))
   const pageStart = (currentPage - 1) * PRODUCTS_PER_PAGE
@@ -412,6 +555,7 @@ export default function Products() {
   const visibleProducts = products.slice(pageStart, pageEnd)
   const activeProducts = products.filter((product) => product.status === 'active').length
   const vendorCount = new Set(products.map((product) => product.vendor).filter((vendor) => vendor && vendor !== 'Unknown vendor')).size
+  const selectedProduct = products.find((product) => product.id === productId) || null
 
   useEffect(() => {
     setCurrentPage((page) => Math.min(page, totalPages))
@@ -436,7 +580,14 @@ export default function Products() {
                     Import Shopify products and browse the latest 50 synced items.
                   </p>
                 </div>
-
+                <button
+                  type="button"
+                  onClick={() => handleOpenGenerateModal(selectedProduct)}
+                  disabled={!selectedProduct}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-4 py-2.5 text-sm font-semibold text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Generate Selected Product
+                </button>
                 <button
                   type="button"
                   onClick={handleImport}
@@ -458,6 +609,12 @@ export default function Products() {
               </div>
 
               <NoticeBanner notice={importNotice} onDismiss={() => setImportNotice(null)} />
+
+              {selectedProduct && (
+                <p className="mb-5 text-sm text-[#CAC4CF]">
+                  Selected product: <span className="font-semibold text-white">{selectedProduct.title}</span>
+                </p>
+              )}
 
               <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937] p-4">
@@ -557,7 +714,11 @@ export default function Products() {
                 </div>
               ) : (
                 <>
-                  <ProductTable products={visibleProducts} />
+                  <ProductTable
+                    products={visibleProducts}
+                    selectedProductId={productId}
+                    onGenerateProduct={handleOpenGenerateModal}
+                  />
 
                   {totalPages > 1 && (
                     <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -602,6 +763,13 @@ export default function Products() {
           </main>
         </div>
       </div>
+
+      <ProductGenerationModal
+        product={modalProduct}
+        isOpen={Boolean(modalProduct)}
+        onClose={handleCloseGenerateModal}
+        onConfirm={handleConfirmGenerate}
+      />
     </div>
   )
 }

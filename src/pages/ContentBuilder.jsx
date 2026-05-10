@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import { saveDraft as saveDraftContent, publishContent } from '../service/api/content'
+import { generateContentProduct, saveDraft as saveDraftContent, publishContent } from '../service/api/content'
 import PreviewComponent from '../components/builder/PreviewComponent'
 import ComponentEditor from '../components/builder/ComponentEditor'
 import Loader from '../components/Loader'
@@ -87,37 +87,330 @@ const collectUploadsForSubmission = (blocks, blockUploads) => blocks.reduce((upl
   return uploads
 }, {})
 
+const DEFAULT_TEMPLATE_ID = 3
+const MIN_LOADER_MS = 1500
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const createDefaultMetadata = () => ({
+  name: 'My Landing Page',
+  description: '',
+  smsExclusiveOffer: { enabled: false, discountPercent: 0, barLabel: '' },
+})
+
+const pickFirstString = (...values) => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim()
+    }
+  }
+
+  return ''
+}
+
+const pickFirstArray = (...values) => {
+  for (const value of values) {
+    if (Array.isArray(value) && value.length > 0) {
+      return value
+    }
+  }
+
+  return []
+}
+
+const formatPriceLabel = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return `$${value.toFixed(2)}`
+  }
+
+  if (typeof value !== 'string') {
+    return ''
+  }
+
+  const trimmedValue = value.trim()
+
+  if (!trimmedValue) {
+    return ''
+  }
+
+  return /^[\d.]+$/.test(trimmedValue) ? `$${trimmedValue}` : trimmedValue
+}
+
+const createBuilderBlocks = (blocks = []) => {
+  if (!Array.isArray(blocks)) {
+    return []
+  }
+
+  return blocks.map((block, index) => ({
+    ...block,
+    id: index,
+    props: block?.props ?? {},
+  }))
+}
+
+const extractGeneratedComponents = (payload) => pickFirstArray(
+  payload?.structure?.components,
+  payload?.content?.structure?.components,
+)
+
+const createHeroBlock = (component = {}, payload = {}) => ({
+  type: 'video-hero',
+  props: {
+    videoUrl: pickFirstString(component?.props?.videoUrl, component?.props?.video_url),
+    title: pickFirstString(
+      payload?.copy?.hero_title,
+      component?.props?.title,
+      component?.props?.headline,
+      payload?.product?.title,
+    ),
+    fallbackImage: pickFirstString(
+      payload?.product?.featured_image_url,
+      payload?.product?.primary_variant?.image_url,
+      component?.props?.image,
+      payload?.rules?.gallery_items?.[0]?.url,
+      payload?.product?.images?.[0],
+    ),
+    posterImage: pickFirstString(
+      payload?.product?.featured_image_url,
+      payload?.rules?.gallery_items?.[0]?.url,
+      payload?.product?.images?.[0],
+    ),
+    autoplay: false,
+    muted: true,
+    loop: false,
+  },
+})
+
+const createCtaBlock = (component = {}, payload = {}) => ({
+  type: 'cta',
+  props: {
+    text: pickFirstString(
+      payload?.copy?.cta_label,
+      component?.props?.text,
+      'Shop now',
+    ),
+    link: pickFirstString(
+      component?.props?.url,
+      component?.props?.link,
+      payload?.product?.product_url,
+    ),
+    sticky: true,
+    style: 'primary',
+    size: 'large',
+  },
+})
+
+const createBundleBlock = (payload = {}) => {
+  const variantItems = pickFirstArray(payload?.rules?.variant_items, payload?.product?.variants)
+
+  if (variantItems.length === 0) {
+    return null
+  }
+
+  return {
+    type: 'product-bundle',
+    props: {
+      title: pickFirstString(payload?.copy?.bundle_headline, 'Choose your preferred option'),
+      subtitle: pickFirstString(
+        payload?.copy?.hero_subtitle,
+        payload?.product?.seo_description,
+        payload?.product?.description_text,
+      ),
+      products: variantItems.map((item, index) => ({
+        shopifyId: pickFirstString(item?.id, item?.shopify_variant_id),
+        image: pickFirstString(
+          item?.image_url,
+          payload?.rules?.gallery_items?.[index]?.url,
+          payload?.product?.featured_image_url,
+        ),
+        name: pickFirstString(item?.title, payload?.copy?.bundle_items?.[index], `Option ${index + 1}`),
+        price: formatPriceLabel(item?.price || item?.price_amount || payload?.rules?.price_label),
+      })),
+      bundleCtaText: pickFirstString(payload?.copy?.cta_label, 'Shop now'),
+      bundleCtaLink: pickFirstString(payload?.product?.product_url),
+    },
+  }
+}
+
+const mapGeneratedComponentToBlock = (component = {}, payload = {}) => {
+  switch (component?.type) {
+    case 'hero':
+      return createHeroBlock(component, payload)
+    case 'cta':
+      return createCtaBlock(component, payload)
+    case 'product-bundle':
+      return {
+        type: 'product-bundle',
+        props: component?.props ?? {},
+      }
+    case 'video-hero':
+    case 'comparison-table':
+    case 'inventory-tracker':
+    case 'social-proof':
+    case 'countdown-timer':
+      return {
+        type: component.type,
+        props: component?.props ?? {},
+      }
+    default:
+      return null
+  }
+}
+
+const normalizeMetadata = (metadata = {}, fallback = {}) => {
+  const defaults = createDefaultMetadata()
+
+  return {
+    name: pickFirstString(metadata?.name, fallback?.name, defaults.name),
+    description: pickFirstString(metadata?.description, fallback?.description, defaults.description),
+    smsExclusiveOffer: {
+      ...defaults.smsExclusiveOffer,
+      ...(fallback?.smsExclusiveOffer && typeof fallback.smsExclusiveOffer === 'object' ? fallback.smsExclusiveOffer : {}),
+      ...(metadata?.smsExclusiveOffer && typeof metadata.smsExclusiveOffer === 'object' ? metadata.smsExclusiveOffer : {}),
+    },
+  }
+}
+
+const resolveGeneratedBlocks = (payload) => {
+  const directBlocks = pickFirstArray(
+    payload?.structure?.blocks,
+    payload?.content?.structure?.blocks,
+  )
+
+  if (directBlocks.length > 0) {
+    return createBuilderBlocks(directBlocks)
+  }
+
+  const components = extractGeneratedComponents(payload)
+  const mappedBlocks = components
+    .map((component) => mapGeneratedComponentToBlock(component, payload))
+    .filter(Boolean)
+
+  const hasCtaBlock = mappedBlocks.some((block) => block.type === 'cta')
+  const shouldShowBundle = payload?.rules?.blocks?.show_bundle !== false
+  const bundleBlock = shouldShowBundle ? createBundleBlock(payload) : null
+
+  if (bundleBlock && !mappedBlocks.some((block) => block.type === 'product-bundle')) {
+    const insertionIndex = hasCtaBlock
+      ? mappedBlocks.findIndex((block) => block.type === 'cta')
+      : mappedBlocks.length
+
+    mappedBlocks.splice(insertionIndex, 0, bundleBlock)
+  }
+
+  return createBuilderBlocks(mappedBlocks)
+}
+
+const resolveGeneratedMetadata = (payload, generationRequest) => normalizeMetadata(
+  payload?.structure?.metadata ?? payload?.content?.structure?.metadata ?? payload?.content?.metadata ?? {},
+  {
+    name: pickFirstString(
+      payload?.content?.name,
+      payload?.product?.title ? `${payload.product.title} Landing Page` : '',
+      generationRequest?.productTitle ? `${generationRequest.productTitle} Landing Page` : '',
+    ),
+    description: pickFirstString(
+      payload?.copy?.hero_subtitle,
+      payload?.copy?.description,
+      payload?.product?.seo_description,
+      payload?.product?.description_text,
+      payload?.product?.handle ? `Generated from ${payload.product.handle}` : '',
+      generationRequest?.productHandle ? `Generated from ${generationRequest.productHandle}` : '',
+    ),
+  },
+)
+
+const buildGenerationNotice = ({ payload, tone = 'success', productTitle = '' }) => {
+  if (tone === 'error') {
+    return {
+      tone,
+      title: 'Content generation failed',
+      description: payload?.error || payload?.detail || payload?.message || 'We could not generate blocks for this product.',
+    }
+  }
+
+  return {
+    tone,
+    title: 'Content ready',
+    description: productTitle
+      ? `${productTitle} has been turned into editable blocks. Review and refine anything you want.`
+      : 'Your generated content is ready to review and refine.',
+  }
+}
+
+function BuilderNotice({ notice, onDismiss }) {
+  if (!notice) {
+    return null
+  }
+
+  const toneStyles = notice.tone === 'error'
+    ? 'border-red-500/35 bg-red-500/10 text-red-100'
+    : 'border-emerald-500/35 bg-emerald-500/10 text-emerald-50'
+
+  return (
+    <div className={`flex items-start justify-between gap-4 rounded-2xl border px-4 py-3 ${toneStyles}`}>
+      <div>
+        <p className="text-sm font-semibold">{notice.title}</p>
+        <p className="mt-1 text-sm opacity-85">{notice.description}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onDismiss}
+        className="shrink-0 rounded-lg border border-white/10 bg-black/10 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-black/20 hover:text-white"
+      >
+        Dismiss
+      </button>
+    </div>
+  )
+}
+
 const ContentBuilder = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const generationRequest = location.state?.productGeneration
   const [templateId, setTemplateId] = useState(null)
   const [blocks, setBlocks] = useState([])
   const [blockUploads, setBlockUploads] = useState({})
-  const [metadata, setMetadata] = useState({
-    name: 'My Landing Page',
-    description: '',
-    smsExclusiveOffer: { enabled: false, discountPercent: 0, barLabel: '' },
-  })
+  const [metadata, setMetadata] = useState(createDefaultMetadata)
   const [selectedBlockId, setSelectedBlockId] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [loadingMessage, setLoadingMessage] = useState('Processing...')
+  const [loading, setLoading] = useState(Boolean(generationRequest))
+  const [loadingMessage, setLoadingMessage] = useState(
+    generationRequest ? 'Generating your landing page...' : 'Processing...'
+  )
+  const [loadingDetail, setLoadingDetail] = useState(
+    generationRequest?.productTitle
+      ? `We are building editable blocks for ${generationRequest.productTitle}.`
+      : ''
+  )
+  const [builderNotice, setBuilderNotice] = useState(null)
   const blockUploadsRef = useRef(blockUploads)
 
-  // Initialize from template or blank
-  useEffect(() => {
-    const template = location.state?.template
-    if (template?.id) setTemplateId(template.id)
-    const blocks = template?.structure?.blocks
-    if (blocks?.length) {
-      setBlocks(blocks.map((block, idx) => ({ ...block, id: idx })))
-      if (template.metadata) setMetadata(template.metadata)
-    } else {
-      setBlocks([])
-    }
+  const clearBlockUploads = () => {
     setBlockUploads((currentUploads) => {
       Object.values(currentUploads).forEach(revokeUploadPreviewUrls)
       return {}
     })
+  }
+
+  // Initialize from template or blank
+  useEffect(() => {
+    const template = location.state?.template
+    const nextBlocks = createBuilderBlocks(template?.structure?.blocks)
+
+    setBuilderNotice(null)
+    clearBlockUploads()
+
+    if (template?.id) {
+      setTemplateId(template.id)
+      setBlocks(nextBlocks)
+      setSelectedBlockId(nextBlocks[0]?.id ?? null)
+      setMetadata(normalizeMetadata(template?.metadata ?? template?.structure?.metadata))
+    } else {
+      setTemplateId(null)
+      setBlocks([])
+      setSelectedBlockId(null)
+      setMetadata(createDefaultMetadata())
+    }
   }, [location.state])
 
   useEffect(() => {
@@ -127,6 +420,71 @@ const ContentBuilder = () => {
   useEffect(() => () => {
     Object.values(blockUploadsRef.current).forEach(revokeUploadPreviewUrls)
   }, [])
+
+  useEffect(() => {
+    if (!generationRequest?.productId) {
+      return undefined
+    }
+
+    let isDisposed = false
+
+    const runGeneration = async () => {
+      setBuilderNotice(null)
+      setLoadingMessage('Generating your landing page...')
+      setLoadingDetail(
+        generationRequest?.productTitle
+          ? `We are building editable blocks for ${generationRequest.productTitle}. This can take a moment.`
+          : 'We are building editable blocks for your selected product. This can take a moment.'
+      )
+      setLoading(true)
+
+      try {
+        const [payload] = await Promise.all([
+          generateContentProduct({ product_id: generationRequest.productId, persist: true }),
+          sleep(MIN_LOADER_MS),
+        ])
+
+        if (isDisposed) {
+          return
+        }
+
+        const generatedBlocks = resolveGeneratedBlocks(payload)
+
+        setTemplateId(payload?.template_id ?? DEFAULT_TEMPLATE_ID)
+        setBlocks(generatedBlocks)
+        setSelectedBlockId(generatedBlocks[0]?.id ?? null)
+        setMetadata(resolveGeneratedMetadata(payload, generationRequest))
+        setBuilderNotice(buildGenerationNotice({
+          payload,
+          productTitle: generationRequest?.productTitle,
+        }))
+      } catch (error) {
+        if (isDisposed) {
+          return
+        }
+
+        setTemplateId(DEFAULT_TEMPLATE_ID)
+        setBlocks([])
+        setSelectedBlockId(null)
+        setMetadata(resolveGeneratedMetadata({}, generationRequest))
+        setBuilderNotice(buildGenerationNotice({
+          payload: error?.response?.data,
+          tone: 'error',
+        }))
+      } finally {
+        if (!isDisposed) {
+          setLoading(false)
+          setLoadingDetail('')
+        }
+      }
+    }
+
+    runGeneration()
+
+    return () => {
+      isDisposed = true
+    }
+  }, [generationRequest?.productId])
 
   const addBlock = (type) => {
     const newBlock = {
@@ -260,12 +618,6 @@ const ContentBuilder = () => {
         return {}
     }
   }
-
-
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-  const MIN_LOADER_MS = 1500
-
   const buildStructure = () => ({
     version: '1',
     type: 'sms-landing-page',
@@ -288,9 +640,10 @@ const ContentBuilder = () => {
 
   const submitContent = async (submitRequest, message) => {
     setLoadingMessage(message)
+    setLoadingDetail('')
     setLoading(true)
     const body = {
-      template: templateId ?? 3,
+      template: templateId ?? DEFAULT_TEMPLATE_ID,
       structure: buildStructure(),
       uploads: buildUploads(),
     }
@@ -316,7 +669,7 @@ const ContentBuilder = () => {
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827]">
-      {loading && <Loader message={loadingMessage} />}
+      {loading && <Loader message={loadingMessage} detail={loadingDetail} />}
       <TopBar />
 
       <div className="flex flex-1 overflow-hidden">
@@ -349,6 +702,12 @@ const ContentBuilder = () => {
               </button>
             </div>
           </div>
+
+          {builderNotice && (
+            <div className="px-3 pt-3 md:px-6 md:pt-6">
+              <BuilderNotice notice={builderNotice} onDismiss={() => setBuilderNotice(null)} />
+            </div>
+          )}
 
           {/* Builder Area */}
           <div className="flex-1 flex gap-2 md:gap-4 p-3 md:p-6 overflow-hidden">

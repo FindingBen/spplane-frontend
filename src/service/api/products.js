@@ -1,3 +1,4 @@
+import axios from 'axios'
 import axiosInstance from '../interceptor/axiosInstance'
 
 const PRODUCTS_BASE = '/api/shopify/products'
