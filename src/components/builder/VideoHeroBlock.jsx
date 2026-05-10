@@ -18,7 +18,7 @@ export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder'
           controls={!props.autoplay}
           poster={previewImage || undefined}
           preload="metadata"
-          className={isPublic ? 'w-full h-72 object-cover bg-black' : 'w-full h-40 object-cover bg-black'}
+          className="w-full h-auto bg-black"
         >
           <source src={videoUrl} type={props.mimeType || undefined} />
         </video>
