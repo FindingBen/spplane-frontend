@@ -6,6 +6,7 @@ import { generateContentProduct, saveDraft as saveDraftContent, publishContent }
 import PreviewComponent from '../components/builder/PreviewComponent'
 import ComponentEditor from '../components/builder/ComponentEditor'
 import Loader from '../components/Loader'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 const revokePreviewUrl = (url) => {
   if (typeof url === 'string' && url.startsWith('blob:')) {
@@ -380,6 +381,7 @@ function BuilderNotice({ notice, onDismiss }) {
 const ContentBuilder = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const { trackAction } = useFirstCampaignGuide()
   const generationRequest = location.state?.productGeneration
   const [templateId, setTemplateId] = useState(null)
   const [blocks, setBlocks] = useState([])
@@ -507,6 +509,14 @@ const ContentBuilder = () => {
     }
     setBlocks([...blocks, newBlock])
     setSelectedBlockId(newBlock.id)
+
+    if (type === 'text') {
+      trackAction('content:text-added')
+    }
+
+    if (type === 'cta') {
+      trackAction('content:cta-added')
+    }
   }
 
   const removeBlock = (id) => {
@@ -682,6 +692,9 @@ const ContentBuilder = () => {
         sleep(MIN_LOADER_MS),
       ])
       if (request.status === 201) {
+        if (submitRequest === publishContent) {
+          trackAction('content:published', { request })
+        }
         navigate('/dashboard')
       }
     } catch (error) {
@@ -724,6 +737,7 @@ const ContentBuilder = () => {
                 onClick={handlePublish}
                 disabled={loading || blocks.length === 0}
                 title={blocks.length === 0 ? 'Add at least one block before publishing' : undefined}
+                data-guide-id="content-publish"
                 className="px-3 md:px-4 py-1.5 md:py-2 text-sm bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Publish
@@ -760,6 +774,7 @@ const ContentBuilder = () => {
                   <button
                     key={block.type}
                     onClick={() => addBlock(block.type)}
+                    data-guide-id={block.type === 'text' ? 'content-add-text' : block.type === 'cta' ? 'content-add-cta' : undefined}
                     className="w-full p-2 md:p-3 bg-[#111827] hover:bg-[#1f2937] border border-[#3e6ff4]/20 hover:border-[#3e6ff4]/60 rounded-lg transition-all text-left"
                   >
                     <div className="flex items-center gap-2 md:gap-3">

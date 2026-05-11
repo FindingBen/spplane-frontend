@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { estimateSmsCost, getSms, sendSms } from '../service/api/sms'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 const formatValue = (value) => {
   if (value == null || value === '') return '—'
@@ -14,6 +15,7 @@ export default function SmsSendingPage() {
   const { smsId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+  const { trackAction } = useFirstCampaignGuide()
 
   const [sms, setSms] = useState(location.state?.sms ?? null)
   const [smsLoading, setSmsLoading] = useState(!location.state?.sms)
@@ -73,6 +75,7 @@ export default function SmsSendingPage() {
       setSending(true)
       setSendError('')
       await sendSms(smsId)
+      trackAction('sms:sent', { smsId })
       navigate('/sms')
     } catch (error) {
       setSendError(error?.response?.data?.error || 'Failed to queue SMS send.')
@@ -182,6 +185,7 @@ export default function SmsSendingPage() {
                 <button
                   onClick={handleSend}
                   disabled={sending || !canSend || smsLoading || estimateLoading}
+                  data-guide-id="sms-send-confirm"
                   className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {sending ? 'Sending...' : 'Send SMS'}

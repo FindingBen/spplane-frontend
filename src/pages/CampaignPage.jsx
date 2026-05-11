@@ -2,6 +2,7 @@
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { getCampaigns, createCampaign, deleteCampaign, getContents } from '../service/api/campaign'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 // ─── Tabs — aligned with backend STATUS_CHOICES ────────────────────────────────
 const TABS = [
@@ -19,10 +20,12 @@ const INITIAL_FORM = {
 }
 
 function CreateCampaignModal({ onClose, onCreate, submitting }) {
+  const { active, currentStepId } = useFirstCampaignGuide()
   const [form, setForm] = useState(INITIAL_FORM)
   const [errors, setErrors] = useState({})
   const [contents, setContents] = useState([])
   const [contentsLoading, setContentsLoading] = useState(true)
+  const isGuideLocked = active && currentStepId === 'campaign-form'
 
   useEffect(() => {
     getContents()
@@ -50,15 +53,16 @@ function CreateCampaignModal({ onClose, onCreate, submitting }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={isGuideLocked ? undefined : onClose} />
 
       {/* Panel */}
-      <div className="relative w-full max-w-xl bg-gradient-to-br from-[#1f2937] to-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl overflow-hidden">
+      <div data-guide-id="campaign-form" className="relative w-full max-w-xl bg-gradient-to-br from-[#1f2937] to-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#3e6ff4]/20">
           <h2 className="text-lg font-bold text-white">Create New Campaign</h2>
           <button
             onClick={onClose}
+            disabled={isGuideLocked}
             className="text-[#CAC4CF] hover:text-white transition-colors p-1 rounded-lg hover:bg-[#3e6ff4]/20"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,6 +293,7 @@ function EmptyState({ tab, onCreateClick }) {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const CampaignPage = () => {
+  const { active, currentStepId, trackAction } = useFirstCampaignGuide()
   const [activeTab, setActiveTab] = useState('active')
   // campaigns is a flat array matching the backend response list
   const [campaigns, setCampaigns] = useState([])
@@ -301,6 +306,12 @@ const CampaignPage = () => {
   useEffect(() => {
     fetchCampaigns()
   }, [])
+
+  useEffect(() => {
+    if (active && currentStepId === 'campaign-form') {
+      setShowModal(true)
+    }
+  }, [active, currentStepId])
 
   const fetchCampaigns = async () => {
     try {
@@ -329,6 +340,7 @@ const CampaignPage = () => {
       setActiveTab('draft')
       setSuccessMsg('Draft saved successfully!')
       setShowModal(false)
+      trackAction('campaign:created', { campaign: created })
       setTimeout(() => setSuccessMsg(''), 3500)
     } catch (err) {
       console.error('Error creating campaign:', err)
@@ -376,7 +388,11 @@ const CampaignPage = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => setShowModal(true)}
+                  onClick={() => {
+                    setShowModal(true)
+                    trackAction('campaign:open')
+                  }}
+                  data-guide-id="campaign-new"
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start sm:self-auto"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

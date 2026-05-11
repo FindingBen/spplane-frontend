@@ -5,6 +5,7 @@ import TopBar from '../components/TopBar'
 import { getSmsList, createSms, deleteSms } from '../service/api/sms'
 import { getCampaigns } from '../service/api/campaign'
 import { getContactLists } from '../service/api/segments'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -82,11 +83,13 @@ const PERSONALIZATION_TOKENS = [
 ]
 
 function CreateSmsModal({ onClose, onCreate, submitting }) {
+  const { active, currentStepId } = useFirstCampaignGuide()
   const [form, setForm] = useState(INIT_FORM)
   const [errors, setErrors] = useState({})
   const [campaigns, setCampaigns] = useState([])
   const [contactLists, setContactLists] = useState([])
   const [loading, setLoading] = useState(true)
+  const isGuideLocked = active && currentStepId === 'sms-form'
 
   useEffect(() => {
     Promise.all([
@@ -138,9 +141,9 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={isGuideLocked ? undefined : onClose} />
 
-      <div className="relative w-full max-w-xl bg-gradient-to-br from-[#1f2937] to-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl overflow-hidden">
+      <div data-guide-id="sms-form" className="relative w-full max-w-xl bg-gradient-to-br from-[#1f2937] to-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl overflow-hidden">
         {/* Modal header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#3e6ff4]/20">
           <div className="flex items-center gap-3">
@@ -153,6 +156,7 @@ function CreateSmsModal({ onClose, onCreate, submitting }) {
           </div>
           <button
             onClick={onClose}
+            disabled={isGuideLocked}
             className="text-[#CAC4CF] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#3e6ff4]/20"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,6 +367,7 @@ function SmsCard({ sms, onDelete, onSend }) {
         {canSend && (
           <button
             onClick={() => onSend(sms)}
+            data-guide-id={`sms-send-${sms.id}`}
             className="inline-flex items-center gap-1.5 rounded-lg border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-2.5 py-1.5 text-[#60a5fa] hover:bg-[#3e6ff4]/20 hover:border-[#3e6ff4]/60 transition-colors"
             title="Review cost and send"
           >
@@ -428,6 +433,7 @@ function EmptyState({ tab, onCreateClick }) {
 
 export default function SmsPage() {
   const navigate = useNavigate()
+  const { active, currentStepId, trackAction } = useFirstCampaignGuide()
   const [smsList, setSmsList] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -448,6 +454,11 @@ export default function SmsPage() {
   }
 
   useEffect(() => { fetchSms() }, [])
+  useEffect(() => {
+    if (active && currentStepId === 'sms-form') {
+      setShowModal(true)
+    }
+  }, [active, currentStepId])
 
   const handleCreate = async ({ campaign, contact_list, sender, body }) => {
     setSubmitting(true)
@@ -456,6 +467,7 @@ export default function SmsPage() {
       
       setSmsList(prev => [newSms, ...prev])
       setShowModal(false)
+      trackAction('sms:created', { sms: newSms })
     } catch {
       // keep modal open so user can retry
     } finally {
@@ -473,6 +485,7 @@ export default function SmsPage() {
   }
 
   const handleGoToSending = (sms) => {
+    trackAction('sms:open-send-review', { sms })
     navigate(`/sms/${sms.id}/sending`, { state: { sms } })
   }
 
@@ -502,7 +515,11 @@ export default function SmsPage() {
                   </p>
                 </div>
                 <button
-                  onClick={() => setShowModal(true)}
+                  onClick={() => {
+                    setShowModal(true)
+                    trackAction('sms:open')
+                  }}
+                  data-guide-id="sms-new"
                   className="flex items-center gap-2 px-5 py-2.5 2xl:px-4 2xl:py-2 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

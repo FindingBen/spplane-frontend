@@ -13,84 +13,87 @@ import SmsPage from './pages/SmsPage'
 import SmsSendingPage from './pages/SmsSendingPage'
 import SmsPageContent from './pages/SmsPageContent'
 import ProtectedRoute from './components/ProtectedRoute'
+import { FirstCampaignGuideProvider } from './guide/FirstCampaignGuideProvider'
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/set-password" element={<SetPassword />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/content/templates"
-          element={
-            <ProtectedRoute>
-              <Templates />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/content/products"
-          element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/content/builder" element={<ProtectedRoute>
-          <ContentBuilder />
-        </ProtectedRoute>} />
-        <Route
-          path="/campaigns"
-          element={
-            <ProtectedRoute>
-              <CampaignPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/audience"
-          element={
-            <ProtectedRoute>
-              <AudiencePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/customers"
-          element={
-            <ProtectedRoute>
-              <CustomersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sms"
-          element={
-            <ProtectedRoute>
-              <SmsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/sms/:smsId/sending"
-          element={
-            <ProtectedRoute>
-              <SmsSendingPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/sms/page/:slug" element={<SmsPageContent />} />
-      </Routes>
+      <FirstCampaignGuideProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/set-password" element={<SetPassword />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/content/templates"
+            element={
+              <ProtectedRoute>
+                <Templates />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/content/products"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/content/builder" element={<ProtectedRoute>
+            <ContentBuilder />
+          </ProtectedRoute>} />
+          <Route
+            path="/campaigns"
+            element={
+              <ProtectedRoute>
+                <CampaignPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/audience"
+            element={
+              <ProtectedRoute>
+                <AudiencePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/customers"
+            element={
+              <ProtectedRoute>
+                <CustomersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sms"
+            element={
+              <ProtectedRoute>
+                <SmsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sms/:smsId/sending"
+            element={
+              <ProtectedRoute>
+                <SmsSendingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/sms/page/:slug" element={<SmsPageContent />} />
+        </Routes>
+      </FirstCampaignGuideProvider>
     </BrowserRouter>
   )
 }

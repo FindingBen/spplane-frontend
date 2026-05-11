@@ -4,10 +4,22 @@ import axiosInstance from '../service/interceptor/axiosInstance'
 import { tokenService } from '../service/token/tokenService'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 const Home = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState({})
+  const { active, completed, currentStep, openIntro } = useFirstCampaignGuide()
+
+  const guideButtonLabel = active
+    ? 'Continue first campaign guide'
+    : completed
+      ? 'Run the first campaign guide again'
+      : 'Guide me through my first campaign'
+
+  const guideHelperText = active
+    ? `Current step: ${currentStep?.title ?? 'Continue where you left off.'}`
+    : 'Follow the full flow from content creation to cost review and final send.'
 
   useEffect(() => {
     fetchUserData()
@@ -73,13 +85,32 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Logout Button */}
-              <button
-                onClick={handleLogout}
-                className="px-4 md:px-6 2xl:px-5 py-2 md:py-3 2xl:py-2 text-sm md:text-base 2xl:text-sm bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90 text-white font-semibold rounded-lg transition-all duration-200"
-              >
-                Logout
-              </button>
+              <div className="rounded-2xl border border-[#3e6ff4]/25 bg-[#0f172a]/65 px-5 py-5 md:px-6 md:py-6 text-left shadow-[0_20px_45px_rgba(2,6,23,0.2)]">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#93c5fd]">First Campaign Walkthrough</p>
+                    <h2 className="mt-2 text-xl font-semibold text-white">Need a guided path for the full SMS send flow?</h2>
+                    <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">{guideHelperText}</p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={openIntro}
+                    className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  >
+                    {guideButtonLabel}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button
+                  onClick={handleLogout}
+                  className="px-4 md:px-6 2xl:px-5 py-2 md:py-3 2xl:py-2 text-sm md:text-base 2xl:text-sm bg-gradient-to-r from-red-500 to-red-600 hover:opacity-90 text-white font-semibold rounded-lg transition-all duration-200"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </main>
         </div>

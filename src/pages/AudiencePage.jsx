@@ -9,6 +9,7 @@ import {
   addContactToSegment,
   removeContactFromSegment
 } from '../service/api/segments'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -35,19 +36,25 @@ const STATUS_BADGE = {
 const INIT_SEG = { segment_name: '' }
 
 function CreateSegmentModal({ onClose, onCreate, submitting }) {
+  const { active, currentStepId } = useFirstCampaignGuide()
   const [form, setForm] = useState(INIT_SEG)
   const [error, setError] = useState('')
+  const isGuideLocked = active && currentStepId === 'audience-segment-form'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!form.segment_name.trim()) { setError('Segment name is required.'); return }
-    await onCreate(form)
+    const created = await onCreate(form)
+    if (!created) {
+      setError('Failed to create segment.')
+      return
+    }
     onClose()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="bg-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl w-full max-w-md p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={isGuideLocked ? undefined : onClose}>
+      <div data-guide-id="audience-segment-form" onClick={(event) => event.stopPropagation()} className="bg-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#3e6ff4]/15 border border-[#3e6ff4]/30 flex items-center justify-center">
@@ -57,7 +64,7 @@ function CreateSegmentModal({ onClose, onCreate, submitting }) {
             </div>
             <h2 className="text-lg font-bold text-white">Create Segment</h2>
           </div>
-          <button onClick={onClose} className="text-[#CAC4CF] hover:text-white transition-colors p-1" disabled={submitting}>
+          <button onClick={onClose} className="text-[#CAC4CF] hover:text-white transition-colors p-1" disabled={submitting || isGuideLocked}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -105,11 +112,13 @@ function CreateSegmentModal({ onClose, onCreate, submitting }) {
 // ── Add To Segment Modal (picks from existing customers) ──────────────────────
 
 function AddToSegmentModal({ onClose, onAdd, submitting, alreadyInSegment }) {
+  const { active, currentStepId } = useFirstCampaignGuide()
   const [allContacts, setAllContacts] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState(new Set())
   const [error, setError] = useState('')
+  const isGuideLocked = active && currentStepId === 'audience-add-customers-form'
 
   useEffect(() => {
     getContacts()
@@ -141,13 +150,17 @@ function AddToSegmentModal({ onClose, onAdd, submitting, alreadyInSegment }) {
   const handleSubmit = async () => {
     if (selected.size === 0) { setError('Select at least one customer.'); return }
     const selectedContacts = allContacts.filter(c => selected.has(c.id))
-    await onAdd(selectedContacts)
+    const didAdd = await onAdd(selectedContacts)
+    if (!didAdd) {
+      setError('Failed to add customers to segment.')
+      return
+    }
     onClose()
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="bg-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl w-full max-w-lg p-6 flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={isGuideLocked ? undefined : onClose}>
+      <div data-guide-id="audience-add-customers-form" onClick={(event) => event.stopPropagation()} className="bg-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl w-full max-w-lg p-6 flex flex-col max-h-[85vh]">
         <div className="flex items-center justify-between mb-5 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#3e6ff4]/15 border border-[#3e6ff4]/30 flex items-center justify-center">
@@ -157,7 +170,7 @@ function AddToSegmentModal({ onClose, onAdd, submitting, alreadyInSegment }) {
             </div>
             <h2 className="text-lg font-bold text-white">Add Customers to Segment</h2>
           </div>
-          <button onClick={onClose} disabled={submitting} className="text-[#CAC4CF] hover:text-white transition-colors p-1">
+          <button onClick={onClose} disabled={submitting || isGuideLocked} className="text-[#CAC4CF] hover:text-white transition-colors p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -258,6 +271,7 @@ function AddToSegmentModal({ onClose, onAdd, submitting, alreadyInSegment }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 const AudiencePage = () => {
+  const { active, currentStepId, trackAction } = useFirstCampaignGuide()
   const [segments, setSegments] = useState([])
   const [members, setMembers] = useState([])
   const [selectedSegment, setSelectedSegment] = useState(null)
@@ -286,6 +300,16 @@ const AudiencePage = () => {
   }
 
   useEffect(() => { fetchSegments() }, [])
+  useEffect(() => {
+    if (active && currentStepId === 'audience-segment-form') {
+      setShowCreateModal(true)
+    }
+  }, [active, currentStepId])
+  useEffect(() => {
+    if (active && currentStepId === 'audience-add-customers-form' && selectedSegment) {
+      setShowAddModal(true)
+    }
+  }, [active, currentStepId, selectedSegment])
 
   const handleSelectSegment = (seg) => {
     setSelectedSegment(seg)
@@ -298,8 +322,15 @@ const AudiencePage = () => {
     try {
       const created = await createContactList({ segment_name: form.segment_name })
       setSegments(prev => [...prev, created])
+      if (active && currentStepId === 'audience-segment-form') {
+        setSelectedSegment(created)
+        setMembers([])
+      }
+      trackAction('audience:segment-created', { segment: created })
+      return created
     } catch {
       setError('Failed to create segment.')
+      return null
     } finally {
       setSubmitting(false)
     }
@@ -328,8 +359,11 @@ const AudiencePage = () => {
         s.id === selectedSegment.id ? { ...s, contact_lenght: newLength } : s
       ))
       setSelectedSegment(prev => ({ ...prev, contact_lenght: newLength }))
+      trackAction('audience:customers-added', { contacts })
+      return true
     } catch {
       setMembersError('Failed to add customers to segment.')
+      return false
     } finally {
       setSubmitting(false)
     }
@@ -396,7 +430,11 @@ const AudiencePage = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => setShowAddModal(true)}
+                    onClick={() => {
+                      setShowAddModal(true)
+                      trackAction('audience:open-add-customers')
+                    }}
+                    data-guide-id="audience-add-customers"
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -528,7 +566,11 @@ const AudiencePage = () => {
                 <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
             
                   <button
-                    onClick={() => setShowCreateModal(true)}
+                    onClick={() => {
+                      setShowCreateModal(true)
+                      trackAction('audience:open-segment')
+                    }}
+                    data-guide-id="audience-new-segment"
                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

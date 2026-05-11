@@ -1,17 +1,19 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 const SidebarNav = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [isContentOpen, setIsContentOpen] = useState(false)
+  const { currentTargetId, trackAction } = useFirstCampaignGuide()
 
   // Auto-open Content if on content pages
   React.useEffect(() => {
-    if (location.pathname.startsWith('/content')) {
+    if (location.pathname.startsWith('/content') || currentTargetId === 'nav-content-builder') {
       setIsContentOpen(true)
     }
-  }, [location.pathname])
+  }, [currentTargetId, location.pathname])
 
   const isActive = (path) => location.pathname === path
 
@@ -30,7 +32,11 @@ const SidebarNav = () => {
 
       {/* Campaigns */}
       <button
-        onClick={() => navigate('/campaigns')}
+        onClick={() => {
+          trackAction('nav:campaigns')
+          navigate('/campaigns')
+        }}
+        data-guide-id="nav-campaigns"
         className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/campaigns')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
@@ -45,7 +51,11 @@ const SidebarNav = () => {
 
       {/* Audience */}
       <button
-        onClick={() => navigate('/audience')}
+        onClick={() => {
+          trackAction('nav:audience')
+          navigate('/audience')
+        }}
+        data-guide-id="nav-audience"
         className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/audience')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
@@ -60,7 +70,11 @@ const SidebarNav = () => {
 
       {/* Customers */}
       <button
-        onClick={() => navigate('/customers')}
+        onClick={() => {
+          trackAction('nav:customers')
+          navigate('/customers')
+        }}
+        data-guide-id="nav-customers"
         className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/customers')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
@@ -75,7 +89,11 @@ const SidebarNav = () => {
 
       {/* SMS */}
       <button
-        onClick={() => navigate('/sms')}
+        onClick={() => {
+          trackAction('nav:sms')
+          navigate('/sms')
+        }}
+        data-guide-id="nav-sms"
         className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/sms')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
@@ -114,7 +132,11 @@ const SidebarNav = () => {
         {isContentOpen && (
           <div className="ml-6 mt-2 space-y-2">
             <button
-              onClick={() => navigate('/content/builder')}
+              onClick={() => {
+                trackAction('nav:content-builder')
+                navigate('/content/builder')
+              }}
+              data-guide-id="nav-content-builder"
               className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
                 isActive('/content/builder')
                   ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'

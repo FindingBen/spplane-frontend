@@ -7,6 +7,7 @@ import {
   deleteContact,
   importShopifyCustomers
 } from '../service/api/segments'
+import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -196,8 +197,10 @@ function ImportErrorBanner({ notice, retrying, onRetry, onDismiss }) {
 const INIT_FORM = { first_name: '', last_name: '', phone: '', status: 'subscribed', source: 'manual' }
 
 function CreateCustomerModal({ onClose, onCreate, submitting }) {
+  const { active, currentStepId } = useFirstCampaignGuide()
   const [form, setForm] = useState(INIT_FORM)
   const [error, setError] = useState('')
+  const isGuideLocked = active && currentStepId === 'customer-form'
 
   const set = (field) => (e) => { setForm(f => ({ ...f, [field]: e.target.value })); setError('') }
 
@@ -213,8 +216,8 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-      <div className="bg-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl w-full max-w-md p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={isGuideLocked ? undefined : onClose}>
+      <div data-guide-id="customer-form" onClick={(event) => event.stopPropagation()} className="bg-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#3e6ff4]/15 border border-[#3e6ff4]/30 flex items-center justify-center">
@@ -224,7 +227,7 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
             </div>
             <h2 className="text-lg font-bold text-white">New Customer</h2>
           </div>
-          <button onClick={onClose} disabled={submitting} className="text-[#CAC4CF] hover:text-white transition-colors p-1">
+          <button onClick={onClose} disabled={submitting || isGuideLocked} className="text-[#CAC4CF] hover:text-white transition-colors p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -283,6 +286,7 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function CustomersPage() {
+  const { active, currentStepId, trackAction } = useFirstCampaignGuide()
   const [contacts, setContacts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -327,6 +331,11 @@ export default function CustomersPage() {
   useEffect(() => {
     setCurrentPage(prev => Math.min(prev, totalPages))
   }, [totalPages])
+  useEffect(() => {
+    if (active && currentStepId === 'customer-form') {
+      setShowCreateModal(true)
+    }
+  }, [active, currentStepId])
 
   const handleCreate = async (form) => {
     setSubmitting(true)
@@ -340,6 +349,7 @@ export default function CustomersPage() {
       })
       setContacts(prev => [created, ...prev])
       setCurrentPage(1)
+      trackAction('customer:created', { customer: created })
     } finally {
       setSubmitting(false)
     }
@@ -409,7 +419,11 @@ export default function CustomersPage() {
                     {importing ? 'Importing…' : 'Import from Shopify'}
                   </button>
                   <button
-                    onClick={() => setShowCreateModal(true)}
+                    onClick={() => {
+                      setShowCreateModal(true)
+                      trackAction('customer:open')
+                    }}
+                    data-guide-id="customer-create"
                     className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors"
                   >
                     Create
