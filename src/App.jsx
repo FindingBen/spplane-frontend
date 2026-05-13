@@ -10,6 +10,9 @@ import ContentBuilder from './pages/ContentBuilder'
 import CampaignPage from './pages/CampaignPage'
 import AudiencePage from './pages/AudiencePage'
 import SmsPage from './pages/SmsPage'
+import SmsPlansPage from './pages/SmsPlansPage'
+import SmsPurchaseCallbackPage from './pages/SmsPurchaseCallbackPage'
+import SmsPurchaseCancelPage from './pages/SmsPurchaseCancelPage'
 import SmsSendingPage from './pages/SmsSendingPage'
 import SmsPageContent from './pages/SmsPageContent'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -79,6 +82,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <SmsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sms-plans"
+            element={
+              <ProtectedRoute>
+                <SmsPlansPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sms-plans/callback"
+            element={
+              <ProtectedRoute>
+                <SmsPurchaseCallbackPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sms-plans/callback/confirmation"
+            element={
+              <ProtectedRoute>
+                <SmsPurchaseCallbackPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sms-plans/cancel"
+            element={
+              <ProtectedRoute>
+                <SmsPurchaseCancelPage />
               </ProtectedRoute>
             }
           />

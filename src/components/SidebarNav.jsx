@@ -106,6 +106,20 @@ const SidebarNav = () => {
         SMS
       </button>
 
+      <button
+        onClick={() => navigate('/sms-plans')}
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+          isActive('/sms-plans')
+            ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
+            : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+        }`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a5 5 0 00-10 0v2m-2 0h14a1 1 0 011 1v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8a1 1 0 011-1zm7 4h.01" />
+        </svg>
+        Top up
+      </button>
+
       {/* Content with Dropdown */}
       <div className="mt-4">
         <button
