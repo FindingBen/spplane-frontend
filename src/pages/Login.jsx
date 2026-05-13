@@ -117,12 +117,12 @@ export default function Login() {
 
     {/* Links */}
     <div className="flex flex-col items-center gap-2 mt-4">
-      <a
+      {/* <a
         href="#reset_password"
         className="text-sm text-white hover:text-[#3e6ff4] transition-colors"
       >
         Forgot password?
-      </a>
+      </a> */}
       <p className="text-sm text-gray-400">
         Don't have an account?{" "}
         <Link to="/register" className="text-[#3e6ff4] font-semibold hover:underline">
