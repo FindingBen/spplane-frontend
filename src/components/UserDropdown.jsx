@@ -55,7 +55,7 @@ const UserDropdown = () => {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg shadow-lg z-50">
           {/* Profile Settings */}
-          <button
+          {/* <button
             onClick={() => {
               navigate('/profile')
               setIsOpen(false)
@@ -67,7 +67,7 @@ const UserDropdown = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             Settings
-          </button>
+          </button> */}
 
           {/* Separator */}
           <div className="border-t border-[#3e6ff4]/20"></div>
