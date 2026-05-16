@@ -36,10 +36,14 @@ export const CtaPreview = ({ props = {}, variant = 'builder' }) => {
       )}
       <a
         href={props.link || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
+        {...(isPublic ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
         className={`block w-full text-center font-bold ${isPublic ? 'rounded-2xl' : 'rounded-lg'} ${sizeClass} ${styleClass}`}
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (!isPublic) {
+            e.preventDefault()
+          }
+        }}
       >
         {props.text || 'Buy Now'}
       </a>

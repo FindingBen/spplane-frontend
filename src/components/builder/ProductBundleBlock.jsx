@@ -27,10 +27,14 @@ export const ProductBundlePreview = ({ props = {}, variant = 'builder' }) => {
       {props.bundleCtaText && (
         <a
           href={props.bundleCtaLink || '#'}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(isPublic ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
           className={isPublic ? 'block w-full mt-4 py-3.5 bg-black text-white text-sm font-bold text-center rounded-2xl' : 'block w-full mt-2 py-2 bg-black text-white text-[10px] font-bold text-center rounded-lg'}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (!isPublic) {
+              e.preventDefault()
+            }
+          }}
         >
           {props.bundleCtaText}
         </a>
