@@ -20,7 +20,7 @@ const TopBar = () => {
       </div>
       
       {/* Search Bar - Center */}
-      <SearchBar />
+      {/* <SearchBar /> */}
       
       {/* User Actions - Right side */}
       <div className="flex items-center gap-2 md:gap-3">
