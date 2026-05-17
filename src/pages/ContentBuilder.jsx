@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import { generateContentProduct, saveDraft as saveDraftContent, publishContent } from '../service/api/content'
+import { deleteMyContent, generateContentProduct, saveDraft as saveDraftContent, publishContent } from '../service/api/content'
+import { tokenService } from '../service/token/tokenService'
 import PreviewComponent from '../components/builder/PreviewComponent'
 import ComponentEditor from '../components/builder/ComponentEditor'
 import Loader from '../components/Loader'
@@ -160,6 +161,7 @@ const DEFAULT_TEMPLATE_ID = 3
 const MIN_LOADER_MS = 1500
 const MAX_CAROUSEL_IMAGES = 5
 const MAX_LIST_ITEMS = 15
+const CONTENT_API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -187,6 +189,34 @@ const pickFirstArray = (...values) => {
   }
 
   return []
+}
+
+const pickFirstIdentifier = (...values) => {
+  for (const value of values) {
+    if ((typeof value === 'string' && value.trim()) || typeof value === 'number') {
+      return value
+    }
+  }
+
+  return null
+}
+
+const extractGeneratedContentId = (payload = {}) => pickFirstIdentifier(
+  payload?.content_id,
+  payload?.contentId,
+  payload?.generated_content_id,
+  payload?.generatedContentId,
+  payload?.content?.id,
+  payload?.content?.content_id,
+  payload?.content?.contentId,
+  payload?.data?.id,
+  payload?.result?.id,
+  payload?.id,
+)
+
+const buildGeneratedContentDeleteUrl = (contentId) => {
+  const relativePath = `/api/content/mine/${contentId}/`
+  return CONTENT_API_BASE_URL ? `${CONTENT_API_BASE_URL}${relativePath}` : relativePath
 }
 
 const normalizeCarouselImageItem = (item = {}, index = 0) => {
@@ -657,6 +687,33 @@ const ContentBuilder = () => {
   )
   const [builderNotice, setBuilderNotice] = useState(null)
   const blockUploadsRef = useRef(blockUploads)
+  const generatedContentIdRef = useRef(null)
+  const hasDeletedGeneratedContentRef = useRef(false)
+  const [generatedContentId, setGeneratedContentId] = useState(null)
+
+  const deleteGeneratedContent = (contentId, { preferKeepalive = false } = {}) => {
+    if (!contentId || hasDeletedGeneratedContentRef.current) {
+      return
+    }
+
+    hasDeletedGeneratedContentRef.current = true
+    generatedContentIdRef.current = null
+
+    if (preferKeepalive && typeof fetch === 'function') {
+      const accessToken = tokenService.getAccess()
+      const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+
+      void fetch(buildGeneratedContentDeleteUrl(contentId), {
+        method: 'DELETE',
+        headers,
+        keepalive: true,
+      }).catch(() => {})
+
+      return
+    }
+
+    void deleteMyContent(contentId).catch(() => {})
+  }
 
   const clearBlockUploads = () => {
     setBlockUploads((currentUploads) => {
@@ -695,9 +752,42 @@ const ContentBuilder = () => {
   }, [])
 
   useEffect(() => {
-    if (!generationRequest?.productId) {
+    if (!generationRequest?.productId || !generatedContentId) {
       return undefined
     }
+
+    const handlePageHide = () => {
+      deleteGeneratedContent(generatedContentIdRef.current ?? generatedContentId, { preferKeepalive: true })
+    }
+
+    window.addEventListener('pagehide', handlePageHide)
+
+    return () => {
+      window.removeEventListener('pagehide', handlePageHide)
+    }
+  }, [generatedContentId, generationRequest?.productId])
+
+  useEffect(() => {
+    if (!generationRequest?.productId || !generatedContentId) {
+      return undefined
+    }
+
+    return () => {
+      deleteGeneratedContent(generatedContentId)
+    }
+  }, [generatedContentId, generationRequest?.productId])
+
+  useEffect(() => {
+    if (!generationRequest?.productId) {
+      generatedContentIdRef.current = null
+      hasDeletedGeneratedContentRef.current = false
+      setGeneratedContentId(null)
+      return undefined
+    }
+
+    generatedContentIdRef.current = null
+    hasDeletedGeneratedContentRef.current = false
+    setGeneratedContentId(null)
 
     let isDisposed = false
 
@@ -717,12 +807,17 @@ const ContentBuilder = () => {
           sleep(MIN_LOADER_MS),
         ])
 
+        const nextGeneratedContentId = extractGeneratedContentId(payload)
+
         if (isDisposed) {
+          deleteGeneratedContent(nextGeneratedContentId)
           return
         }
 
         const generatedBlocks = resolveGeneratedBlocks(payload)
 
+        generatedContentIdRef.current = nextGeneratedContentId
+        setGeneratedContentId(nextGeneratedContentId)
         setTemplateId(payload?.template_id ?? DEFAULT_TEMPLATE_ID)
         setBlocks(generatedBlocks)
         setSelectedBlockId(generatedBlocks[0]?.id ?? null)
