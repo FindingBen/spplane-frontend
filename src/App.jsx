@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Templates from './pages/Templates'
 import Products from './pages/Products'
 import ContentBuilder from './pages/ContentBuilder'
+import MyContents from './pages/MyContents'
 import CampaignPage from './pages/CampaignPage'
 import AudiencePage from './pages/AudiencePage'
 import SmsPage from './pages/SmsPage'
@@ -39,6 +40,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Templates />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/content/mine"
+            element={
+              <ProtectedRoute>
+                <MyContents />
               </ProtectedRoute>
             }
           />

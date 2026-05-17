@@ -7,6 +7,11 @@ import { CountdownTimerEditor } from './CountdownTimerBlock'
 import { CtaEditor } from './CtaBlock'
 import { TextBlockEditor } from './TextBlock'
 import { ProductImageEditor } from './ProductImageBlock'
+import { CarouselEditor } from './CarouselBlock'
+import { ListBlockEditor } from './ListBlock'
+import { DescriptionEditor } from './DescriptionBlock'
+import { PriceEditor } from './PriceBlock'
+import { TaglineEditor } from './TaglineBlock'
 
 const ComponentEditor = ({ component, uploads, onUpdate, onUploadChange }) => {
   const { type, props = {} } = component
@@ -34,6 +39,11 @@ const ComponentEditor = ({ component, uploads, onUpdate, onUploadChange }) => {
       {type === 'countdown-timer' && <CountdownTimerEditor props={props} onChange={onChange} />}
       {type === 'cta' && <CtaEditor props={props} onChange={onChange} />}
       {type === 'text' && <TextBlockEditor props={props} onChange={onChange} />}
+      {type === 'description' && <DescriptionEditor props={props} onChange={onChange} />}
+      {type === 'price' && <PriceEditor props={props} onChange={onChange} />}
+      {type === 'tagline' && <TaglineEditor props={props} onChange={onChange} />}
+      {(type === 'carousel' || type === 'gallery') && <CarouselEditor props={props} uploads={uploads} onChange={onChange} onUploadChange={onUploadChange} />}
+      {type === 'list' && <ListBlockEditor props={props} onChange={onChange} />}
       {type === 'image' && <ProductImageEditor props={props} uploads={uploads} onChange={onChange} onUploadChange={onUploadChange} />}
     </div>
   )

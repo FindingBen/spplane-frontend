@@ -120,10 +120,11 @@ const TemplateBlock = ({ block }) => {
 
   switch (type) {
     case 'video-hero':
+    case 'hero':
       return (
         <div className="w-full relative">
-          {props.fallbackImage ? (
-            <img src={props.fallbackImage} alt={props.title || 'Video'} className="w-full h-36 object-cover" />
+          {(props.fallbackImage || props.image) ? (
+            <img src={props.fallbackImage || props.image} alt={props.title || props.headline || 'Video'} className="w-full h-36 object-cover" />
           ) : (
             <div className="w-full h-36 bg-gray-900 flex items-center justify-center">
               <div className="w-10 h-10 bg-black/60 rounded-full flex items-center justify-center">
@@ -131,9 +132,9 @@ const TemplateBlock = ({ block }) => {
               </div>
             </div>
           )}
-          {props.title && (
+          {(props.title || props.headline) && (
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-              <p className="text-white text-xs font-semibold">{props.title}</p>
+              <p className="text-white text-xs font-semibold">{props.title || props.headline}</p>
             </div>
           )}
         </div>
@@ -142,26 +143,26 @@ const TemplateBlock = ({ block }) => {
     case 'product-bundle':
       return (
         <div className="w-full px-3 py-3 bg-white">
-          {props.title && <p className="text-xs font-bold text-black mb-1">{props.title}</p>}
+          {(props.title || props.heading) && <p className="text-xs font-bold text-black mb-1">{props.title || props.heading}</p>}
           <div className="flex gap-2 overflow-x-auto pb-1">
-            {(props.products || []).map((p, idx) => (
+            {((Array.isArray(props.products) && props.products.length > 0 ? props.products : props.items || [])).map((p, idx) => (
               <div key={idx} className="flex-shrink-0 w-20 bg-gray-50 rounded border border-gray-200 overflow-hidden">
-                {p.image ? (
-                  <img src={p.image} alt={p.name} className="w-full h-14 object-cover" />
+                {(p.image || p.image_url) ? (
+                  <img src={p.image || p.image_url} alt={p.name || p.title} className="w-full h-14 object-cover" />
                 ) : (
                   <div className="w-full h-14 bg-gray-200 flex items-center justify-center">
                     <span className="text-[9px] text-gray-400">No image</span>
                   </div>
                 )}
                 <div className="p-1">
-                  <p className="text-[10px] font-semibold text-black truncate">{p.name}</p>
-                  <p className="text-[10px] text-green-700">{p.price}</p>
+                  <p className="text-[10px] font-semibold text-black truncate">{p.name || p.title}</p>
+                  <p className="text-[10px] text-green-700">{String(p.price || p.price_amount || '').startsWith('$') ? String(p.price || p.price_amount || '') : `$${p.price || p.price_amount || ''}`}</p>
                 </div>
               </div>
             ))}
           </div>
-          {props.bundleCtaText && (
-            <div className="w-full mt-2 py-1.5 bg-black text-white text-[10px] font-bold text-center rounded">{props.bundleCtaText}</div>
+          {(props.bundleCtaText || props.ctaText || props.buttonText) && (
+            <div className="w-full mt-2 py-1.5 bg-black text-white text-[10px] font-bold text-center rounded">{props.bundleCtaText || props.ctaText || props.buttonText}</div>
           )}
         </div>
       )
@@ -191,12 +192,15 @@ const TemplateBlock = ({ block }) => {
         </div>
       )
 
-    case 'inventory-tracker': {
-      const msg = (props.messageTemplate || 'Only {remaining} left in stock!').replace('{remaining}', 3)
+    case 'inventory-tracker':
+    case 'urgency_text': {
+      const rawMessage = props.text || props.message || props.urgencyMessage || props.messageTemplate || 'Only {remaining} left in stock!'
+      const msg = String(rawMessage).replace('{remaining}', 3)
+      const isUrgent = type === 'urgency_text' || Boolean(props.text || props.message) || 3 <= (props.urgencyThreshold || 5)
       return (
-        <div className="w-full px-3 py-2 bg-orange-50 flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0" />
-          <p className="text-[10px] font-semibold text-orange-600">{msg}</p>
+        <div className={`w-full px-3 py-2 flex items-center gap-2 ${isUrgent ? 'bg-red-50' : 'bg-orange-50'}`}>
+          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isUrgent ? 'bg-red-500' : 'bg-orange-400'}`} />
+          <p className={`text-[10px] font-semibold ${isUrgent ? 'text-red-600' : 'text-orange-600'}`}>{msg}</p>
         </div>
       )
     }
@@ -235,6 +239,76 @@ const TemplateBlock = ({ block }) => {
       )
     }
 
+    case 'carousel':
+    case 'gallery': {
+      const carouselItems = (Array.isArray(props.images) && props.images.length > 0 ? props.images : props.items || []).slice(0, 5)
+      const firstImage = carouselItems[0]
+      const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url || firstImage?.image || ''
+      const altText = typeof firstImage === 'string' ? 'Carousel image' : firstImage?.alt || firstImage?.title || 'Carousel image'
+
+      return (
+        <div className="w-full bg-white px-3 py-3">
+          {imageUrl ? (
+            <img src={imageUrl} alt={altText} className="h-28 w-full rounded-lg object-cover" />
+          ) : (
+            <div className="flex h-28 items-center justify-center rounded-lg bg-gray-100">
+              <span className="text-[10px] text-gray-400">Carousel block</span>
+            </div>
+          )}
+          {carouselItems.length > 1 && (
+            <div className="mt-2 flex gap-1">
+              {carouselItems.slice(0, 4).map((_, index) => (
+                <span key={index} className={`h-1.5 rounded-full ${index === 0 ? 'w-4 bg-black' : 'w-1.5 bg-gray-300'}`} />
+              ))}
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    case 'list': {
+      const listItems = (Array.isArray(props.items) ? props.items : []).map((item) => (typeof item === 'string' ? item : item?.text || item?.label || '')).filter(Boolean)
+
+      return (
+        <div className="w-full bg-white px-3 py-3">
+          <ul className="list-disc space-y-1 pl-4 text-[10px] leading-relaxed text-gray-700">
+            {(listItems.length > 0 ? listItems : ['List block']).slice(0, 3).map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    case 'tagline':
+    case 'text-tag':
+      return (
+        <div className="w-full bg-white px-3 pb-2 pt-3">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500">{props.text || props.label || 'Tagline'}</p>
+        </div>
+      )
+
+    case 'description':
+    case 'text-desc':
+      return (
+        <div className="w-full bg-[#f3f4f6] px-3 py-3">
+          {(props.heading || props.title) && <p className="mb-1 text-[10px] font-semibold text-gray-900">{props.heading || props.title}</p>}
+          <p className="whitespace-pre-line text-[10px] leading-relaxed text-gray-700">{props.content || props.text || 'Description block'}</p>
+        </div>
+      )
+
+    case 'price': {
+      const price = String(props.price || props.amount || props.text || '').trim()
+      const formattedPrice = price && !price.startsWith('$') ? `$${price}` : price || '$0.00'
+
+      return (
+        <div className="w-full bg-black px-3 py-3 text-center">
+          <p className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/60">Price</p>
+          <p className="mt-1 text-lg font-bold text-white">{formattedPrice}</p>
+        </div>
+      )
+    }
+
     case 'text':
       return (
         <div className="w-full bg-white px-3 py-3">
@@ -264,7 +338,7 @@ const TemplateBlock = ({ block }) => {
       return (
         <div className={`w-full px-3 py-2 bg-white ${props.sticky ? 'border-t-2 border-gray-200' : ''}`}>
           <div className={`w-full text-center font-bold rounded-lg text-xs ${sizeClass} ${styleClass}`}>
-            {props.text || 'Buy Now'}
+            {props.text || props.label || 'Buy Now'}
           </div>
         </div>
       )

@@ -1,9 +1,9 @@
 import axiosInstance from '../interceptor/axiosInstance'
 
-// GET /api/content/content/
+// GET /api/content/mine/
 // Returns: [{ id, title, ... }]
 export async function getContents() {
-  const response = await axiosInstance.get('/api/content/v1/')
+  const response = await axiosInstance.get('/api/content/mine/')
   return response.data
 }
 

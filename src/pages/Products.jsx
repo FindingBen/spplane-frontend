@@ -580,14 +580,7 @@ export default function Products() {
                     Import Shopify products and browse the latest 50 synced items.
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleOpenGenerateModal(selectedProduct)}
-                  disabled={!selectedProduct}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-4 py-2.5 text-sm font-semibold text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/20 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  Generate Selected Product
-                </button>
+               
                 <button
                   type="button"
                   onClick={handleImport}

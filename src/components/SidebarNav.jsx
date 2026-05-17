@@ -146,6 +146,17 @@ const SidebarNav = () => {
         {isContentOpen && (
           <div className="ml-6 mt-2 space-y-2">
             <button
+              onClick={() => navigate('/content/mine')}
+              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+                isActive('/content/mine')
+                  ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
+                  : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+              }`}
+            >
+              <div className={`w-1 h-1 rounded-full ${isActive('/content/mine') ? 'bg-[#60a5fa]' : 'bg-[#3e6ff4]'}`}></div>
+              My Content
+            </button>
+            <button
               onClick={() => {
                 trackAction('nav:content-builder')
                 navigate('/content/builder')

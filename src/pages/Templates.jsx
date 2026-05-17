@@ -248,10 +248,11 @@ const TemplateCardBlock = ({ block }) => {
 
   switch (type) {
     case 'video-hero':
+    case 'hero':
       return (
         <div className="w-full relative flex-shrink-0">
-          {props.fallbackImage ? (
-            <img src={props.fallbackImage} alt={props.title || ''} className="w-full h-10 object-cover" />
+          {(props.fallbackImage || props.image) ? (
+            <img src={props.fallbackImage || props.image} alt={props.title || props.headline || ''} className="w-full h-10 object-cover" />
           ) : (
             <div className="w-full h-10 bg-gray-900 flex items-center justify-center">
               <span className="text-[8px] text-gray-400">▶ Video</span>
@@ -271,11 +272,16 @@ const TemplateCardBlock = ({ block }) => {
         </div>
       )
     case 'inventory-tracker':
+    case 'urgency_text': {
+      const rawMessage = props.text || props.message || props.urgencyMessage || props.messageTemplate || 'Only {remaining} left in stock!'
+      const message = String(rawMessage).replace('{remaining}', 3)
+      const isUrgent = type === 'urgency_text' || Boolean(props.text || props.message)
       return (
-        <div className="w-full px-1 py-0.5 bg-orange-50 flex-shrink-0">
-          <p className="text-[8px] text-orange-600 line-clamp-1">🔴 Only 3 left in stock!</p>
+        <div className={`w-full px-1 py-0.5 flex-shrink-0 ${isUrgent ? 'bg-red-50' : 'bg-orange-50'}`}>
+          <p className={`text-[8px] line-clamp-1 ${isUrgent ? 'text-red-600' : 'text-orange-600'}`}>{message}</p>
         </div>
       )
+    }
     case 'countdown-timer':
       return (
         <div className="w-full px-1 py-0.5 bg-white flex-shrink-0">
@@ -286,6 +292,62 @@ const TemplateCardBlock = ({ block }) => {
           </div>
         </div>
       )
+    case 'carousel':
+    case 'gallery': {
+      const carouselItems = (Array.isArray(props.images) && props.images.length > 0 ? props.images : props.items || []).slice(0, 5)
+      const firstImage = carouselItems[0]
+      const imageUrl = typeof firstImage === 'string' ? firstImage : firstImage?.url || firstImage?.image || ''
+      const altText = typeof firstImage === 'string' ? 'Carousel image' : firstImage?.alt || firstImage?.title || 'Carousel image'
+
+      return (
+        <div className="w-full px-1 py-1 bg-white flex-shrink-0">
+          {imageUrl ? (
+            <img src={imageUrl} alt={altText} className="h-10 w-full rounded object-cover" />
+          ) : (
+            <div className="flex h-10 items-center justify-center rounded bg-gray-100">
+              <span className="text-[8px] text-gray-400">Carousel</span>
+            </div>
+          )}
+        </div>
+      )
+    }
+    case 'list': {
+      const listItems = (Array.isArray(props.items) ? props.items : []).map((item) => (typeof item === 'string' ? item : item?.text || item?.label || '')).filter(Boolean)
+
+      return (
+        <div className="w-full px-1 py-1 bg-white flex-shrink-0">
+          <ul className="list-disc pl-3 text-[8px] leading-snug text-gray-600">
+            {(listItems.length > 0 ? listItems : ['List']).slice(0, 2).map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    case 'tagline':
+    case 'text-tag':
+      return (
+        <div className="w-full px-1 py-0.5 bg-white flex-shrink-0">
+          <p className="text-[8px] uppercase tracking-[0.16em] text-gray-500">{props.text || props.label || 'Tagline'}</p>
+        </div>
+      )
+    case 'description':
+    case 'text-desc':
+      return (
+        <div className="w-full px-1 py-1 bg-[#f3f4f6] flex-shrink-0">
+          <p className="line-clamp-2 text-[8px] leading-snug text-gray-600">{props.content || props.text || 'Description block'}</p>
+        </div>
+      )
+    case 'price': {
+      const price = String(props.price || props.amount || props.text || '').trim()
+      const formattedPrice = price && !price.startsWith('$') ? `$${price}` : price || '$0.00'
+
+      return (
+        <div className="w-full px-1 py-1 bg-black flex-shrink-0">
+          <p className="text-center text-[8px] font-semibold text-white">{formattedPrice}</p>
+        </div>
+      )
+    }
     case 'text':
       return (
         <div className="w-full px-1 py-1 bg-white flex-shrink-0">
@@ -308,18 +370,18 @@ const TemplateCardBlock = ({ block }) => {
       return (
         <div className="w-full p-1 flex-shrink-0">
           <div className="w-full py-1 rounded text-white text-center bg-black" style={{ fontSize: '8px' }}>
-            {props.text || 'Buy Now'}
+            {props.text || props.label || 'Buy Now'}
           </div>
         </div>
       )
     case 'product-bundle':
       return (
         <div className="w-full px-1 py-0.5 bg-white flex-shrink-0">
-          <p className="text-[8px] font-semibold text-black line-clamp-1">{props.title || 'Bundle'}</p>
+          <p className="text-[8px] font-semibold text-black line-clamp-1">{props.title || props.heading || 'Bundle'}</p>
           <div className="flex gap-0.5 mt-0.5">
-            {(props.products || []).slice(0, 2).map((p, i) => (
+            {((Array.isArray(props.products) && props.products.length > 0 ? props.products : props.items || [])).slice(0, 2).map((p, i) => (
               <div key={i} className="w-6 h-6 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                {p.image && <img src={p.image} alt={p.name} className="w-full h-full object-cover" />}
+                {(p.image || p.image_url) && <img src={p.image || p.image_url} alt={p.name || p.title} className="w-full h-full object-cover" />}
               </div>
             ))}
           </div>

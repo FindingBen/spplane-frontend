@@ -18,6 +18,10 @@ const revokeUploadPreviewUrls = (uploads = {}) => {
   revokePreviewUrl(uploads.imagePreviewUrl)
   revokePreviewUrl(uploads.heroImagePreviewUrl)
   revokePreviewUrl(uploads.heroVideoPosterPreviewUrl)
+
+  if (Array.isArray(uploads.carouselImagePreviewUrls)) {
+    uploads.carouselImagePreviewUrls.forEach(revokePreviewUrl)
+  }
 }
 
 const hasUploadData = (uploads = {}) => Boolean(
@@ -29,6 +33,8 @@ const hasUploadData = (uploads = {}) => Boolean(
   || uploads.heroVideoFileName
   || uploads.heroVideoPosterFile
   || uploads.heroVideoPosterPreviewUrl
+  || (Array.isArray(uploads.carouselImageFiles) && uploads.carouselImageFiles.some(Boolean))
+  || (Array.isArray(uploads.carouselImagePreviewUrls) && uploads.carouselImagePreviewUrls.some(Boolean))
 )
 
 const BLOCK_UPLOAD_CONFIG = {
@@ -44,7 +50,49 @@ const BLOCK_UPLOAD_CONFIG = {
 
 const getUploadFieldName = (blockId, fieldPrefix) => `${fieldPrefix}-${blockId}`
 
+const serializeCarouselBlockForSubmission = (block, uploads = {}) => {
+  const { uploadFields: _ignoredUploadFields, ...restProps } = block.props ?? {}
+  const normalizedProps = normalizeCarouselProps(restProps)
+  const carouselFiles = Array.isArray(uploads.carouselImageFiles)
+    ? uploads.carouselImageFiles
+    : []
+  const nextImages = normalizedProps.images.map((image, index) => (
+    carouselFiles[index] ? { ...image, url: '' } : image
+  ))
+  const nextUploadFields = carouselFiles.reduce((fields, file, index) => {
+    if (!file) {
+      return fields
+    }
+
+    const uploadField = getUploadFieldName(block.id, `carousel-image-${index}`)
+
+    return {
+      ...fields,
+      [`images.${index}.url`]: { uploadField },
+      [`items.${index}.url`]: { uploadField },
+    }
+  }, {})
+  const nextProps = {
+    ...normalizedProps,
+    images: nextImages,
+    items: nextImages,
+  }
+
+  if (Object.keys(nextUploadFields).length > 0) {
+    nextProps.uploadFields = nextUploadFields
+  }
+
+  return {
+    ...block,
+    props: nextProps,
+  }
+}
+
 const serializeBlockForSubmission = (block, uploads = {}) => {
+  if (block.type === 'carousel') {
+    return serializeCarouselBlockForSubmission(block, uploads)
+  }
+
   const uploadConfig = BLOCK_UPLOAD_CONFIG[block.type]
 
   if (!uploadConfig) {
@@ -76,6 +124,20 @@ const serializeBlockForSubmission = (block, uploads = {}) => {
 }
 
 const collectUploadsForSubmission = (blocks, blockUploads) => blocks.reduce((uploads, block) => {
+  if (block.type === 'carousel') {
+    const carouselFiles = Array.isArray(blockUploads[block.id]?.carouselImageFiles)
+      ? blockUploads[block.id].carouselImageFiles
+      : []
+
+    carouselFiles.forEach((file, index) => {
+      if (file) {
+        uploads[getUploadFieldName(block.id, `carousel-image-${index}`)] = file
+      }
+    })
+
+    return uploads
+  }
+
   const blockUploadConfig = BLOCK_UPLOAD_CONFIG[block.type]
   const currentBlockUploads = blockUploads[block.id]
 
@@ -96,6 +158,8 @@ const collectUploadsForSubmission = (blocks, blockUploads) => blocks.reduce((upl
 
 const DEFAULT_TEMPLATE_ID = 3
 const MIN_LOADER_MS = 1500
+const MAX_CAROUSEL_IMAGES = 5
+const MAX_LIST_ITEMS = 15
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -125,6 +189,47 @@ const pickFirstArray = (...values) => {
   return []
 }
 
+const normalizeCarouselImageItem = (item = {}, index = 0) => {
+  if (typeof item === 'string') {
+    return {
+      url: item,
+      alt: `Carousel image ${index + 1}`,
+    }
+  }
+
+  return {
+    url: pickFirstString(item?.url, item?.image, item?.src),
+    alt: pickFirstString(item?.alt, item?.title, item?.label, `Carousel image ${index + 1}`),
+  }
+}
+
+const normalizeCarouselProps = (props = {}) => {
+  const images = pickFirstArray(props?.images, props?.items)
+    .slice(0, MAX_CAROUSEL_IMAGES)
+    .map((item, index) => normalizeCarouselImageItem(item, index))
+
+  return {
+    ...props,
+    images,
+    items: images,
+  }
+}
+
+const normalizeListItem = (item = '') => {
+  if (typeof item === 'string') {
+    return item
+  }
+
+  return pickFirstString(item?.text, item?.label, item?.value)
+}
+
+const normalizeListProps = (props = {}) => ({
+  ...props,
+  items: pickFirstArray(props?.items, props?.values)
+    .slice(0, MAX_LIST_ITEMS)
+    .map(normalizeListItem),
+})
+
 const formatPriceLabel = (value) => {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return `$${value.toFixed(2)}`
@@ -143,16 +248,162 @@ const formatPriceLabel = (value) => {
   return /^[\d.]+$/.test(trimmedValue) ? `$${trimmedValue}` : trimmedValue
 }
 
+const normalizeHeroProps = (props = {}) => ({
+  ...props,
+  videoUrl: pickFirstString(props?.videoUrl, props?.video_url),
+  title: pickFirstString(props?.title, props?.headline),
+  subtitle: pickFirstString(props?.subtitle),
+  fallbackImage: pickFirstString(props?.fallbackImage, props?.posterImage, props?.image),
+  posterImage: pickFirstString(props?.posterImage, props?.fallbackImage, props?.image),
+  autoplay: props?.autoplay ?? false,
+  muted: props?.muted ?? true,
+  loop: props?.loop ?? false,
+})
+
+const normalizeCtaProps = (props = {}) => ({
+  ...props,
+  text: pickFirstString(props?.text, props?.label, 'Shop now'),
+  link: pickFirstString(props?.link, props?.url),
+  sticky: props?.sticky ?? true,
+  style: props?.style || 'primary',
+  size: props?.size || 'large',
+})
+
+const normalizeBundleProps = (props = {}) => ({
+  ...props,
+  title: pickFirstString(props?.title, props?.heading),
+  subtitle: pickFirstString(props?.subtitle, props?.description),
+  products: pickFirstArray(props?.products, props?.items).map((item, index) => ({
+    shopifyId: pickFirstString(item?.shopifyId, item?.id, item?.shopify_variant_id),
+    image: pickFirstString(item?.image, item?.image_url),
+    name: pickFirstString(item?.name, item?.title, `Option ${index + 1}`),
+    price: formatPriceLabel(item?.price || item?.price_amount),
+  })),
+  bundleCtaText: pickFirstString(props?.bundleCtaText, props?.ctaText, props?.buttonText),
+  bundleCtaLink: pickFirstString(props?.bundleCtaLink, props?.ctaLink, props?.link, props?.url),
+})
+
+const normalizeDescriptionProps = (props = {}) => ({
+  ...props,
+  heading: pickFirstString(props?.heading, props?.title, props?.label),
+  content: pickFirstString(props?.content, props?.text, props?.description),
+})
+
+const normalizePriceProps = (props = {}) => ({
+  ...props,
+  price: formatPriceLabel(props?.price || props?.amount || props?.text),
+})
+
+const normalizeTaglineProps = (props = {}) => ({
+  ...props,
+  text: pickFirstString(props?.text, props?.tagline, props?.label),
+})
+
+const normalizeInventoryProps = (props = {}) => {
+  const overrideText = pickFirstString(props?.text, props?.message, props?.customMessage)
+
+  return {
+    ...props,
+    text: overrideText,
+    forceUrgent: props?.forceUrgent ?? Boolean(overrideText),
+  }
+}
+
+const normalizeBuilderBlock = (block = {}) => {
+  if (!block || typeof block !== 'object') {
+    return {
+      type: 'text',
+      props: {},
+    }
+  }
+
+  switch (block.type) {
+    case 'hero':
+      return {
+        ...block,
+        type: 'video-hero',
+        props: normalizeHeroProps(block?.props ?? {}),
+      }
+    case 'cta':
+      return {
+        ...block,
+        type: 'cta',
+        props: normalizeCtaProps(block?.props ?? {}),
+      }
+    case 'product-bundle':
+      return {
+        ...block,
+        type: 'product-bundle',
+        props: normalizeBundleProps(block?.props ?? {}),
+      }
+    case 'gallery':
+    case 'carousel':
+      return {
+        ...block,
+        type: 'carousel',
+        props: normalizeCarouselProps(block?.props ?? {}),
+      }
+    case 'list':
+      return {
+        ...block,
+        type: 'list',
+        props: normalizeListProps(block?.props ?? {}),
+      }
+    case 'text-desc':
+    case 'description':
+      return {
+        ...block,
+        type: 'description',
+        props: normalizeDescriptionProps(block?.props ?? {}),
+      }
+    case 'text-tag':
+    case 'tagline':
+      return {
+        ...block,
+        type: 'tagline',
+        props: normalizeTaglineProps(block?.props ?? {}),
+      }
+    case 'price':
+      return {
+        ...block,
+        type: 'price',
+        props: normalizePriceProps(block?.props ?? {}),
+      }
+    case 'urgency_text':
+    case 'inventory-tracker':
+      return {
+        ...block,
+        type: 'inventory-tracker',
+        props: normalizeInventoryProps(block?.props ?? {}),
+      }
+    case 'product-image':
+      return {
+        ...block,
+        type: 'image',
+        props: block?.props ?? {},
+      }
+    default:
+      return {
+        ...block,
+        props: block?.props ?? {},
+      }
+  }
+}
+
 const createBuilderBlocks = (blocks = []) => {
   if (!Array.isArray(blocks)) {
     return []
   }
 
-  return blocks.map((block, index) => ({
-    ...block,
-    id: index,
-    props: block?.props ?? {},
-  }))
+  return blocks.map((block, index) => {
+    const normalizedBlock = normalizeBuilderBlock(block)
+
+    return {
+      ...normalizedBlock,
+      id: index,
+      props: normalizedBlock?.props ?? {},
+    }
+  })
 }
 
 const extractGeneratedComponents = (payload) => pickFirstArray(
@@ -161,6 +412,7 @@ const extractGeneratedComponents = (payload) => pickFirstArray(
 )
 
 const createHeroBlock = (component = {}, payload = {}) => ({
+  
   type: 'video-hero',
   props: {
     videoUrl: pickFirstString(component?.props?.videoUrl, component?.props?.video_url),
@@ -170,6 +422,7 @@ const createHeroBlock = (component = {}, payload = {}) => ({
       component?.props?.headline,
       payload?.product?.title,
     ),
+    subtitle: pickFirstString(payload?.copy?.urgency_message, payload?.copy?.hero_subtitle, component?.props?.subtitle, payload?.product?.seo_description),
     fallbackImage: pickFirstString(
       payload?.product?.featured_image_url,
       payload?.product?.primary_variant?.image_url,
@@ -246,10 +499,15 @@ const mapGeneratedComponentToBlock = (component = {}, payload = {}) => {
     case 'cta':
       return createCtaBlock(component, payload)
     case 'product-bundle':
-      return {
-        type: 'product-bundle',
-        props: component?.props ?? {},
-      }
+    case 'gallery':
+    case 'carousel':
+    case 'list':
+    case 'text-desc':
+    case 'description':
+    case 'text-tag':
+    case 'tagline':
+    case 'price':
+    case 'urgency_text':
     case 'video-hero':
     case 'comparison-table':
     case 'inventory-tracker':
@@ -257,15 +515,15 @@ const mapGeneratedComponentToBlock = (component = {}, payload = {}) => {
     case 'countdown-timer':
     case 'text':
     case 'image':
-      return {
+      return normalizeBuilderBlock({
         type: component.type,
         props: component?.props ?? {},
-      }
+      })
     case 'product-image':
-      return {
-        type: 'image',
+      return normalizeBuilderBlock({
+        type: 'product-image',
         props: component?.props ?? {},
-      }
+      })
     default:
       return null
   }
@@ -531,15 +789,16 @@ const ContentBuilder = () => {
   }
 
   const updateBlock = (id, updates) => {
-    setBlocks(
-      blocks.map((b) => (b.id === id ? { ...b, props: { ...b.props, ...updates } } : b))
-    )
+    setBlocks((currentBlocks) => (
+      currentBlocks.map((b) => (b.id === id ? { ...b, props: { ...b.props, ...updates } } : b))
+    ))
   }
 
-  const updateBlockUploads = (id, key, file) => {
+  const updateBlockUploads = (id, key, file, options = {}) => {
     setBlockUploads((currentUploads) => {
       const currentBlockUploads = currentUploads[id] ?? {}
       const nextBlockUploads = { ...currentBlockUploads }
+      const targetIndex = Number.isInteger(options.index) ? options.index : 0
 
       if (key === 'imageFile') {
         revokePreviewUrl(currentBlockUploads.imagePreviewUrl)
@@ -562,6 +821,36 @@ const ContentBuilder = () => {
         revokePreviewUrl(currentBlockUploads.heroVideoPosterPreviewUrl)
         nextBlockUploads.heroVideoPosterFile = file
         nextBlockUploads.heroVideoPosterPreviewUrl = file ? URL.createObjectURL(file) : ''
+      }
+
+      if (key === 'carouselImageFile') {
+        const carouselImageFiles = Array.isArray(currentBlockUploads.carouselImageFiles)
+          ? [...currentBlockUploads.carouselImageFiles]
+          : []
+        const carouselImagePreviewUrls = Array.isArray(currentBlockUploads.carouselImagePreviewUrls)
+          ? [...currentBlockUploads.carouselImagePreviewUrls]
+          : []
+
+        revokePreviewUrl(carouselImagePreviewUrls[targetIndex])
+        carouselImageFiles[targetIndex] = file
+        carouselImagePreviewUrls[targetIndex] = file ? URL.createObjectURL(file) : ''
+        nextBlockUploads.carouselImageFiles = carouselImageFiles
+        nextBlockUploads.carouselImagePreviewUrls = carouselImagePreviewUrls
+      }
+
+      if (key === 'carouselImageRemove') {
+        const carouselImageFiles = Array.isArray(currentBlockUploads.carouselImageFiles)
+          ? [...currentBlockUploads.carouselImageFiles]
+          : []
+        const carouselImagePreviewUrls = Array.isArray(currentBlockUploads.carouselImagePreviewUrls)
+          ? [...currentBlockUploads.carouselImagePreviewUrls]
+          : []
+
+        revokePreviewUrl(carouselImagePreviewUrls[targetIndex])
+        carouselImageFiles.splice(targetIndex, 1)
+        carouselImagePreviewUrls.splice(targetIndex, 1)
+        nextBlockUploads.carouselImageFiles = carouselImageFiles
+        nextBlockUploads.carouselImagePreviewUrls = carouselImagePreviewUrls
       }
 
       if (!hasUploadData(nextBlockUploads)) {
@@ -646,6 +935,32 @@ const ContentBuilder = () => {
       case 'text':
         return {
           text: 'Add supporting details, delivery information, or extra context for your offer here.',
+        }
+      case 'description':
+        return {
+          heading: 'Why it matters',
+          content: 'Add a short explanation of the pain point, product benefit, or transformation here.',
+        }
+      case 'tagline':
+        return {
+          text: 'Limited-time offer',
+        }
+      case 'price':
+        return {
+          price: '$59.00',
+        }
+      case 'carousel':
+        return normalizeCarouselProps({
+          images: [
+            { url: 'https://via.placeholder.com/800x800', alt: 'Carousel image 1' },
+          ],
+        })
+      case 'list':
+        return {
+          items: [
+            'First benefit or key point',
+            'Second benefit or key point',
+          ],
         }
       case 'image':
         return {
@@ -762,11 +1077,16 @@ const ContentBuilder = () => {
               <div className="flex-1 overflow-y-auto p-2 md:p-4 space-y-2 md:space-y-3">
                 {[
                   { type: 'video-hero', label: 'Video Hero', icon: '🎬' },
+                  { type: 'carousel', label: 'Carousel', icon: '🖼️' },
                   { type: 'product-bundle', label: 'Product Bundle', icon: '📦' },
                   { type: 'comparison-table', label: 'Comparison Table', icon: '📊' },
                   { type: 'inventory-tracker', label: 'Inventory Tracker', icon: '📉' },
                   { type: 'social-proof', label: 'Social Proof', icon: '⭐' },
                   { type: 'countdown-timer', label: 'Countdown Timer', icon: '⏱️' },
+                  { type: 'tagline', label: 'Tagline', icon: '🏷️' },
+                  { type: 'description', label: 'Description', icon: '📄' },
+                  { type: 'price', label: 'Price', icon: '💵' },
+                  { type: 'list', label: 'Bullet List', icon: '•' },
                   { type: 'text', label: 'Text Block', icon: '📝' },
                   { type: 'image', label: 'Image Block', icon: '🖼️' },
                   { type: 'cta', label: 'CTA Button', icon: '🛒' },
@@ -860,7 +1180,7 @@ const ContentBuilder = () => {
                     component={blocks.find((b) => b.id === selectedBlockId)}
                     uploads={blockUploads[selectedBlockId]}
                     onUpdate={(updates) => updateBlock(selectedBlockId, updates)}
-                    onUploadChange={(key, file) => updateBlockUploads(selectedBlockId, key, file)}
+                    onUploadChange={(key, file, options) => updateBlockUploads(selectedBlockId, key, file, options)}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">

@@ -1,11 +1,35 @@
 // InventoryTrackerBlock — Live stock count from Shopify (simulated in builder)
 
+const applyRemainingValue = (message, remaining) => {
+  if (typeof message !== 'string') {
+    return ''
+  }
+
+  return message.replace('{remaining}', remaining)
+}
+
+const getOverrideMessage = (props = {}) => {
+  if (typeof props.text === 'string' && props.text.trim()) {
+    return props.text.trim()
+  }
+
+  if (typeof props.customMessage === 'string' && props.customMessage.trim()) {
+    return props.customMessage.trim()
+  }
+
+  return ''
+}
+
 export const InventoryTrackerPreview = ({ props = {}, variant = 'builder' }) => {
   const sampleRemaining = 3
-  const isUrgent = sampleRemaining <= (props.urgencyThreshold || 5)
-  const message = isUrgent
-    ? (props.urgencyMessage || 'Last {remaining} available - order now!').replace('{remaining}', sampleRemaining)
-    : (props.messageTemplate || 'Only {remaining} left in stock!').replace('{remaining}', sampleRemaining)
+  const overrideMessage = getOverrideMessage(props)
+  const shouldForceUrgency = props.forceUrgent === true || Boolean(overrideMessage)
+  const isUrgent = shouldForceUrgency || sampleRemaining <= (props.urgencyThreshold || 5)
+  const message = overrideMessage
+    ? applyRemainingValue(overrideMessage, sampleRemaining)
+    : isUrgent
+      ? applyRemainingValue(props.urgencyMessage || 'Last {remaining} available - order now!', sampleRemaining)
+      : applyRemainingValue(props.messageTemplate || 'Only {remaining} left in stock!', sampleRemaining)
   const isPublic = variant === 'public'
 
   return (
@@ -23,6 +47,13 @@ export const InventoryTrackerPreview = ({ props = {}, variant = 'builder' }) => 
 
 export const InventoryTrackerEditor = ({ props = {}, onChange }) => (
   <>
+    <div>
+      <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Custom Message Override</label>
+      <input type="text" value={props.text || ''} onChange={(e) => onChange('text', e.target.value)}
+        placeholder="Almost sold out"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+      <p className="text-[10px] text-[#CAC4CF]/60 mt-1">If set, this message is shown instead of the stock template.</p>
+    </div>
     <div>
       <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Shopify Product ID</label>
       <input type="text" value={props.shopifyProductId || ''} onChange={(e) => onChange('shopifyProductId', e.target.value)}

@@ -45,9 +45,20 @@ export async function getContents() {
   return response.data
 }
 
+// GET /api/content/mine/
+export async function getMyContents() {
+  const response = await axiosInstance.get('/api/content/mine/')
+  return response.data
+}
+
 // DELETE /api/content/content/{id}/
 export async function deleteContent(id) {
   await axiosInstance.delete(`/api/content/v1/${id}`)
+}
+
+// DELETE /api/content/mine/{id}/
+export async function deleteMyContent(id) {
+  await axiosInstance.delete(`/api/content/mine/${id}/`)
 }
 
 export async function generateContentProduct({ product_id, persist = true }) {
