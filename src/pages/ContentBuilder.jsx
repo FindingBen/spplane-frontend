@@ -157,7 +157,7 @@ const collectUploadsForSubmission = (blocks, blockUploads) => blocks.reduce((upl
   return uploads
 }, {})
 
-const DEFAULT_TEMPLATE_ID = 3
+const DEFAULT_TEMPLATE_ID = 1
 const MIN_LOADER_MS = 1500
 const MAX_CAROUSEL_IMAGES = 5
 const MAX_LIST_ITEMS = 15
@@ -671,7 +671,7 @@ const ContentBuilder = () => {
   const navigate = useNavigate()
   const { trackAction } = useFirstCampaignGuide()
   const generationRequest = location.state?.productGeneration
-  const [templateId, setTemplateId] = useState(null)
+  const [templateId, setTemplateId] = useState(DEFAULT_TEMPLATE_ID)
   const [blocks, setBlocks] = useState([])
   const [blockUploads, setBlockUploads] = useState({})
   const [metadata, setMetadata] = useState(createDefaultMetadata)
@@ -736,7 +736,7 @@ const ContentBuilder = () => {
       setSelectedBlockId(nextBlocks[0]?.id ?? null)
       setMetadata(normalizeMetadata(template?.metadata ?? template?.structure?.metadata))
     } else {
-      setTemplateId(null)
+      setTemplateId(DEFAULT_TEMPLATE_ID)
       setBlocks([])
       setSelectedBlockId(null)
       setMetadata(createDefaultMetadata())
