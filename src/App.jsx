@@ -25,7 +25,7 @@ function App() {
       <FirstCampaignGuideProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* <Route path="/register" element={<Register />} /> */}
           <Route path="/set-password" element={<SetPassword />} />
           <Route
             path="/dashboard"

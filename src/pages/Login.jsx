@@ -125,9 +125,9 @@ export default function Login() {
       </a> */}
       <p className="text-sm text-gray-400">
         Don't have an account?{" "}
-        <Link to="/register" className="text-[#3e6ff4] font-semibold hover:underline">
+        {/* <Link to="/register" className="text-[#3e6ff4] font-semibold hover:underline">
           Register
-        </Link>
+        </Link> */}
       </p>
     </div>
 
