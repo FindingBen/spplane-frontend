@@ -7,6 +7,7 @@ import {
   deleteContact,
   importShopifyCustomers
 } from '../service/api/segments'
+import { createCustomerSignupQrCode, getCustomerSignupQrCode } from '../service/api/sms'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -283,6 +284,117 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
   )
 }
 
+function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, onRetry }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm px-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="customer-signup-qr-title"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="w-full max-w-xl rounded-[28px] border border-[#3e6ff4]/30 bg-[#1D1A22] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.38)]"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#60a5fa]">In-Store Signup</p>
+            <h2 id="customer-signup-qr-title" className="mt-1 text-2xl font-bold text-white">Customer Signup QR</h2>
+            <p className="mt-2 max-w-md text-sm leading-6 text-[#CAC4CF]">
+              Scan this code to open your customer signup flow. Print it and place it near checkout or inside your store.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-white/10 bg-white/5 p-2 text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
+            aria-label="Close signup QR modal"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mt-6 rounded-[24px] border border-[#3e6ff4]/18 bg-[radial-gradient(circle_at_top,_rgba(96,165,250,0.12),_rgba(17,24,39,0.88)_55%)] p-5">
+          {loading ? (
+            <div className="flex min-h-[360px] flex-col items-center justify-center gap-4 text-center">
+              <div className="h-12 w-12 rounded-full border-4 border-[#3e6ff4]/25 border-t-[#60a5fa] animate-spin" />
+              <div>
+                <p className="text-base font-semibold text-white">Preparing your signup QR</p>
+                <p className="mt-1 text-sm text-[#CAC4CF]">We are creating or retrieving the latest code for this account.</p>
+              </div>
+            </div>
+          ) : qrCodeUrl ? (
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-full max-w-[340px] rounded-[28px] bg-white p-5 shadow-[0_22px_50px_rgba(15,23,42,0.26)]">
+                <img
+                  src={qrCodeUrl}
+                  alt="Customer signup QR code"
+                  className="mx-auto aspect-square w-full max-w-[300px] object-contain"
+                />
+              </div>
+              <p className="max-w-md text-center text-sm leading-6 text-[#CAC4CF]">
+                Test scan it once on your phone, then print it for walk-in visitors to join your customer list.
+              </p>
+            </div>
+          ) : (
+            <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[20px] border border-red-500/30 bg-red-500/8 px-6 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-red-400/25 bg-red-500/12 text-red-200">
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
+                </svg>
+              </div>
+              <p className="mt-4 text-base font-semibold text-white">We could not load the signup QR code.</p>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-red-100/85">
+                {error || 'Try again in a moment. If the problem continues, confirm that the QR code endpoint is available.'}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {error && qrCodeUrl && (
+          <div className="mt-4 rounded-2xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-[#3e6ff4]/25 px-4 py-2.5 text-sm font-medium text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white"
+          >
+            Close
+          </button>
+
+          {!loading && !qrCodeUrl && (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="rounded-xl border border-red-300/25 bg-red-500/12 px-4 py-2.5 text-sm font-semibold text-red-100 transition-colors hover:bg-red-500/18"
+            >
+              Retry
+            </button>
+          )}
+
+          {!loading && qrCodeUrl && (
+            <button
+              type="button"
+              onClick={onPrint}
+              className="rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_35px_rgba(62,111,244,0.3)] transition-opacity hover:opacity-90"
+            >
+              Print QR
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function CustomersPage() {
@@ -294,9 +406,15 @@ export default function CustomersPage() {
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showQrModal, setShowQrModal] = useState(false)
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [hasCustomerSignupQr, setHasCustomerSignupQr] = useState(false)
+  const [qrStatusLoading, setQrStatusLoading] = useState(true)
+  const [qrCodeUrl, setQrCodeUrl] = useState('')
+  const [qrLoading, setQrLoading] = useState(false)
+  const [qrError, setQrError] = useState('')
 
   const filtered = contacts.filter(c => {
     const q = search.toLowerCase()
@@ -331,6 +449,33 @@ export default function CustomersPage() {
   useEffect(() => {
     setCurrentPage(prev => Math.min(prev, totalPages))
   }, [totalPages])
+  useEffect(() => {
+    let ignore = false
+
+    const hydrateCustomerSignupQr = async () => {
+      try {
+        const existingQrCodeUrl = await getCustomerSignupQrCode()
+        if (ignore) return
+
+        setQrCodeUrl(existingQrCodeUrl)
+        setHasCustomerSignupQr(true)
+      } catch {
+        if (ignore) return
+
+        setHasCustomerSignupQr(false)
+      } finally {
+        if (!ignore) {
+          setQrStatusLoading(false)
+        }
+      }
+    }
+
+    hydrateCustomerSignupQr()
+
+    return () => {
+      ignore = true
+    }
+  }, [])
   useEffect(() => {
     if (active && currentStepId === 'customer-form') {
       setShowCreateModal(true)
@@ -380,6 +525,106 @@ export default function CustomersPage() {
     }
   }
 
+  const loadCustomerSignupQrCode = async () => {
+    setQrLoading(true)
+    setQrError('')
+
+    try {
+      const nextQrCodeUrl = hasCustomerSignupQr
+        ? await getCustomerSignupQrCode()
+        : await createCustomerSignupQrCode()
+
+      setQrCodeUrl(nextQrCodeUrl)
+      setHasCustomerSignupQr(true)
+    } catch (err) {
+      setQrError(err?.response?.data?.error || err?.message || 'Failed to load the signup QR code.')
+    } finally {
+      setQrLoading(false)
+    }
+  }
+
+  const handleOpenQrModal = async () => {
+    setShowQrModal(true)
+
+    if (qrCodeUrl || qrLoading) {
+      return
+    }
+
+    await loadCustomerSignupQrCode()
+  }
+
+  const handlePrintQrCode = () => {
+    if (!qrCodeUrl) {
+      return
+    }
+
+    const printWindow = window.open('', '_blank', 'noopener,noreferrer')
+    if (!printWindow) {
+      setQrError('Allow pop-ups in your browser to print the QR code.')
+      return
+    }
+
+    const escapedQrCodeUrl = qrCodeUrl.replace(/"/g, '&quot;')
+
+    printWindow.document.write(`<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Customer Signup QR</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f7fb;
+        color: #0f172a;
+        font-family: Arial, sans-serif;
+      }
+      main {
+        width: min(92vw, 540px);
+        padding: 32px;
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+        text-align: center;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 28px;
+      }
+      p {
+        margin: 0 0 24px;
+        color: #475569;
+        line-height: 1.6;
+      }
+      img {
+        display: block;
+        width: min(100%, 320px);
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Customer Signup QR</h1>
+      <p>Scan this code to join the customer signup flow.</p>
+      <img src="${escapedQrCodeUrl}" alt="Customer signup QR code" />
+    </main>
+    <script>
+      window.addEventListener('load', function () {
+        window.focus();
+        window.print();
+      });
+    </script>
+  </body>
+</html>`)
+    printWindow.document.close()
+  }
+
   const subscribedCount = contacts.filter(c => c.status === 'subscribed').length
   const shopifyCount    = contacts.filter(c => c.source === 'shopify').length
 
@@ -401,6 +646,24 @@ export default function CustomersPage() {
                   <p className="text-sm md:text-base text-[#CAC4CF]">All imported and manually added contacts.</p>
                 </div>
                 <div className='flex flex-row gap-2'>
+                  <button
+                    type="button"
+                    onClick={handleOpenQrModal}
+                    disabled={qrLoading || qrStatusLoading}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {qrLoading || qrStatusLoading ? (
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h4M4 17h4M16 7h4M16 17h4M9 4v4M15 4v4M9 16v4M15 16v4M8 8h8v8H8V8z" />
+                      </svg>
+                    )}
+                    {qrStatusLoading ? 'Checking QR…' : (qrLoading ? 'Preparing QR…' : (hasCustomerSignupQr ? 'View Signup QR' : 'Create Signup QR'))}
+                  </button>
                   <button
                     onClick={handleShopifyImport}
                     disabled={importing}
@@ -675,6 +938,17 @@ export default function CustomersPage() {
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreate}
           submitting={submitting}
+        />
+      )}
+
+      {showQrModal && (
+        <CustomerSignupQrModal
+          qrCodeUrl={qrCodeUrl}
+          loading={qrLoading}
+          error={qrError}
+          onClose={() => setShowQrModal(false)}
+          onPrint={handlePrintQrCode}
+          onRetry={loadCustomerSignupQrCode}
         />
       )}
     </div>

@@ -4,6 +4,36 @@ import axiosInstance from '../interceptor/axiosInstance'
 const BASE = '/api/sms'
 const API_URL = import.meta.env.VITE_API_URL
 
+const extractQrCodeUrl = (data) => (
+  data?.qr_code_url
+  ?? data?.qrCodeUrl
+  ?? data?.url
+  ?? data?.qr_code?.url
+  ?? ''
+)
+
+const normalizeQrCodeUrl = (value) => {
+  if (!value) return ''
+
+  try {
+    return new URL(value, API_URL).toString()
+  } catch {
+    return value
+  }
+}
+
+const resolveQrCodeUrl = (data) => {
+  const qrCodeUrl = normalizeQrCodeUrl(extractQrCodeUrl(data))
+
+  if (!qrCodeUrl) {
+    throw new Error('QR code URL missing from response.')
+  }
+
+  return qrCodeUrl
+}
+
+const isQrPostFallbackError = (error) => [405, 500].includes(error?.response?.status)
+
 // ── SMS ───────────────────────────────────────────────────────────────────────
 
 export async function getSmsList() {
@@ -94,4 +124,30 @@ export async function getSmsPublicPage(slug, token) {
   const params = token ? { t: token } : {}
   const res = await axios.get(`${API_URL}/api/sms/public/page/${slug}/`, { params })
   return res.data
+}
+
+// --- QR CODE
+
+export async function createQrCode(payload) {
+  const res = await axiosInstance.post(`${BASE}/sms-page-signup/`, payload)
+  return res.data
+}
+
+export async function getCustomerSignupQrCode() {
+  const res = await axiosInstance.get(`${BASE}/sms-page-signup/`)
+  return resolveQrCodeUrl(res.data)
+}
+
+export async function createCustomerSignupQrCode() {
+  const payload = { qr_source_signup: 'customers' }
+
+  try {
+    return resolveQrCodeUrl(await createQrCode(payload))
+  } catch (error) {
+    if (!isQrPostFallbackError(error)) {
+      throw error
+    }
+  }
+
+  return getCustomerSignupQrCode()
 }

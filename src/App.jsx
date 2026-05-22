@@ -16,6 +16,7 @@ import SmsPurchaseCallbackPage from './pages/SmsPurchaseCallbackPage'
 import SmsPurchaseCancelPage from './pages/SmsPurchaseCancelPage'
 import SmsSendingPage from './pages/SmsSendingPage'
 import SmsPageContent from './pages/SmsPageContent'
+import SmsOptInPage from './pages/SmsOptInPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { FirstCampaignGuideProvider } from './guide/FirstCampaignGuideProvider'
 
@@ -136,6 +137,7 @@ function App() {
           />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/sms/page/:slug" element={<SmsPageContent />} />
+          <Route path="/sms-optin" element={<SmsOptInPage />} />
         </Routes>
       </FirstCampaignGuideProvider>
     </BrowserRouter>

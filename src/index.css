@@ -123,3 +123,78 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.sms-phone-input {
+  --PhoneInputCountryFlag-height: 1.05rem;
+  --PhoneInputCountryFlag-borderColor: transparent;
+  --PhoneInputCountrySelectArrow-color: #93c5fd;
+  align-items: stretch;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  background: #1b2233;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.sms-phone-input:focus-within {
+  border-color: #3e6ff4;
+  box-shadow: 0 0 0 2px rgba(62, 111, 244, 0.4);
+}
+
+.sms-phone-input .PhoneInputCountry {
+  gap: 0.6rem;
+  align-self: stretch;
+  margin: 0;
+  padding: 0 0.95rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background: #161d2d;
+}
+
+.sms-phone-input .PhoneInputCountrySelect {
+  color: #111827;
+  background: #ffffff;
+}
+
+.sms-phone-input .PhoneInputCountrySelect option {
+  color: #111827;
+  background: #ffffff;
+}
+
+.sms-phone-input .PhoneInputCountryIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  box-shadow: none;
+  background: transparent;
+}
+
+.sms-phone-input .PhoneInputCountrySelectArrow {
+  margin-left: 0;
+  opacity: 0.9;
+}
+
+.sms-phone-input .PhoneInputInput {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.sms-phone-input .PhoneInputInput::placeholder {
+  color: #6b7280;
+}
+
+@media (max-width: 640px) {
+  .sms-phone-input .PhoneInputCountry {
+    padding: 0 0.75rem;
+  }
+
+  .sms-phone-input .PhoneInputInput {
+    padding: 0.85rem 0.85rem;
+  }
+}

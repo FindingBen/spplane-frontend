@@ -4,6 +4,7 @@ import { tokenService } from '../token/tokenService'
 const API_URL       = import.meta.env.VITE_API_URL
 const LISTS_BASE    = '/api/contacts/v1'
 const CONTACTS_BASE = '/api/contacts/audience/v1'
+const BASE = '/api/contacts/'
 
 // ── Contact Lists (Segments) ──────────────────────────────────────────────────
 
@@ -51,6 +52,11 @@ export async function updateContact(id, data) {
 
 export async function deleteContact(id) {
   await axiosInstance.delete(`${CONTACTS_BASE}/${id}/`)
+}
+
+export async function customerSignupWithQrCode(payload){
+   const res = await axiosInstance.post(`${BASE}sms-optin/v1/`, payload) 
+   return res.data
 }
 
 // ── Shopify Import ──────────────────────────────────────────────────────────
