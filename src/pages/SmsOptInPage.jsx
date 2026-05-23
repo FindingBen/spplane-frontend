@@ -4,12 +4,6 @@ import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import {customerSignupWithQrCode} from '../service/api/segments'
 
-const audienceHighlights = [
-  'Receive early-access drops and campaign alerts',
-  'Get exclusive SMS-only offers and reminders',
-  'One-tap opt out whenever you want',
-]
-
 const SmsOptInPage = () => {
     const [searchParams] = useSearchParams()
     const q = searchParams.get('q')
@@ -17,22 +11,24 @@ const SmsOptInPage = () => {
     const [last_name, setLastName] = useState('')
     const [phone_number, setPhoneNumber] = useState('')
     const [optIn, setOptIn] = useState('')
-    const [error, setError] = useState('')
+    const [feedback, setFeedback] = useState(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!optIn) {
-      setError('Please accept SMS consent before joining the list.')
+      setFeedback({ type: 'error', message: 'Please accept SMS consent before joining the list.' })
       return
     }
 
     if (!phone_number || !isValidPhoneNumber(phone_number)) {
-      setError('Please enter a valid mobile number.')
+      setFeedback({ type: 'error', message: 'Please enter a valid mobile number.' })
       return
     }
 
-    setError('')
+    setFeedback(null)
+    setIsSubmitting(true)
 
         const payload = {
             qr_id:q,
@@ -43,8 +39,23 @@ const SmsOptInPage = () => {
 
         }
 
+    try {
         const response = await customerSignupWithQrCode(payload)
-        console.log(response)
+        setFeedback({
+          type: 'success',
+          message: response?.message || response?.detail || "You're signed up. We'll be in touch by SMS.",
+        })
+    } catch (submitError) {
+      setFeedback({
+        type: 'error',
+        message:
+          submitError?.response?.data?.detail ||
+          submitError?.response?.data?.message ||
+          'We could not complete your signup. Please try again.',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
     }
 
 
@@ -119,9 +130,17 @@ const SmsOptInPage = () => {
               </div>
 
               <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-                {error && (
-                  <div className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-                    {error}
+                {feedback && (
+                  <div
+                    role={feedback.type === 'error' ? 'alert' : 'status'}
+                    aria-live="polite"
+                    className={`rounded-2xl px-4 py-3 text-sm ${
+                      feedback.type === 'success'
+                        ? 'border border-emerald-400/30 bg-emerald-400/10 text-emerald-100'
+                        : 'border border-red-500/30 bg-red-500/10 text-red-100'
+                    }`}
+                  >
+                    {feedback.message}
                   </div>
                 )}
 
@@ -132,7 +151,12 @@ const SmsOptInPage = () => {
                       type="text"
                       placeholder="Jordan"
                       value={first_name}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      onChange={(e) => {
+                        setFirstName(e.target.value)
+                        if (feedback) {
+                          setFeedback(null)
+                        }
+                      }}
                       className="w-full rounded-2xl border border-white/10 bg-[#1B2233] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none transition focus:border-[#3e6ff4] focus:ring-2 focus:ring-[#3e6ff4]/40"
                     />
                   </label>
@@ -143,7 +167,12 @@ const SmsOptInPage = () => {
                       type="text"
                       placeholder="Miles"
                       value={last_name}
-                      onChange={(e) => setLastName(e.target.value)}
+                      onChange={(e) => {
+                        setLastName(e.target.value)
+                        if (feedback) {
+                          setFeedback(null)
+                        }
+                      }}
                       className="w-full rounded-2xl border border-white/10 bg-[#1B2233] px-4 py-3 text-white placeholder:text-[#6B7280] outline-none transition focus:border-[#3e6ff4] focus:ring-2 focus:ring-[#3e6ff4]/40"
                     />
                   </label>
@@ -158,8 +187,8 @@ const SmsOptInPage = () => {
                     value={phone_number}
                     onChange={(value) => {
                       setPhoneNumber(value || '')
-                      if (error) {
-                        setError('')
+                      if (feedback) {
+                        setFeedback(null)
                       }
                     }}
                     autoComplete="tel"
@@ -176,8 +205,8 @@ const SmsOptInPage = () => {
                     checked={optIn === 'subscribed'}
                     onChange={(e) => {
                       setOptIn(e.target.checked ? 'subscribed' : '')
-                      if (e.target.checked) {
-                        setError('')
+                      if (feedback) {
+                        setFeedback(null)
                       }
                     }}
                     type="checkbox"
@@ -190,10 +219,10 @@ const SmsOptInPage = () => {
 
                 <button
                   type="submit"
-                  disabled={!optIn}
+                  disabled={!optIn || isSubmitting}
                   className="w-full rounded-2xl bg-gradient-to-r from-[#3e6ff4] via-[#4f7cf7] to-[#4937BA] px-5 py-3.5 text-base font-semibold text-white shadow-[0_18px_40px_rgba(62,111,244,0.35)] transition hover:scale-[0.995] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Join SMS list
+                  {isSubmitting ? 'Joining...' : 'Join SMS list'}
                 </button>
               </form>
 
