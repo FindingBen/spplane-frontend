@@ -1,8 +1,9 @@
 ﻿import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import { getCampaigns, createCampaign, deleteCampaign, getContents } from '../service/api/campaign'
+import { getCampaigns, createCampaign, deleteCampaign } from '../service/api/campaign'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
+import CreateCampaignModal from '../modals/CreateCampaignModal'
 
 // ─── Tabs — aligned with backend STATUS_CHOICES ────────────────────────────────
 const TABS = [
@@ -10,149 +11,6 @@ const TABS = [
   { key: 'draft', label: 'Drafts' },
   { key: 'paused', label: 'Paused' },
 ]
-
-// ─── Create Campaign Modal ─────────────────────────────────────────────────────
-// POST body: { name, description, status }
-const INITIAL_FORM = {
-  name: '',
-  description: '',
-  content: '', // content ID (number), optional
-}
-
-function CreateCampaignModal({ onClose, onCreate, submitting }) {
-  const { active, currentStepId } = useFirstCampaignGuide()
-  const [form, setForm] = useState(INITIAL_FORM)
-  const [errors, setErrors] = useState({})
-  const [contents, setContents] = useState([])
-  const [contentsLoading, setContentsLoading] = useState(true)
-  const isGuideLocked = active && currentStepId === 'campaign-form'
-
-  useEffect(() => {
-    getContents()
-      .then(data => setContents(data))
-      .catch(() => setContents([]))
-      .finally(() => setContentsLoading(false))
-  }, [])
-
-  const validate = () => {
-    const e = {}
-    if (!form.name.trim()) e.name = 'Campaign name is required.'
-    if (!form.description.trim()) e.description = 'Description is required.'
-    return e
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const e2 = validate()
-    if (Object.keys(e2).length) { setErrors(e2); return }
-    onCreate(form)
-  }
-
-  const field = (key, value) => setForm(prev => ({ ...prev, [key]: value }))
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={isGuideLocked ? undefined : onClose} />
-
-      {/* Panel */}
-      <div data-guide-id="campaign-form" className="relative w-full max-w-xl bg-gradient-to-br from-[#1f2937] to-[#1D1A22] border border-[#3e6ff4]/30 rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#3e6ff4]/20">
-          <h2 className="text-lg font-bold text-white">Create New Campaign</h2>
-          <button
-            onClick={onClose}
-            disabled={isGuideLocked}
-            className="text-[#CAC4CF] hover:text-white transition-colors p-1 rounded-lg hover:bg-[#3e6ff4]/20"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[75vh]">
-          {/* Campaign Name */}
-          <div>
-            <label className="block text-sm text-[#CAC4CF] mb-1">Campaign Name</label>
-            <input
-              type="text"
-              placeholder="e.g. Summer Flash Sale"
-              value={form.name}
-              onChange={e => field('name', e.target.value)}
-              className="w-full bg-[#111827] border border-[#3e6ff4]/30 focus:border-[#3e6ff4] text-white text-sm rounded-lg px-4 py-2.5 outline-none placeholder-[#CAC4CF]/50 transition-colors"
-            />
-            {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
-          </div>
-
-          {/* Content */}
-          <div>
-            <label className="block text-sm text-[#CAC4CF] mb-1">
-              Content
-              <span className="ml-2 text-[#3e6ff4]/70 text-xs">Optional — link an existing content</span>
-            </label>
-            {contentsLoading ? (
-              <div className="w-full bg-[#111827] border border-[#3e6ff4]/30 rounded-lg px-4 py-2.5 flex items-center gap-2">
-                <div className="w-3.5 h-3.5 border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4] rounded-full animate-spin" />
-                <span className="text-[#CAC4CF]/50 text-sm">Loading content...</span>
-              </div>
-            ) : (
-              <select
-                value={form.content}
-                onChange={e => field('content', e.target.value)}
-                className="w-full bg-[#111827] border border-[#3e6ff4]/30 focus:border-[#3e6ff4] text-white text-sm rounded-lg px-4 py-2.5 outline-none transition-colors"
-              >
-                <option value="">None</option>
-                {contents.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.name || c.title || `Content #${c.id}`}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm text-[#CAC4CF] mb-1">Description</label>
-            <textarea
-              rows={4}
-              placeholder="Describe the goal and audience of this campaign..."
-              value={form.description}
-              onChange={e => field('description', e.target.value)}
-              className="w-full bg-[#111827] border border-[#3e6ff4]/30 focus:border-[#3e6ff4] text-white text-sm rounded-lg px-4 py-2.5 outline-none placeholder-[#CAC4CF]/50 resize-none transition-colors"
-            />
-            <div className="flex justify-between mt-1">
-              {errors.description
-                ? <p className="text-red-400 text-xs">{errors.description}</p>
-                : <span />}
-              <span className="text-[#CAC4CF]/50 text-xs">{form.description.length} chars</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 py-2.5 rounded-lg border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white hover:border-[#3e6ff4]/60 text-sm font-medium transition-all duration-200"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
-            >
-              {submitting ? 'Saving...' : 'Save Draft'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
 
 // ─── Status Badge — covers all model STATUS_CHOICES ───────────────────────────
 function StatusBadge({ status }) {

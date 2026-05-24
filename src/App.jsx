@@ -10,6 +10,7 @@ import ContentBuilder from './pages/ContentBuilder'
 import MyContents from './pages/MyContents'
 import CampaignPage from './pages/CampaignPage'
 import AudiencePage from './pages/AudiencePage'
+import AutomationPage from './pages/AutomationPage'
 import SmsPage from './pages/SmsPage'
 import SmsPlansPage from './pages/SmsPlansPage'
 import SmsPurchaseCallbackPage from './pages/SmsPurchaseCallbackPage'
@@ -76,6 +77,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AudiencePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/automations"
+            element={
+              <ProtectedRoute>
+                <AutomationPage />
               </ProtectedRoute>
             }
           />

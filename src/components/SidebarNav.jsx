@@ -107,6 +107,20 @@ const SidebarNav = () => {
       </button>
 
       <button
+        onClick={() => navigate('/automations')}
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+          isActive('/automations')
+            ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
+            : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
+        }`}
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5-1a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Automations
+      </button>
+
+      <button
         onClick={() => navigate('/sms-plans')}
         className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/sms-plans')
