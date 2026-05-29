@@ -11,3 +11,8 @@ export async function createAutomation(payload){
     const response = await axiosInstance.post(BASE, payload)
     return response.data
 }
+
+export async function updateAutomation(id, payload){
+    const response = await axiosInstance.patch(`${BASE}${id}/`, payload)
+    return response.data
+}

@@ -80,14 +80,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route
+          <Route
             path="/automations"
             element={
               <ProtectedRoute>
                 <AutomationPage />
               </ProtectedRoute>
             }
-          /> */}
+          />
           <Route
             path="/customers"
             element={

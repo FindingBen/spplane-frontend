@@ -43,15 +43,18 @@ function CreateSmsModal({
   submitLabel = 'Create SMS',
   initialValues = {},
   lockedCampaign = null,
+  showCampaign = true,
   showAudience = true,
+  showSender = true,
   bodyPlaceholder = 'Hello {{first_name}}, tap here: {{page_link}}',
   templateText = 'Hello {{first_name}}, tap here: {{page_link}}',
+  personalizationTokens = PERSONALIZATION_TOKENS,
 }) {
   const { active, currentStepId } = useFirstCampaignGuide()
   const [form, setForm] = useState(() => ({
     ...INITIAL_FORM,
     ...initialValues,
-    campaign: lockedCampaign?.id ? String(lockedCampaign.id) : (initialValues.campaign ?? ''),
+    campaign: showCampaign ? (lockedCampaign?.id ? String(lockedCampaign.id) : (initialValues.campaign ?? '')) : '',
   }))
   const [errors, setErrors] = useState({})
   const [campaigns, setCampaigns] = useState([])
@@ -63,7 +66,7 @@ function CreateSmsModal({
     let ignore = false
 
     Promise.all([
-      lockedCampaign ? Promise.resolve([]) : getCampaigns().catch(() => []),
+      showCampaign && !lockedCampaign ? getCampaigns().catch(() => []) : Promise.resolve([]),
       showAudience ? getContactLists().catch(() => []) : Promise.resolve([]),
     ])
       .then(([campaignData, listData]) => {
@@ -79,16 +82,16 @@ function CreateSmsModal({
     return () => {
       ignore = true
     }
-  }, [lockedCampaign, showAudience])
+  }, [lockedCampaign, showAudience, showCampaign])
 
   const field = (key, value) => setForm((prev) => ({ ...prev, [key]: value }))
 
   const validate = () => {
     const nextErrors = {}
 
-    if (!form.campaign) nextErrors.campaign = 'Please select a campaign.'
+    if (showCampaign && !form.campaign) nextErrors.campaign = 'Please select a campaign.'
     if (showAudience && !form.contactList) nextErrors.contactList = 'Please select a contact list.'
-    if (!form.sender.trim()) nextErrors.sender = 'Sender is required.'
+    if (showSender && !form.sender.trim()) nextErrors.sender = 'Sender is required.'
     if (!form.body.trim()) nextErrors.body = 'SMS body is required.'
     if (form.body.length > 1600) nextErrors.body = 'Body cannot exceed 1600 characters.'
 
@@ -116,17 +119,18 @@ function CreateSmsModal({
     }
 
     onCreate({
-      campaign: form.campaign,
+      ...(showCampaign && form.campaign ? { campaign: form.campaign } : {}),
       ...(showAudience && form.contactList ? { contact_list: form.contactList } : {}),
-      sender: form.sender.trim(),
+      ...(showSender ? { sender: form.sender.trim() } : {}),
       body: form.body.trim(),
     })
   }
 
   const segments = smsSegments(form.body)
   const charsLeft = 1600 - form.body.length
-  const smsSectionNumber = showAudience ? 3 : 2
-  const senderSectionNumber = showAudience ? 4 : 3
+  const audienceSectionNumber = showCampaign ? 2 : 1
+  const smsSectionNumber = showCampaign ? (showAudience ? 3 : 2) : (showAudience ? 2 : 1)
+  const senderSectionNumber = smsSectionNumber + 1
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -154,46 +158,48 @@ function CreateSmsModal({
         </div>
 
         <form onSubmit={handleSubmit} className="max-h-[76vh] space-y-6 overflow-y-auto p-6">
-          <div>
-            <SectionLabel number="1">Campaign</SectionLabel>
-            <p className="mb-3 text-xs text-[#CAC4CF]/60">
-              Select a campaign to connect the content link page used by <code className="text-[#60a5fa]">{'{{page_link}}'}</code>.
-            </p>
-            {lockedCampaign ? (
-              <div className="rounded-lg border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white">
-                {lockedCampaign.name || `Campaign #${lockedCampaign.id}`}
-              </div>
-            ) : loading ? (
-              <div className="flex items-center gap-2 rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5">
-                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4]" />
-                <span className="text-sm text-[#CAC4CF]/50">Loading...</span>
-              </div>
-            ) : (
-              <select
-                value={form.campaign}
-                onChange={(event) => {
-                  field('campaign', event.target.value)
-                  setErrors((prev) => ({ ...prev, campaign: '' }))
-                }}
-                className={selectCls}
-              >
-                <option value="">Select a campaign...</option>
-                {campaigns.map((campaign) => (
-                  <option key={campaign.id} value={campaign.id}>
-                    {campaign.name || `Campaign #${campaign.id}`}
-                  </option>
-                ))}
-              </select>
-            )}
-            {errors.campaign && <p className="mt-1 text-xs text-red-400">{errors.campaign}</p>}
-          </div>
+          {showCampaign && (
+            <div>
+              <SectionLabel number="1">Campaign</SectionLabel>
+              <p className="mb-3 text-xs text-[#CAC4CF]/60">
+                Select a campaign to connect the content link page used by <code className="text-[#60a5fa]">{'{{page_link}}'}</code>.
+              </p>
+              {lockedCampaign ? (
+                <div className="rounded-lg border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white">
+                  {lockedCampaign.name || `Campaign #${lockedCampaign.id}`}
+                </div>
+              ) : loading ? (
+                <div className="flex items-center gap-2 rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5">
+                  <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4]" />
+                  <span className="text-sm text-[#CAC4CF]/50">Loading...</span>
+                </div>
+              ) : (
+                <select
+                  value={form.campaign}
+                  onChange={(event) => {
+                    field('campaign', event.target.value)
+                    setErrors((prev) => ({ ...prev, campaign: '' }))
+                  }}
+                  className={selectCls}
+                >
+                  <option value="">Select a campaign...</option>
+                  {campaigns.map((campaign) => (
+                    <option key={campaign.id} value={campaign.id}>
+                      {campaign.name || `Campaign #${campaign.id}`}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {errors.campaign && <p className="mt-1 text-xs text-red-400">{errors.campaign}</p>}
+            </div>
+          )}
 
           {showAudience && (
             <>
               <div className="border-t border-[#3e6ff4]/10" />
 
               <div>
-                <SectionLabel number="2">Audience</SectionLabel>
+                <SectionLabel number={audienceSectionNumber}>Audience</SectionLabel>
                 {loading ? (
                   <div className="flex items-center gap-2 rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5">
                     <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4]" />
@@ -227,7 +233,7 @@ function CreateSmsModal({
           <div>
             <SectionLabel number={smsSectionNumber}>SMS Message</SectionLabel>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              {PERSONALIZATION_TOKENS.map(({ label, token }) => (
+              {personalizationTokens.map(({ label, token }) => (
                 <button
                   key={token}
                   type="button"
@@ -260,7 +266,22 @@ function CreateSmsModal({
               {errors.body ? (
                 <p className="text-xs text-red-400">{errors.body}</p>
               ) : (
-                <span className="text-xs text-[#CAC4CF]/40">Use <code className="text-[#93c5fd]">{'{{first_name}}'}</code> and <code className="text-[#93c5fd]">{'{{page_link}}'}</code> tokens. Max 1600 characters.</span>
+                <span className="text-xs text-[#CAC4CF]/40">
+                  {personalizationTokens.length > 0 ? (
+                    <>
+                      Use{' '}
+                      {personalizationTokens.map(({ token }, index) => (
+                        <span key={token}>
+                          {index > 0 ? (index === personalizationTokens.length - 1 ? ' and ' : ', ') : ''}
+                          <code className="text-[#93c5fd]">{token}</code>
+                        </span>
+                      ))}{' '}
+                      tokens. Max 1600 characters.
+                    </>
+                  ) : (
+                    'Max 1600 characters.'
+                  )}
+                </span>
               )}
               <div className="ml-4 flex shrink-0 items-center gap-2 text-xs text-[#CAC4CF]/50">
                 {form.body.length > 0 && (
@@ -273,23 +294,27 @@ function CreateSmsModal({
             </div>
           </div>
 
-          <div className="border-t border-[#3e6ff4]/10" />
+          {showSender && (
+            <>
+              <div className="border-t border-[#3e6ff4]/10" />
 
-          <div>
-            <SectionLabel number={senderSectionNumber}>Sender</SectionLabel>
-            <input
-              type="text"
-              placeholder="e.g. +1234567890 or MyBrand"
-              value={form.sender}
-              onChange={(event) => {
-                field('sender', event.target.value)
-                setErrors((prev) => ({ ...prev, sender: '' }))
-              }}
-              className={inputCls}
-            />
-            {errors.sender && <p className="mt-1 text-xs text-red-400">{errors.sender}</p>}
-            <p className="mt-1.5 text-xs text-[#CAC4CF]/40">Phone number in E.164 format or registered alphanumeric sender ID.</p>
-          </div>
+              <div>
+                <SectionLabel number={senderSectionNumber}>Sender</SectionLabel>
+                <input
+                  type="text"
+                  placeholder="e.g. +1234567890 or MyBrand"
+                  value={form.sender}
+                  onChange={(event) => {
+                    field('sender', event.target.value)
+                    setErrors((prev) => ({ ...prev, sender: '' }))
+                  }}
+                  className={inputCls}
+                />
+                {errors.sender && <p className="mt-1 text-xs text-red-400">{errors.sender}</p>}
+                <p className="mt-1.5 text-xs text-[#CAC4CF]/40">Phone number in E.164 format or registered alphanumeric sender ID.</p>
+              </div>
+            </>
+          )}
 
           <div className="flex gap-3 pt-1">
             <button
