@@ -48,79 +48,97 @@ const TABS = [
   { key: 'failed',    label: 'Failed' },
 ]
 
-// ── SMS Row Card ──────────────────────────────────────────────────────────────
+// ── SMS Table Row ─────────────────────────────────────────────────────────────
 
-function SmsCard({ sms, onDelete, onSend }) {
+function SmsTableRow({ sms, onDelete, onSend }) {
   const segs = smsSegments(sms.body)
   const canSend = sms.status === 'draft' || sms.status === 'scheduled'
+
   return (
-    <div className="bg-[#1f2937] border border-[#3e6ff4]/20 rounded-xl p-5 flex flex-col gap-3 hover:border-[#3e6ff4]/40 transition-all duration-200">
-      {/* Top row */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${STATUS_STYLE[sms.status] ?? STATUS_STYLE.draft}`}>
-            {STATUS_LABEL[sms.status] ?? sms.status}
-          </span>
-          {segs > 0 && (
-            <span className="text-xs text-[#CAC4CF]/60 bg-[#111827] border border-[#3e6ff4]/10 px-2 py-0.5 rounded-full">
-              {segs} segment{segs !== 1 ? 's' : ''}
-            </span>
-          )}
-          {sms.contact_list && (
-            <span className="text-xs text-[#3e6ff4]/80 bg-[#3e6ff4]/10 border border-[#3e6ff4]/20 px-2 py-0.5 rounded-full">
+    <tr className="text-left transition-colors hover:bg-[#3e6ff4]/5">
+      <td className="px-4 py-4 align-top">
+        <div className="max-w-[360px]">
+          <p className="text-sm font-medium leading-6 text-white line-clamp-2">
+            {sms.body || <span className="italic opacity-40">No body</span>}
+          </p>
+          <div className="mt-2 flex items-center gap-2 text-xs text-[#CAC4CF]/55">
+            <span>{sms.body?.length ?? 0} chars</span>
+            <span className="h-1 w-1 rounded-full bg-[#3e6ff4]/30" />
+            <span>Text message</span>
+          </div>
+        </div>
+      </td>
+
+      <td className="px-4 py-4 align-top">
+        <div className="flex min-w-[160px] flex-col gap-2">
+          {sms.contact_list ? (
+            <span className="inline-flex w-fit items-center rounded-full border border-[#3e6ff4]/20 bg-[#3e6ff4]/10 px-2.5 py-1 text-xs font-medium text-[#60a5fa]">
               List #{sms.contact_list}
             </span>
+          ) : (
+            <span className="text-sm text-[#CAC4CF]/40">No list assigned</span>
           )}
+          <span className="text-xs text-[#CAC4CF]/60">
+            {segs} segment{segs !== 1 ? 's' : ''}
+          </span>
         </div>
-        <button
-          onClick={() => onDelete(sms.id)}
-          className="p-1.5 rounded-lg text-[#CAC4CF]/40 hover:text-red-400 hover:bg-red-500/10 transition-colors shrink-0"
-          title="Delete SMS"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
-      </div>
+      </td>
 
-      {/* Body preview */}
-      <div className="bg-[#111827]/70 rounded-lg px-4 py-3 border border-[#3e6ff4]/10">
-        <p className="text-[#CAC4CF] text-sm leading-relaxed line-clamp-3">
-          {sms.body || <span className="italic opacity-40">No body</span>}
-        </p>
-      </div>
-
-      {/* Meta row */}
-      <div className="flex items-center gap-4 text-xs text-[#CAC4CF]/50 border-t border-[#3e6ff4]/10 pt-2.5">
-        {canSend && (
-          <button
-            onClick={() => onSend(sms)}
-            data-guide-id={`sms-send-${sms.id}`}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-2.5 py-1.5 text-[#60a5fa] hover:bg-[#3e6ff4]/20 hover:border-[#3e6ff4]/60 transition-colors"
-            title="Review cost and send"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
-            Send
-          </button>
-        )}
-        {sms.sender && (
-          <div className="flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <td className="px-4 py-4 align-top">
+        {sms.sender ? (
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-sm text-white">
+            <svg className="h-3.5 w-3.5 shrink-0 text-[#60a5fa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
             {sms.sender}
           </div>
+        ) : (
+          <span className="text-sm text-[#CAC4CF]/40">—</span>
         )}
-        <div className="flex items-center gap-1.5 ml-auto">
-          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      </td>
+
+      <td className="px-4 py-4 align-top">
+        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${STATUS_STYLE[sms.status] ?? STATUS_STYLE.draft}`}>
+          {STATUS_LABEL[sms.status] ?? sms.status}
+        </span>
+      </td>
+
+      <td className="px-4 py-4 align-top text-sm text-[#CAC4CF]/75">
+        <div className="flex min-w-[150px] items-center gap-2 leading-5">
+          <svg className="h-3.5 w-3.5 shrink-0 text-[#CAC4CF]/45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          {formatDate(sms.created_at)}
+          <span>{formatDate(sms.created_at)}</span>
         </div>
-      </div>
-    </div>
+      </td>
+
+      <td className="px-4 py-4 align-top">
+        <div className="flex items-center justify-end gap-2">
+          {canSend && (
+            <button
+              onClick={() => onSend(sms)}
+              data-guide-id={`sms-send-${sms.id}`}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-2.5 py-1.5 text-xs font-medium text-[#60a5fa] transition-colors hover:border-[#3e6ff4]/60 hover:bg-[#3e6ff4]/20"
+              title="Review cost and send"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              Send
+            </button>
+          )}
+          <button
+            onClick={() => onDelete(sms.id)}
+            className="rounded-lg p-1.5 text-[#CAC4CF]/40 transition-colors hover:bg-red-500/10 hover:text-red-400"
+            title="Delete SMS"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>
   )
 }
 
@@ -312,10 +330,36 @@ export default function SmsPage() {
               ) : filtered.length === 0 ? (
                 <EmptyState tab={activeTab} onCreateClick={() => setShowModal(true)} />
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 2xl:gap-3">
-                  {filtered.map(sms => (
-                    <SmsCard key={sms.id} sms={sms} onDelete={handleDelete} onSend={handleGoToSending} />
-                  ))}
+                <div className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937]/60 shadow-[0_24px_60px_rgba(15,23,42,0.24)]">
+                  <div className="flex items-center justify-between gap-3 border-b border-[#3e6ff4]/15 bg-[linear-gradient(135deg,rgba(17,24,39,0.96),rgba(31,41,55,0.92))] px-4 py-3">
+                    <div>
+                      <p className="text-sm text-left font-semibold text-white">SMS Queue</p>
+                      <p className="text-xs text-[#CAC4CF]/60">Review drafts, scheduled sends, and delivery status in one compact list.</p>
+                    </div>
+                    <span className="rounded-full border border-[#3e6ff4]/20 bg-[#3e6ff4]/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#60a5fa]">
+                      {filtered.length} shown
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="min-w-[860px] w-full text-sm">
+                      <thead className="bg-[#111827]/55">
+                        <tr className="border-b border-[#3e6ff4]/15 text-left">
+                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Message</th>
+                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Audience</th>
+                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Sender</th>
+                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Status</th>
+                          <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Created</th>
+                          <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#3e6ff4]/10">
+                        {filtered.map((sms) => (
+                          <SmsTableRow key={sms.id} sms={sms} onDelete={handleDelete} onSend={handleGoToSending} />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

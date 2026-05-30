@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
+import SendSingleSmsModal from '../components/SendSingleSmsModal'
 import TopBar from '../components/TopBar'
 import {
   getContacts,
@@ -7,7 +8,7 @@ import {
   deleteContact,
   importShopifyCustomers
 } from '../service/api/segments'
-import { createCustomerSignupQrCode, getCustomerSignupQrCode } from '../service/api/sms'
+import { createCustomerSignupQrCode, getCustomerSignupQrCode, sendSingleSms } from '../service/api/sms'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -407,8 +408,10 @@ export default function CustomersPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showQrModal, setShowQrModal] = useState(false)
+  const [smsCustomer, setSmsCustomer] = useState(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [sendingSingleSms, setSendingSingleSms] = useState(false)
   const [importing, setImporting] = useState(false)
   const [hasCustomerSignupQr, setHasCustomerSignupQr] = useState(false)
   const [qrStatusLoading, setQrStatusLoading] = useState(true)
@@ -508,6 +511,15 @@ export default function CustomersPage() {
       setError('Failed to delete customer.')
     } finally {
       setDeleteConfirmId(null)
+    }
+  }
+
+  const handleSendSingleSms = async (payload) => {
+    setSendingSingleSms(true)
+    try {
+      await sendSingleSms(payload)
+    } finally {
+      setSendingSingleSms(false)
     }
   }
 
@@ -846,15 +858,27 @@ export default function CustomersPage() {
                                   </button>
                                 </div>
                               ) : (
-                                <button
-                                  onClick={() => setDeleteConfirmId(c.id)}
-                                  className="p-1.5 rounded-lg text-[#CAC4CF]/40 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                                  title="Delete customer"
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                  </svg>
-                                </button>
+                                <div className="flex items-center justify-end gap-1">
+                                  <button
+                                    onClick={() => setSmsCustomer(c)}
+                                    className="p-1.5 rounded-lg text-[#CAC4CF]/40 hover:bg-[#3e6ff4]/10 hover:text-[#60a5fa] transition-colors"
+                                    title="Send SMS"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M22 2L11 13" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M22 2L15 22L11 13L2 9L22 2z" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={() => setDeleteConfirmId(c.id)}
+                                    className="p-1.5 rounded-lg text-[#CAC4CF]/40 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                    title="Delete customer"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </div>
                               )}
                             </td>
                           </tr>
@@ -949,6 +973,15 @@ export default function CustomersPage() {
           onClose={() => setShowQrModal(false)}
           onPrint={handlePrintQrCode}
           onRetry={loadCustomerSignupQrCode}
+        />
+      )}
+
+      {smsCustomer && (
+        <SendSingleSmsModal
+          customer={smsCustomer}
+          onClose={() => setSmsCustomer(null)}
+          onSend={handleSendSingleSms}
+          sending={sendingSingleSms}
         />
       )}
     </div>

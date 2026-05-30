@@ -647,9 +647,7 @@ const AutomationPage = () => {
               <div className="rounded-[28px] border border-[#3e6ff4]/20 bg-[linear-gradient(180deg,rgba(17,24,39,0.94),rgba(17,24,39,0.78))] p-6 shadow-[0_30px_80px_rgba(2,6,23,0.28)] md:p-8 xl:p-10">
                 <div className="max-w-3xl text-left">
                   <h1 className="mt-1 text-3xl font-bold text-white md:text-3xl xl:text-4xl">Automation flow</h1>
-                  <p className="mt-4 max-w-2xl text-sm leading-7 text-[#CAC4CF] md:text-base">
-                    Build each automation step by step. The welcome flow now starts from the message template itself, while weekly offers can still reuse campaign and segment setup.
-                  </p>
+                 
                 </div>
 
                 <div className="mt-8 space-y-6 xl:mt-10">

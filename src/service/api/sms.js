@@ -76,6 +76,11 @@ export async function sendSms(id) {
   return res.data
 }
 
+export async function sendSingleSms(payload) {
+  const res = await axiosInstance.post(`${BASE}/v1/single-send/`, payload)
+  return res.data
+}
+
 // ── SMS Pages ─────────────────────────────────────────────────────────────────
 
 export async function getSmsPages() {
