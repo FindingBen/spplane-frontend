@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
-import CreateCampaignModal from '../modals/CreateCampaignModal'
 import CreateSmsModal from '../modals/CreateSmsModal'
 import { createAutomation, getAutomations, updateAutomation } from '../service/api/automation'
-import { createCampaign } from '../service/api/campaign'
 import { getContactLists } from '../service/api/segments'
 
 const FALLBACK_SEGMENTS = ['Test list', 'Other list', 'VIP Customers', 'New Subscribers']
@@ -25,15 +23,11 @@ const FLOWS = [
     ],
   },
   {
-    id: 'weekly_offer',
-    heading: 'Weekly offers',
-    automationTitle: 'Weekly offers SMS',
-    automationDescription: 'Send the weekly offer SMS to the selected audience.',
-    campaignDefaults: {
-      name: 'Weekly offers campaign',
-      description: 'Draft campaign for weekly offers automation.',
-    },
-    smsTitle: 'Create weekly offer SMS',
+    id: 'recurring',
+    heading: 'Recurring sms',
+    automationTitle: 'Recurring sms',
+    automationDescription: 'Send recurring SMS offers to the selected audience.',
+    smsTitle: 'Create Recurring sms',
     smsPlaceholder: 'This week only: discover the latest offer here {{page_link}}',
     smsTemplate: 'This week only: discover the latest offer here {{page_link}}',
     smsTokens: [
@@ -41,18 +35,16 @@ const FLOWS = [
       { label: 'Page Link', token: '{{page_link}}' },
     ],
     steps: [
-      { id: 'campaign', label: 'create campaign' },
-      { id: 'sms', label: 'Craft curated\nmessage to\nweekly offers' },
+      { id: 'sms', label: 'Craft curated\nmessage to\nrecourring sms' },
       { id: 'content', label: 'Create personalized\ncontent', optional: true },
       { id: 'segment', label: 'Select segment\nlist' },
-      { id: 'trigger', label: 'Trigger the\nautomation' },
     ],
   },
 ]
 
 const INITIAL_FLOW_STATE = {
-  welcome_user: { automation: null, campaign: null, smsBody: '', smsSender: '', segment: null },
-  weekly_offer: { automation: null, campaign: null, smsBody: '', smsSender: '', segment: null },
+  welcome_user: { automation: null, smsBody: '', smsSender: '', segment: null },
+  recurring: { automation: null, smsBody: '', smsSender: '', segment: null },
 }
 
 const getFlowConfig = (flowId) => FLOWS.find((flow) => flow.id === flowId)
@@ -61,12 +53,20 @@ const getAutomationSmsBody = (automation) => (typeof automation?.sms_body === 's
 
 const getAutomationSmsSender = (automation) => (typeof automation?.sms_sender === 'string' ? automation.sms_sender : '')
 
+const resolveAutomationSegment = (automation, segments) => {
+  const contactListId = automation?.segment_list_id
+  if (!contactListId) return null
+  return segments.find((segment) => String(segment.id) === String(contactListId)) ?? null
+}
+
 const mergeAutomationRecord = (currentAutomation, nextAutomation) => ({
   ...currentAutomation,
   ...nextAutomation,
   sms_body: nextAutomation?.sms_body ?? currentAutomation?.sms_body ?? '',
   sms_sender: nextAutomation?.sms_sender ?? currentAutomation?.sms_sender ?? '',
   is_active: nextAutomation?.is_active ?? currentAutomation?.is_active ?? false,
+  status: nextAutomation?.status ?? currentAutomation?.status ?? 'deactivated',
+  segment_list_id: nextAutomation?.segment_list_id ?? currentAutomation?.segment_list_id ?? null,
 })
 
 function StepConnector() {
@@ -129,10 +129,10 @@ function SegmentSelectionModal({ segments, selectedSegmentId, onSelect, onClose,
       <div className="relative z-10 w-full max-w-lg rounded-[28px] border border-[#3e6ff4]/25 bg-[linear-gradient(180deg,rgba(17,24,39,0.98),rgba(29,26,34,0.95))] p-6 shadow-[0_30px_100px_rgba(2,6,23,0.55)] md:p-7">
         <div className="flex items-start justify-between gap-4">
           <div className="text-left">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">Weekly offers</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">Recourring sms</p>
             <h2 className="mt-3 text-2xl font-semibold text-white">Select segment list</h2>
             <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
-              Choose the segment that should receive the weekly offer automation.
+              Choose the segment that should receive the recourring sms automation.
             </p>
           </div>
 
@@ -185,8 +185,11 @@ function SegmentSelectionModal({ segments, selectedSegmentId, onSelect, onClose,
   )
 }
 
-function FlowStatusConfirmModal({ mode, onClose, onConfirm }) {
+function FlowStatusConfirmModal({ flowId, mode, onClose, onConfirm }) {
   const isDeactivate = mode === 'deactivate'
+  const isWelcomeFlow = flowId === 'welcome_user'
+  const flowLabel = isWelcomeFlow ? 'New customer signup' : 'Recurring sms'
+  const flowName = isWelcomeFlow ? 'welcome' : 'recurring'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020617]/75 px-4 backdrop-blur-sm">
@@ -195,12 +198,12 @@ function FlowStatusConfirmModal({ mode, onClose, onConfirm }) {
       <div className="relative z-10 w-full max-w-lg rounded-[28px] border border-[#3e6ff4]/25 bg-[linear-gradient(180deg,rgba(17,24,39,0.98),rgba(29,26,34,0.95))] p-6 shadow-[0_30px_100px_rgba(2,6,23,0.55)] md:p-7">
         <div className="flex items-start justify-between gap-4">
           <div className="text-left">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">New customer signup</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">{flowLabel}</p>
             <h2 className="mt-3 text-2xl font-semibold text-white">{isDeactivate ? 'Deactivate this flow?' : 'Activate this flow?'}</h2>
             <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
               {isDeactivate
-                ? 'Once deactivated, new customers who sign up through the QR code will stop receiving this welcome SMS.'
-                : 'Once activated, every customer who signs up through the QR code will automatically receive this welcome SMS.'}
+                ? `Once deactivated, this ${flowName} automation will stop sending messages.`
+                : `Once activated, this ${flowName} automation will start sending messages automatically.`}
             </p>
           </div>
 
@@ -230,8 +233,8 @@ function FlowStatusConfirmModal({ mode, onClose, onConfirm }) {
               <p className="text-sm font-medium text-white">{isDeactivate ? 'This turns the automation off immediately.' : 'This turns on the automation immediately.'}</p>
               <p className="mt-1 text-sm leading-6 text-[#CAC4CF]">
                 {isDeactivate
-                  ? 'The welcome automation will remain saved, but new QR signups will not receive the message until you activate it again.'
-                  : 'You can only activate it after saving the welcome message template, and future QR signups will use the message currently saved in this automation.'}
+                  ? `The ${flowName} automation will remain saved, but it will not send messages until you activate it again.`
+                  : `You can only activate after saving the message template. Future sends will use the message currently saved in this automation.`}
               </p>
             </div>
           </div>
@@ -265,7 +268,6 @@ const AutomationPage = () => {
   const [flowFeedback, setFlowFeedback] = useState({})
   const [modalState, setModalState] = useState(null)
   const [flowStatusModal, setFlowStatusModal] = useState(null)
-  const [isSubmittingCampaign, setIsSubmittingCampaign] = useState(false)
   const [isSubmittingSms, setIsSubmittingSms] = useState(false)
   const [activatingFlowId, setActivatingFlowId] = useState(null)
   const [isLoadingAutomations, setIsLoadingAutomations] = useState(true)
@@ -292,6 +294,7 @@ const AutomationPage = () => {
         const contactListItems = Array.isArray(contactListData) ? contactListData : contactListData?.results ?? []
         const automationItems = Array.isArray(automationData) ? automationData : automationData?.results ?? []
         const welcomeAutomation = automationItems.find((automation) => automation?.automation_type === 'welcome_user') ?? null
+        const recourringAutomation = automationItems.find((automation) => automation?.automation_type === 'recurring') ?? null
 
         setContactLists(contactListItems)
 
@@ -312,6 +315,21 @@ const AutomationPage = () => {
               ? 'You already have an active welcome automation for new customer signups. Deactivate it to edit the sender or message template.'
               : 'A welcome automation already exists for this account. Click the message step to update its sender or body.',
           )
+        }
+
+        if (recourringAutomation) {
+          const recourringSegment = resolveAutomationSegment(recourringAutomation, contactListItems)
+
+          setFlowState((prev) => ({
+            ...prev,
+            recurring: {
+              ...prev.recurring,
+              automation: mergeAutomationRecord(prev.recurring.automation, recourringAutomation),
+              smsBody: getAutomationSmsBody(recourringAutomation),
+              smsSender: getAutomationSmsSender(recourringAutomation),
+              segment: recourringSegment,
+            },
+          }))
         }
       })
       .finally(() => {
@@ -354,11 +372,21 @@ const AutomationPage = () => {
     setFlowStatusModal(null)
   }
 
-  const persistAutomation = async (flowId, { smsBody, smsSender, isActive } = {}) => {
+  const persistAutomation = async (flowId, { smsBody, smsSender, isActive, contactListId } = {}) => {
     const flowConfig = getFlowConfig(flowId)
     const currentFlow = flowState[flowId]
     const resolvedSmsBody = (smsBody ?? currentFlow.smsBody ?? currentFlow.automation?.sms_body ?? '').trim()
     const resolvedSmsSender = (smsSender ?? currentFlow.smsSender ?? currentFlow.automation?.sms_sender ?? '').trim()
+    const resolvedIsActive = typeof isActive === 'boolean'
+      ? isActive
+      : Boolean(currentFlow.automation?.is_active)
+    const resolvedStatus = typeof isActive === 'boolean'
+      ? (isActive ? 'activated' : 'deactivated')
+      : (currentFlow.automation?.status ?? (resolvedIsActive ? 'activated' : 'deactivated'))
+    const resolvedContactListId = contactListId
+      ?? currentFlow.segment?.id
+      ?? currentFlow.automation?.segment_list_id
+      ?? null
 
     if (!resolvedSmsBody) {
       throw new Error('Create the SMS template before saving the automation.')
@@ -374,7 +402,9 @@ const AutomationPage = () => {
       description: flowConfig.automationDescription,
       sms_body: resolvedSmsBody,
       sms_sender: resolvedSmsSender,
-      ...(typeof isActive === 'boolean' ? { is_active: isActive } : {}),
+      is_active: resolvedIsActive,
+      status: resolvedStatus,
+      ...(flowId === 'recurring' && resolvedContactListId ? { segment_list_id: resolvedContactListId } : {}),
     }
 
     if (currentFlow.automation?.id) {
@@ -383,45 +413,9 @@ const AutomationPage = () => {
 
     return createAutomation({
       ...payload,
-      is_active: typeof isActive === 'boolean' ? isActive : false,
+      is_active: resolvedIsActive,
+      status: resolvedStatus,
     })
-  }
-
-  const handleCreateCampaign = async (form) => {
-    const flowId = modalState?.flowId
-    if (!flowId) return
-
-    setIsSubmittingCampaign(true)
-
-    try {
-      const created = await createCampaign({
-        name: form.name,
-        description: form.description,
-        content: form.content !== '' ? Number(form.content) : null,
-        status: 'draft',
-      })
-
-      setFlowState((prev) => ({
-        ...prev,
-        [flowId]: {
-          ...prev[flowId],
-          campaign: created,
-          smsBody: '',
-          smsSender: '',
-          segment: null,
-        },
-      }))
-      setFeedback(flowId, 'success', 'Campaign created. Continue to the message template step.')
-      closeModal()
-    } catch (error) {
-      setFeedback(
-        flowId,
-        'error',
-        error?.response?.data?.detail || error?.response?.data?.error || 'Unable to create the campaign right now.',
-      )
-    } finally {
-      setIsSubmittingCampaign(false)
-    }
   }
 
   const handleCreateAutomation = async ({ sender, body }) => {
@@ -449,7 +443,7 @@ const AutomationPage = () => {
       setFeedback(
         flowId,
         'success',
-        flowId === 'weekly_offer'
+        flowId === 'recurring'
           ? isEditingAutomation
             ? 'Automation updated. You can activate it when you are ready.'
             : 'Automation created. Choose the segment list next.'
@@ -469,7 +463,7 @@ const AutomationPage = () => {
     }
   }
 
-  const handleSaveSegment = () => {
+  const handleSaveSegment = async () => {
     const flowId = modalState?.flowId
     if (!flowId) return
 
@@ -480,15 +474,35 @@ const AutomationPage = () => {
       return
     }
 
-    setFlowState((prev) => ({
-      ...prev,
-      [flowId]: {
-        ...prev[flowId],
-        segment: selectedSegment,
-      },
-    }))
-    setFeedback(flowId, 'success', `${selectedSegment.segment_name} selected for weekly offers.`)
-    closeModal()
+    if (String(selectedSegment.id).startsWith('fallback-')) {
+      setFeedback(flowId, 'error', 'Load real segment lists before saving this step to automation.')
+      return
+    }
+
+    try {
+      const savedAutomation = await persistAutomation(flowId, {
+        contactListId: selectedSegment.id,
+      })
+
+      setFlowState((prev) => ({
+        ...prev,
+        [flowId]: {
+          ...prev[flowId],
+          automation: mergeAutomationRecord(prev[flowId].automation, savedAutomation),
+          smsBody: savedAutomation?.sms_body ?? prev[flowId].smsBody,
+          smsSender: savedAutomation?.sms_sender ?? prev[flowId].smsSender,
+          segment: selectedSegment,
+        },
+      }))
+      setFeedback(flowId, 'success', `${selectedSegment.segment_name} saved for recourring sms automation.`)
+      closeModal()
+    } catch (error) {
+      setFeedback(
+        flowId,
+        'error',
+        error?.response?.data?.detail || error?.response?.data?.error || 'Unable to save the segment to automation right now.',
+      )
+    }
   }
 
   const updateFlowActivation = async (flowId, isActive, { skipConfirmation = false } = {}) => {
@@ -505,12 +519,12 @@ const AutomationPage = () => {
       return
     }
 
-    if (isActive && flowId === 'weekly_offer' && !flow.segment) {
-      setFeedback(flowId, 'error', 'Select a segment list before activating the weekly offer automation.')
+    if (isActive && flowId === 'recurring' && !flow.segment) {
+      setFeedback(flowId, 'error', 'Select a segment list before activating the recourring sms automation.')
       return
     }
 
-    if (flowId === 'welcome_user' && !skipConfirmation) {
+    if ((flowId === 'welcome_user' || flowId === 'recurring') && !skipConfirmation) {
       openFlowStatusModal(flowId, isActive ? 'activate' : 'deactivate')
       return
     }
@@ -535,10 +549,10 @@ const AutomationPage = () => {
         isActive
           ? flowId === 'welcome_user'
             ? 'New customer signup flow activated. New QR signups will now receive this welcome SMS.'
-            : 'Weekly offer automation activated.'
+            : 'Recourring sms automation activated.'
           : flowId === 'welcome_user'
             ? 'New customer signup flow deactivated. New QR signups will no longer receive this welcome SMS.'
-            : 'Weekly offer automation deactivated.',
+            : 'Recourring sms automation deactivated.',
       )
     } catch (error) {
       setFeedback(
@@ -570,24 +584,14 @@ const AutomationPage = () => {
         'info',
         flowId === 'welcome_user'
           ? 'This automation is active and locked. Deactivate it before editing the sender or message template.'
-          : 'This automation is active and locked. Deactivate it before editing the campaign, sender, or message template.',
+          : 'This automation is active and locked. Deactivate it before editing the sender or message template.',
       )
-      return
-    }
-
-    if (stepId === 'campaign') {
-      openModal('campaign', flowId)
       return
     }
 
     if (stepId === 'sms') {
       if (flowId === 'welcome_user' && isLoadingAutomations) {
         setFeedback(flowId, 'info', 'Checking whether a welcome automation already exists...')
-        return
-      }
-
-      if (flowId !== 'welcome_user' && !currentFlow.campaign) {
-        setFeedback(flowId, 'error', 'Create the campaign first before saving the message template.')
         return
       }
 
@@ -602,7 +606,7 @@ const AutomationPage = () => {
 
     if (stepId === 'segment') {
       if (!currentFlow.smsBody) {
-        setFeedback(flowId, 'error', 'Create the weekly message template before selecting the segment list.')
+        setFeedback(flowId, 'error', 'Create the recourring sms template before selecting the segment list.')
         return
       }
 
@@ -619,11 +623,10 @@ const AutomationPage = () => {
     const flow = flowState[flowId]
 
     if (stepId === 'content') return 'optional'
-    if (stepId === 'campaign') return flow.campaign ? 'complete' : 'ready'
     if (stepId === 'sms') {
       if (flowId === 'welcome_user' && isLoadingAutomations) return 'locked'
       if (flowId === 'welcome_user' && flow.automation?.id) return flow.smsBody ? 'complete' : 'locked'
-      return flow.smsBody ? 'complete' : flowId === 'welcome_user' || flow.campaign ? 'ready' : 'locked'
+      return flow.smsBody ? 'complete' : 'ready'
     }
     if (stepId === 'segment') return flow.segment ? 'complete' : flow.smsBody ? 'ready' : 'locked'
     if (stepId === 'trigger') {
@@ -677,14 +680,18 @@ const AutomationPage = () => {
                             )}
                           </div>
 
-                          {flow.id === 'welcome_user' && (
+                          {(flow.id === 'welcome_user' || flow.id === 'recurring') && (
                             <div className="flex flex-col items-start gap-2 sm:items-end">
                               <button
                                 type="button"
                                 onClick={() =>
                                   void (currentFlow.automation?.is_active ? handleDeactivateFlow(flow.id) : handleActivateFlow(flow.id))
                                 }
-                                disabled={((!currentFlow.smsBody || !currentFlow.smsSender) && !currentFlow.automation?.is_active) || activatingFlowId === flow.id}
+                                disabled={(
+                                  ((!currentFlow.smsBody || !currentFlow.smsSender) && !currentFlow.automation?.is_active)
+                                  || (flow.id === 'recurring' && !currentFlow.automation?.is_active && !currentFlow.segment)
+                                  || activatingFlowId === flow.id
+                                )}
                                 className={`inline-flex min-w-[124px] items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold transition-opacity ${
                                   currentFlow.automation?.is_active
                                     ? 'bg-amber-500/20 text-amber-100 hover:bg-amber-500/30'
@@ -708,7 +715,7 @@ const AutomationPage = () => {
                           <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                             {flow.id === 'welcome_user'
                               ? 'This automation is locked while active. Deactivate it to edit the sender or message template.'
-                              : 'This automation is locked while active. Use the trigger step to deactivate it before editing.'}
+                              : 'This automation is locked while active. Deactivate it to edit the sender or message template.'}
                           </div>
                         )}
 
@@ -730,11 +737,6 @@ const AutomationPage = () => {
                         </div>
 
                         <div className="mt-4 flex flex-wrap gap-2 text-xs">
-                          {flow.steps.some((step) => step.id === 'campaign') && (
-                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[#E5E7EB]">
-                              Campaign: {currentFlow.campaign?.name || 'not created'}
-                            </span>
-                          )}
                           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[#E5E7EB]">
                             Message: {currentFlow.smsBody ? 'saved' : 'not created'}
                           </span>
@@ -744,7 +746,7 @@ const AutomationPage = () => {
                           <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[#E5E7EB]">
                             Automation: {currentFlow.automation ? (currentFlow.automation.is_active ? 'active' : 'inactive') : 'not saved'}
                           </span>
-                          {flow.id === 'weekly_offer' && (
+                          {flow.id === 'recurring' && (
                             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[#E5E7EB]">
                               Segment: {currentFlow.segment?.segment_name || 'not selected'}
                             </span>
@@ -774,17 +776,6 @@ const AutomationPage = () => {
         </div>
       </div>
 
-      {modalState?.type === 'campaign' && modalFlow && (
-        <CreateCampaignModal
-          onClose={closeModal}
-          onCreate={handleCreateCampaign}
-          submitting={isSubmittingCampaign}
-          title={`${modalFlow.automationTitle} campaign`}
-          submitLabel="Save campaign"
-          initialValues={modalFlow.campaignDefaults}
-        />
-      )}
-
       {modalState?.type === 'sms' && modalFlow && (
         <CreateSmsModal
           onClose={closeModal}
@@ -792,8 +783,8 @@ const AutomationPage = () => {
           submitting={isSubmittingSms}
           title={modalFlow.smsTitle}
           submitLabel={currentModalFlowState?.automation?.id ? 'Save changes' : 'Create automation'}
-          lockedCampaign={modalState.flowId === 'welcome_user' ? null : currentModalFlowState?.campaign}
-          showCampaign={modalState.flowId !== 'welcome_user'}
+          lockedCampaign={null}
+          showCampaign={false}
           showAudience={false}
           bodyPlaceholder={modalFlow.smsPlaceholder}
           templateText={modalFlow.smsTemplate}
@@ -815,16 +806,18 @@ const AutomationPage = () => {
         />
       )}
 
-      {flowStatusModal?.flowId === 'welcome_user' && (
+      {flowStatusModal && (
         <FlowStatusConfirmModal
+          flowId={flowStatusModal.flowId}
           mode={flowStatusModal.mode}
           onClose={closeFlowStatusModal}
           onConfirm={() => {
             const isActivation = flowStatusModal.mode === 'activate'
+            const targetFlowId = flowStatusModal.flowId
             closeFlowStatusModal()
             void (isActivation
-              ? handleActivateFlow('welcome_user', { skipConfirmation: true })
-              : handleDeactivateFlow('welcome_user', { skipConfirmation: true }))
+              ? handleActivateFlow(targetFlowId, { skipConfirmation: true })
+              : handleDeactivateFlow(targetFlowId, { skipConfirmation: true }))
           }}
         />
       )}

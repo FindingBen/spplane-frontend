@@ -13,6 +13,6 @@ export async function createAutomation(payload){
 }
 
 export async function updateAutomation(id, payload){
-    const response = await axiosInstance.patch(`${BASE}${id}/`, payload)
+    const response = await axiosInstance.put(`${BASE}${id}/`, payload)
     return response.data
 }
