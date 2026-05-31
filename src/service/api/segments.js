@@ -59,6 +59,11 @@ export async function customerSignupWithQrCode(payload){
    return res.data
 }
 
+export async function optOutCustomer(token){
+   const res = await axiosInstance.get(`${BASE}sms-opt-out/v1/unsubscribe?t=${token}`) 
+   return res.data
+}
+
 // ── Shopify Import ──────────────────────────────────────────────────────────
 
 export async function importShopifyCustomers() {
