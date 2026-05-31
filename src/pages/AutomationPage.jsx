@@ -6,6 +6,9 @@ import { createAutomation, getAutomations, updateAutomation } from '../service/a
 import { getContactLists } from '../service/api/segments'
 
 const FALLBACK_SEGMENTS = ['Test list', 'Other list', 'VIP Customers', 'New Subscribers']
+const PERIOD_OPTIONS = ['SECONDS', 'MINUTES', 'HOURS', 'DAYS', 'WEEKS', 'MONTHS']
+const DEFAULT_RECURRING_EVERY = 1
+const DEFAULT_RECURRING_PERIOD = 'WEEKS'
 
 const FLOWS = [
   {
@@ -37,6 +40,7 @@ const FLOWS = [
     steps: [
       { id: 'sms', label: 'Craft curated\nmessage to\nrecourring sms' },
       { id: 'content', label: 'Create personalized\ncontent', optional: true },
+      { id: 'occurrence', label: 'Select occurrence\ndate' },
       { id: 'segment', label: 'Select segment\nlist' },
     ],
   },
@@ -44,7 +48,14 @@ const FLOWS = [
 
 const INITIAL_FLOW_STATE = {
   welcome_user: { automation: null, smsBody: '', smsSender: '', segment: null },
-  recurring: { automation: null, smsBody: '', smsSender: '', segment: null },
+  recurring: {
+    automation: null,
+    smsBody: '',
+    smsSender: '',
+    segment: null,
+    every: DEFAULT_RECURRING_EVERY,
+    period: DEFAULT_RECURRING_PERIOD,
+  },
 }
 
 const getFlowConfig = (flowId) => FLOWS.find((flow) => flow.id === flowId)
@@ -52,6 +63,21 @@ const getFlowConfig = (flowId) => FLOWS.find((flow) => flow.id === flowId)
 const getAutomationSmsBody = (automation) => (typeof automation?.sms_body === 'string' ? automation.sms_body : '')
 
 const getAutomationSmsSender = (automation) => (typeof automation?.sms_sender === 'string' ? automation.sms_sender : '')
+
+const getAutomationEvery = (automation) => {
+  const parsed = Number(automation?.every)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : DEFAULT_RECURRING_EVERY
+}
+
+const getAutomationPeriod = (automation) => {
+  const normalized = String(automation?.period || '').toUpperCase()
+  return PERIOD_OPTIONS.includes(normalized) ? normalized : DEFAULT_RECURRING_PERIOD
+}
+
+const formatPeriodLabel = (period) => {
+  const label = String(period || '').toLowerCase()
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
 
 const resolveAutomationSegment = (automation, segments) => {
   const contactListId = automation?.segment_list_id
@@ -67,6 +93,8 @@ const mergeAutomationRecord = (currentAutomation, nextAutomation) => ({
   is_active: nextAutomation?.is_active ?? currentAutomation?.is_active ?? false,
   status: nextAutomation?.status ?? currentAutomation?.status ?? 'deactivated',
   segment_list_id: nextAutomation?.segment_list_id ?? currentAutomation?.segment_list_id ?? null,
+  every: nextAutomation?.every ?? currentAutomation?.every ?? DEFAULT_RECURRING_EVERY,
+  period: nextAutomation?.period ?? currentAutomation?.period ?? DEFAULT_RECURRING_PERIOD,
 })
 
 function StepConnector() {
@@ -178,6 +206,113 @@ function SegmentSelectionModal({ segments, selectedSegmentId, onSelect, onClose,
             className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             Save segment
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function OccurrenceScheduleModal({ initialEvery, initialPeriod, onClose, onSave }) {
+  const [every, setEvery] = useState(String(initialEvery ?? DEFAULT_RECURRING_EVERY))
+  const [period, setPeriod] = useState(initialPeriod ?? DEFAULT_RECURRING_PERIOD)
+  const [error, setError] = useState('')
+
+  const handleSave = () => {
+    const parsedEvery = Number(every)
+
+    if (!Number.isInteger(parsedEvery) || parsedEvery <= 0) {
+      setError('Frequency must be a whole number greater than 0.')
+      return
+    }
+
+    if (!PERIOD_OPTIONS.includes(period)) {
+      setError('Select a valid time frame.')
+      return
+    }
+
+    onSave(parsedEvery, period)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020617]/75 px-4 backdrop-blur-sm">
+      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
+
+      <div className="relative z-10 w-full max-w-xl rounded-[28px] border border-[#3e6ff4]/25 bg-[linear-gradient(180deg,rgba(17,24,39,0.98),rgba(29,26,34,0.95))] p-6 shadow-[0_30px_100px_rgba(2,6,23,0.55)] md:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div className="text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">Recurring sms</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">Select occurrence</h2>
+            <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
+              Configure how often this automation runs for Celery beat.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-[#CAC4CF] transition-colors hover:text-white"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-4 rounded-3xl border border-[#3e6ff4]/20 bg-[#0f172a]/70 p-5 md:grid-cols-[1fr_1.3fr]">
+          <label className="block text-left">
+            <span className="text-sm font-medium text-[#E5E7EB]">Every</span>
+            <input
+              type="number"
+              min={1}
+              step={1}
+              value={every}
+              onChange={(event) => {
+                setEvery(event.target.value)
+                setError('')
+              }}
+              className="mt-3 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#60a5fa]"
+              placeholder="1"
+            />
+          </label>
+
+          <label className="block text-left">
+            <span className="text-sm font-medium text-[#E5E7EB]">Time frame</span>
+            <select
+              value={period}
+              onChange={(event) => {
+                setPeriod(event.target.value)
+                setError('')
+              }}
+              className="mt-3 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#60a5fa]"
+            >
+              {PERIOD_OPTIONS.map((option) => (
+                <option key={option} value={option}>{formatPeriodLabel(option)}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded-2xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            Save occurrence
           </button>
         </div>
       </div>
@@ -328,6 +463,8 @@ const AutomationPage = () => {
               smsBody: getAutomationSmsBody(recourringAutomation),
               smsSender: getAutomationSmsSender(recourringAutomation),
               segment: recourringSegment,
+              every: getAutomationEvery(recourringAutomation),
+              period: getAutomationPeriod(recourringAutomation),
             },
           }))
         }
@@ -372,7 +509,7 @@ const AutomationPage = () => {
     setFlowStatusModal(null)
   }
 
-  const persistAutomation = async (flowId, { smsBody, smsSender, isActive, contactListId } = {}) => {
+  const persistAutomation = async (flowId, { smsBody, smsSender, isActive, contactListId, every, period } = {}) => {
     const flowConfig = getFlowConfig(flowId)
     const currentFlow = flowState[flowId]
     const resolvedSmsBody = (smsBody ?? currentFlow.smsBody ?? currentFlow.automation?.sms_body ?? '').trim()
@@ -387,6 +524,20 @@ const AutomationPage = () => {
       ?? currentFlow.segment?.id
       ?? currentFlow.automation?.segment_list_id
       ?? null
+    const resolvedEvery = flowId === 'recurring'
+      ? (Number.isInteger(Number(every)) && Number(every) > 0
+        ? Number(every)
+        : (Number.isInteger(Number(currentFlow.every)) && Number(currentFlow.every) > 0
+          ? Number(currentFlow.every)
+          : getAutomationEvery(currentFlow.automation)))
+      : null
+    const resolvedPeriod = flowId === 'recurring'
+      ? (PERIOD_OPTIONS.includes(String(period || '').toUpperCase())
+        ? String(period).toUpperCase()
+        : (PERIOD_OPTIONS.includes(String(currentFlow.period || '').toUpperCase())
+          ? String(currentFlow.period).toUpperCase()
+          : getAutomationPeriod(currentFlow.automation)))
+      : null
 
     if (!resolvedSmsBody) {
       throw new Error('Create the SMS template before saving the automation.')
@@ -405,6 +556,7 @@ const AutomationPage = () => {
       is_active: resolvedIsActive,
       status: resolvedStatus,
       ...(flowId === 'recurring' && resolvedContactListId ? { segment_list_id: resolvedContactListId } : {}),
+      ...(flowId === 'recurring' ? { every: resolvedEvery, period: resolvedPeriod } : {}),
     }
 
     if (currentFlow.automation?.id) {
@@ -505,6 +657,38 @@ const AutomationPage = () => {
     }
   }
 
+  const handleSaveOccurrence = async (nextEvery, nextPeriod) => {
+    const flowId = modalState?.flowId
+    if (!flowId) return
+
+    try {
+      const savedAutomation = await persistAutomation(flowId, {
+        every: nextEvery,
+        period: nextPeriod,
+      })
+
+      setFlowState((prev) => ({
+        ...prev,
+        [flowId]: {
+          ...prev[flowId],
+          automation: mergeAutomationRecord(prev[flowId].automation, savedAutomation),
+          smsBody: savedAutomation?.sms_body ?? prev[flowId].smsBody,
+          smsSender: savedAutomation?.sms_sender ?? prev[flowId].smsSender,
+          every: getAutomationEvery(savedAutomation),
+          period: getAutomationPeriod(savedAutomation),
+        },
+      }))
+      setFeedback(flowId, 'success', `Occurrence saved: every ${nextEvery} ${formatPeriodLabel(nextPeriod).toLowerCase()}.`)
+      closeModal()
+    } catch (error) {
+      setFeedback(
+        flowId,
+        'error',
+        error?.response?.data?.detail || error?.response?.data?.error || 'Unable to save occurrence right now.',
+      )
+    }
+  }
+
   const updateFlowActivation = async (flowId, isActive, { skipConfirmation = false } = {}) => {
     const flow = flowState[flowId]
 
@@ -521,6 +705,11 @@ const AutomationPage = () => {
 
     if (isActive && flowId === 'recurring' && !flow.segment) {
       setFeedback(flowId, 'error', 'Select a segment list before activating the recourring sms automation.')
+      return
+    }
+
+    if (isActive && flowId === 'recurring' && !(flow.automation?.every && flow.automation?.period)) {
+      setFeedback(flowId, 'error', 'Select occurrence before activating the recurring sms automation.')
       return
     }
 
@@ -610,7 +799,22 @@ const AutomationPage = () => {
         return
       }
 
+      if (flowId === 'recurring' && !(currentFlow.automation?.every && currentFlow.automation?.period)) {
+        setFeedback(flowId, 'error', 'Select occurrence before selecting the segment list.')
+        return
+      }
+
       openModal('segment', flowId)
+      return
+    }
+
+    if (stepId === 'occurrence') {
+      if (!currentFlow.smsBody) {
+        setFeedback(flowId, 'error', 'Create the recourring sms template before selecting occurrence.')
+        return
+      }
+
+      openModal('occurrence', flowId)
       return
     }
 
@@ -621,6 +825,7 @@ const AutomationPage = () => {
 
   const getStepStatus = (flowId, stepId) => {
     const flow = flowState[flowId]
+    const hasOccurrenceSaved = Boolean(flow?.automation?.every && flow?.automation?.period)
 
     if (stepId === 'content') return 'optional'
     if (stepId === 'sms') {
@@ -628,7 +833,8 @@ const AutomationPage = () => {
       if (flowId === 'welcome_user' && flow.automation?.id) return flow.smsBody ? 'complete' : 'locked'
       return flow.smsBody ? 'complete' : 'ready'
     }
-    if (stepId === 'segment') return flow.segment ? 'complete' : flow.smsBody ? 'ready' : 'locked'
+    if (stepId === 'occurrence') return hasOccurrenceSaved ? 'complete' : flow.smsBody ? 'ready' : 'locked'
+    if (stepId === 'segment') return flow.segment ? 'complete' : (flow.smsBody && hasOccurrenceSaved ? 'ready' : 'locked')
     if (stepId === 'trigger') {
       if (flow.automation?.is_active) return 'complete'
       return flow.smsBody && flow.segment ? 'ready' : 'locked'
@@ -689,6 +895,7 @@ const AutomationPage = () => {
                                 }
                                 disabled={(
                                   ((!currentFlow.smsBody || !currentFlow.smsSender) && !currentFlow.automation?.is_active)
+                                  || (flow.id === 'recurring' && !currentFlow.automation?.is_active && !(currentFlow.automation?.every && currentFlow.automation?.period))
                                   || (flow.id === 'recurring' && !currentFlow.automation?.is_active && !currentFlow.segment)
                                   || activatingFlowId === flow.id
                                 )}
@@ -748,6 +955,11 @@ const AutomationPage = () => {
                           </span>
                           {flow.id === 'recurring' && (
                             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[#E5E7EB]">
+                              Occurrence: {currentFlow.automation?.every && currentFlow.automation?.period ? `Every ${currentFlow.automation.every} ${formatPeriodLabel(currentFlow.automation.period).toLowerCase()}` : 'not set'}
+                            </span>
+                          )}
+                          {flow.id === 'recurring' && (
+                            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[#E5E7EB]">
                               Segment: {currentFlow.segment?.segment_name || 'not selected'}
                             </span>
                           )}
@@ -803,6 +1015,15 @@ const AutomationPage = () => {
           onSelect={setSelectedSegmentId}
           onClose={closeModal}
           onSave={handleSaveSegment}
+        />
+      )}
+
+      {modalState?.type === 'occurrence' && currentModalFlowState && (
+        <OccurrenceScheduleModal
+          initialEvery={currentModalFlowState.every ?? getAutomationEvery(currentModalFlowState.automation)}
+          initialPeriod={currentModalFlowState.period ?? getAutomationPeriod(currentModalFlowState.automation)}
+          onClose={closeModal}
+          onSave={handleSaveOccurrence}
         />
       )}
 
