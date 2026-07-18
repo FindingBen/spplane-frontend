@@ -527,6 +527,10 @@ function GuideOverlay({ active, currentStep, currentTargetId, currentStepIndex, 
 
     if (!targetRect) return null
 
+    if (window.innerWidth < 640) {
+      return { placement: 'bottom-sheet', width: window.innerWidth, bottom: 0, left: 0 }
+    }
+
     const width = Math.min(isContentBuilderStep ? 272 : 360, window.innerWidth - 32)
     const spacing = isContentBuilderStep ? 14 : 18
     const estimatedHeight = isContentBuilderStep ? 132 : 220
@@ -534,7 +538,11 @@ function GuideOverlay({ active, currentStep, currentTargetId, currentStepIndex, 
     const canFitAbove = targetRect.top - spacing - estimatedHeight >= 16
 
     let top = targetRect.bottom + spacing
-    let left = Math.min(window.innerWidth - width - 16, Math.max(16, targetRect.left))
+    const targetCenterX = (targetRect.left + targetRect.right) / 2
+    const targetIsOnLeft = targetCenterX < window.innerWidth / 2
+    let left = targetIsOnLeft
+      ? Math.min(window.innerWidth - width - 16, targetRect.right + spacing)
+      : Math.min(window.innerWidth - width - 16, Math.max(16, targetRect.left))
     let placement = 'bottom'
 
     if (!canFitBelow && canFitAbove) {
@@ -591,7 +599,7 @@ function GuideOverlay({ active, currentStep, currentTargetId, currentStepIndex, 
   }
 
   const arrowBaseClasses = 'absolute h-4 w-4 rotate-45 rounded-[2px] border border-[#60a5fa]/25 bg-[#0b1221]'
-  const arrowStyle = popoverStyle.placement === 'floating'
+  const arrowStyle = (popoverStyle.placement === 'floating' || popoverStyle.placement === 'bottom-sheet')
     ? null
     : {
         bottom: popoverStyle.placement === 'top' ? '-8px' : undefined,
@@ -620,11 +628,17 @@ function GuideOverlay({ active, currentStep, currentTargetId, currentStepIndex, 
 
       <div
         className={`pointer-events-auto fixed z-[80] text-left ${
-          isContentBuilderStep
+          popoverStyle.placement === 'bottom-sheet'
+            ? 'rounded-t-[24px] border-t border-x border-[#60a5fa]/25 bg-[#0b1221]/96 p-5 shadow-[0_-22px_55px_rgba(2,6,23,0.55)]'
+            : isContentBuilderStep
             ? 'rounded-[18px] border border-[#3e6ff4]/20 bg-[#0b1221]/88 p-3.5 shadow-[0_14px_32px_rgba(2,6,23,0.28)]'
             : 'rounded-[24px] border border-[#60a5fa]/25 bg-[#0b1221]/96 p-5 shadow-[0_22px_55px_rgba(2,6,23,0.55)]'
         }`}
-        style={{ top: popoverStyle.top, left: popoverStyle.left, width: popoverStyle.width }}
+        style={
+          popoverStyle.placement === 'bottom-sheet'
+            ? { bottom: 0, left: 0, right: 0 }
+            : { top: popoverStyle.top, left: popoverStyle.left, width: popoverStyle.width }
+        }
       >
         {arrowStyle && <span className={`${arrowBaseClasses}`} style={arrowStyle} />}
 
