@@ -5,10 +5,12 @@ import { tokenService } from '../service/token/tokenService'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
+import { getStatistics } from '../service/api/account'
 
 const Home = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState({})
+  const [stats, setStats] = useState({ active_campaigns: 0, sms_sent: 0, contacts: 0 })
   const { active, completed, currentStep, openIntro } = useFirstCampaignGuide()
 
   const guideButtonLabel = active
@@ -23,6 +25,9 @@ const Home = () => {
 
   useEffect(() => {
     fetchUserData()
+    getStatistics()
+      .then((data) => setStats(data))
+      .catch(() => {})
   }, [])
 
   const fetchUserData = async () => {
@@ -72,16 +77,16 @@ const Home = () => {
               {/* Quick Stats or Info (optional) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 2xl:gap-4 mb-8 md:mb-12 2xl:mb-8">
                 <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-4 md:p-6 2xl:p-4">
-                  <div className="text-2xl md:text-3xl 2xl:text-xl font-bold text-[#3e6ff4] mb-2">0</div>
+                  <div className="text-2xl md:text-3xl 2xl:text-xl font-bold text-[#3e6ff4] mb-2">{stats.active_campaigns ?? 0}</div>
                   <p className="text-[#CAC4CF] text-xs md:text-sm">Active Campaigns</p>
                 </div>
                 <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-4 md:p-6 2xl:p-4">
-                  <div className="text-2xl md:text-3xl 2xl:text-xl font-bold text-[#3e6ff4] mb-2">0</div>
+                  <div className="text-2xl md:text-3xl 2xl:text-xl font-bold text-[#3e6ff4] mb-2">{stats.sms_sent ?? 0}</div>
                   <p className="text-[#CAC4CF] text-xs md:text-sm">Messages Sent</p>
                 </div>
                 <div className="bg-[#1f2937] border border-[#3e6ff4]/30 rounded-lg p-4 md:p-6 2xl:p-4">
-                  <div className="text-2xl md:text-3xl 2xl:text-xl font-bold text-[#3e6ff4] mb-2">0</div>
-                  <p className="text-[#CAC4CF] text-xs md:text-sm">Total Users</p>
+                  <div className="text-2xl md:text-3xl 2xl:text-xl font-bold text-[#3e6ff4] mb-2">{stats.contacts ?? 0}</div>
+                  <p className="text-[#CAC4CF] text-xs md:text-sm">Total Recipients</p>
                 </div>
               </div>
 
