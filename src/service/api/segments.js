@@ -73,6 +73,11 @@ export async function importShopifyCustomers() {
 
 // ── Segment Memberships ───────────────────────────────────────────────────────
 
+export async function getSegmentMembers(segmentId) {
+  const response = await axiosInstance.get(`${CONTACTS_BASE}/`, { params: { segment_id: segmentId } })
+  return response.data
+}
+
 export async function addContactToSegment(segmentId, contact) {
   const response = await axiosInstance.post(`${CONTACTS_BASE}/`, {
     phone: contact.phone,

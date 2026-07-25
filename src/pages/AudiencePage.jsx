@@ -6,6 +6,7 @@ import {
   createContactList,
   deleteContactList,
   getContacts,
+  getSegmentMembers,
   addContactToSegment,
   removeContactFromSegment
 } from '../service/api/segments'
@@ -282,6 +283,7 @@ const AudiencePage = () => {
   const [error, setError] = useState('')
   const [membersError, setMembersError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [membersLoading, setMembersLoading] = useState(false)
   const [importing, setImporting] = useState(false)
   const [importMsg, setImportMsg] = useState('')
 
@@ -291,6 +293,7 @@ const AudiencePage = () => {
     setError('')
     try {
       const data = await getContactLists()
+      console.log('AAA',data)
       setSegments(Array.isArray(data) ? data : (data.results ?? []))
     } catch {
       setError('Failed to load segments. Please try again.')
@@ -310,11 +313,16 @@ const AudiencePage = () => {
       setShowAddModal(true)
     }
   }, [active, currentStepId, selectedSegment])
-
+ console.log('LOLO')
   const handleSelectSegment = (seg) => {
     setSelectedSegment(seg)
     setMembers([])
     setMembersError('')
+    setMembersLoading(true)
+    getSegmentMembers(seg.id)
+      .then(data => setMembers(Array.isArray(data) ? data : (data.results ?? [])))
+      .catch(() => setMembersError('Failed to load segment members.'))
+      .finally(() => setMembersLoading(false))
   }
 
   const handleCreateSegment = async (form) => {
@@ -454,7 +462,11 @@ const AudiencePage = () => {
 
                 {/* Members Table */}
                 <div className="bg-[#1f2937]/60 border border-[#3e6ff4]/20 rounded-xl overflow-hidden">
-                  {members.length === 0 ? (
+                  {membersLoading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <div className="w-8 h-8 border-4 border-[#3e6ff4]/30 border-t-[#3e6ff4] rounded-full animate-spin" />
+                    </div>
+                  ) : members.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 text-center">
                       <div className="w-14 h-14 rounded-full bg-[#3e6ff4]/10 flex items-center justify-center mb-4">
                         <svg className="w-7 h-7 text-[#3e6ff4]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -675,7 +687,7 @@ const AudiencePage = () => {
                         <tr
                           key={seg.id}
                           className="hover:bg-[#3e6ff4]/5 transition-colors cursor-pointer group"
-                          onClick={() => setSelectedSegment(seg)}
+                          onClick={() => handleSelectSegment(seg)}
                         >
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-3">
@@ -703,7 +715,7 @@ const AudiencePage = () => {
                           <td className="py-4 px-4">
                             <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
                               <button
-                                onClick={() => setSelectedSegment(seg)}
+                                onClick={() => handleSelectSegment(seg)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#3e6ff4]/10 text-[#60a5fa] border border-[#3e6ff4]/20 hover:bg-[#3e6ff4]/20 transition-colors"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
