@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { getCampaigns, createCampaign, deleteCampaign } from '../service/api/campaign'
@@ -51,7 +51,7 @@ function CampaignCard({ campaign, onDelete }) {
               </span>
             )}
           </div>
-          <h3 className="text-white font-semibold text-base truncate">{campaign.name}</h3>
+          <h3 className="text-white font-semibold text-sm truncate">{campaign.name}</h3>
         </div>
         <div className="flex gap-1 shrink-0">
           <button className="p-1.5 rounded-lg text-[#CAC4CF] hover:text-white hover:bg-[#3e6ff4]/20 transition-colors">
@@ -72,11 +72,11 @@ function CampaignCard({ campaign, onDelete }) {
 
       {/* Description */}
       {campaign.description ? (
-        <p className="text-[#CAC4CF]/70 text-sm line-clamp-3 bg-[#111827]/60 rounded-lg px-3 py-2 border border-[#3e6ff4]/10">
+        <p className="text-[#CAC4CF]/70 text-xs line-clamp-3 bg-[#111827]/60 rounded-lg px-3 py-2 border border-[#3e6ff4]/10">
           {campaign.description}
         </p>
       ) : (
-        <p className="text-[#CAC4CF]/30 text-sm italic bg-[#111827]/60 rounded-lg px-3 py-2 border border-[#3e6ff4]/10">
+        <p className="text-[#CAC4CF]/30 text-xs italic bg-[#111827]/60 rounded-lg px-3 py-2 border border-[#3e6ff4]/10">
           No description provided.
         </p>
       )}
@@ -137,11 +137,11 @@ function EmptyState({ tab, onCreateClick }) {
       <div className="w-20 h-20 rounded-full bg-[#3e6ff4]/10 border border-[#3e6ff4]/20 flex items-center justify-center">
         {icon}
       </div>
-      <h3 className="text-white font-semibold text-lg">{title}</h3>
-      <p className="text-[#CAC4CF] text-sm max-w-xs">{desc}</p>
+      <h3 className="text-white font-semibold text-base">{title}</h3>
+      <p className="text-[#CAC4CF] text-xs max-w-xs">{desc}</p>
       <button
         onClick={onCreateClick}
-        className="mt-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+        className="mt-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-xs font-semibold hover:opacity-90 transition-opacity"
       >
         Create Campaign
       </button>
@@ -231,17 +231,26 @@ const CampaignPage = () => {
       <div className="flex flex-1 overflow-hidden">
         <Header />
 
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
 
               {/* Page Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8 2xl:mb-5">
                 <div>
-                  <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                  <h1 className="text-xl md:text-2xl xl:text-3xl 2xl:text-2xl font-bold text-white text-left mb-1">
                     <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Campaigns</span>
                   </h1>
-                  <p className="text-sm md:text-base text-[#CAC4CF]">
+                  <p className="text-xs md:text-sm text-[#CAC4CF]">
                     Manage and track all your SMS campaigns in one place.
                   </p>
                 </div>
@@ -251,7 +260,7 @@ const CampaignPage = () => {
                     trackAction('campaign:open')
                   }}
                   data-guide-id="campaign-new"
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start sm:self-auto"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-xs hover:opacity-90 transition-opacity shrink-0 self-start sm:self-auto"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -262,7 +271,7 @@ const CampaignPage = () => {
 
               {/* Success Toast */}
               {successMsg && (
-                <div className="mb-5 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 rounded-xl px-4 py-3 text-sm font-medium">
+                <div className="mb-5 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 rounded-xl px-4 py-3 text-xs font-medium">
                   <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -272,7 +281,7 @@ const CampaignPage = () => {
 
               {/* Error Banner */}
               {error && (
-                <div className="mb-5 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-sm">
+                <div className="mb-5 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-xs">
                   <span>{error}</span>
                   <button onClick={fetchCampaigns} className="text-xs underline hover:no-underline shrink-0">
                     Retry
@@ -289,7 +298,7 @@ const CampaignPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-2xl 2xl:text-xl font-bold text-emerald-400">{tabCounts.active}</div>
+                    <div className="text-xl 2xl:text-lg font-bold text-emerald-400">{tabCounts.active}</div>
                     <div className="text-[#CAC4CF] text-xs">Active Campaigns</div>
                   </div>
                 </div>
@@ -300,7 +309,7 @@ const CampaignPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-2xl 2xl:text-xl font-bold text-[#CAC4CF]">{tabCounts.draft}</div>
+                    <div className="text-xl 2xl:text-lg font-bold text-[#CAC4CF]">{tabCounts.draft}</div>
                     <div className="text-[#CAC4CF] text-xs">Drafts</div>
                   </div>
                 </div>
@@ -311,7 +320,7 @@ const CampaignPage = () => {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-2xl 2xl:text-xl font-bold text-amber-400">{tabCounts.paused}</div>
+                    <div className="text-xl 2xl:text-lg font-bold text-amber-400">{tabCounts.paused}</div>
                     <div className="text-[#CAC4CF] text-xs">Paused</div>
                   </div>
                 </div>
@@ -323,7 +332,7 @@ const CampaignPage = () => {
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm rounded-lg font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-2 px-4 py-2 text-xs rounded-lg font-medium transition-all duration-200 ${
                       activeTab === tab.key
                         ? 'bg-[#3e6ff4] text-white shadow'
                         : 'text-[#CAC4CF] hover:text-white hover:bg-[#3e6ff4]/10'

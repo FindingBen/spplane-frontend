@@ -33,7 +33,7 @@ export const ListBlockPreview = ({ props = {}, variant = 'builder' }) => {
   if (items.length === 0) {
     return (
       <div className={isPublic ? 'w-full bg-white px-5 py-5 text-left' : 'w-full bg-white px-3 py-3 text-left'}>
-        <p className={isPublic ? 'text-sm text-gray-400' : 'text-xs text-gray-400'}>Add bullet points to this block.</p>
+        <p className={isPublic ? 'text-xs text-gray-400' : 'text-xs text-gray-400'}>Add bullet points to this block.</p>
       </div>
     )
   }
@@ -93,7 +93,7 @@ export const ListBlockEditor = ({ props = {}, onChange }) => {
               value={item}
               onChange={(event) => updateItem(index, event.target.value)}
               placeholder={`Bullet point ${index + 1}`}
-              className="w-full rounded border border-[#3e6ff4]/20 bg-[#111827] px-3 py-2 text-sm text-white focus:border-[#3e6ff4]/60 focus:outline-none"
+              className="w-full rounded border border-[#3e6ff4]/20 bg-[#111827] px-3 py-2 text-xs text-white focus:border-[#3e6ff4]/60 focus:outline-none"
             />
             <button
               type="button"

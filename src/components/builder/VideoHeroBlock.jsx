@@ -30,7 +30,7 @@ export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder'
         />
       ) : (
         <div className={isPublic ? 'w-full h-72 bg-gray-900 flex items-center justify-center' : 'w-full h-40 bg-gray-900 flex items-center justify-center'}>
-          <span className={isPublic ? 'text-sm text-gray-400 px-4 text-center' : 'text-[10px] text-gray-400 px-2 text-center'}>{emptyStateLabel}</span>
+          <span className={isPublic ? 'text-xs text-gray-400 px-4 text-center' : 'text-[10px] text-gray-400 px-2 text-center'}>{emptyStateLabel}</span>
         </div>
       )}
       {!shouldRenderVideo && (
@@ -42,7 +42,7 @@ export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder'
       )}
       {props.title && (
         <div className={isPublic ? 'absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 to-transparent px-5 py-4' : 'absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2'}>
-          <p className={isPublic ? 'text-white text-lg font-semibold leading-tight text-left' : 'text-white text-xs font-semibold'}>{props.title}</p>
+          <p className={isPublic ? 'text-white text-base font-semibold leading-tight text-left' : 'text-white text-xs font-semibold'}>{props.title}</p>
         </div>
       )}
       <div className={isPublic ? 'absolute top-3 right-3 flex gap-2' : 'absolute top-2 right-2 flex gap-1'}>
@@ -62,7 +62,7 @@ export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadCh
         value={props.videoUrl || ''}
         onChange={(e) => onChange('videoUrl', e.target.value)}
         placeholder="https://example.com/video.mp4"
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -71,7 +71,7 @@ export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadCh
         type="file"
         accept="video/*"
         onChange={(e) => onUploadChange('heroVideoFile', e.target.files?.[0] ?? null)}
-        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
+        className="w-full text-xs text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
       />
       {uploads.heroVideoFileName && (
         <div className="mt-2 flex items-center justify-between gap-2 text-xs text-[#CAC4CF]">
@@ -92,7 +92,7 @@ export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadCh
         type="text"
         value={props.title || ''}
         onChange={(e) => onChange('title', e.target.value)}
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -101,7 +101,7 @@ export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadCh
         type="file"
         accept="image/*"
         onChange={(e) => onUploadChange('heroImageFile', e.target.files?.[0] ?? null)}
-        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
+        className="w-full text-xs text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
       />
       {uploads.heroImagePreviewUrl && (
         <div className="mt-2 space-y-2">
@@ -123,7 +123,7 @@ export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadCh
         value={props.fallbackImage || ''}
         onChange={(e) => onChange('fallbackImage', e.target.value)}
         placeholder="https://..."
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -132,7 +132,7 @@ export const VideoHeroEditor = ({ props = {}, uploads = {}, onChange, onUploadCh
         type="file"
         accept="image/*"
         onChange={(e) => onUploadChange('heroVideoPosterFile', e.target.files?.[0] ?? null)}
-        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
+        className="w-full text-xs text-[#CAC4CF] file:mr-3 file:px-3 file:py-2 file:rounded file:border-0 file:bg-[#111827] file:text-white"
       />
       {uploads.heroVideoPosterPreviewUrl && (
         <div className="mt-2 space-y-2">

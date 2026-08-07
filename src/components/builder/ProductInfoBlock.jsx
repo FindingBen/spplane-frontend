@@ -4,7 +4,7 @@ export const ProductInfoPreview = ({ props = {} }) => (
   <div className="w-full px-3 pt-3 pb-2 bg-white">
     <div className="flex items-start justify-between">
       <div className="flex-1 pr-2">
-        <h2 className="text-sm font-bold leading-tight" style={{ color: '#000000' }}>
+        <h2 className="text-xs font-bold leading-tight" style={{ color: '#000000' }}>
           {props.name || 'Product Name'}
         </h2>
         <p className="text-xs mt-0.5" style={{ color: '#6b7280' }}>
@@ -41,7 +41,7 @@ export const ProductInfoEditor = ({ props = {}, onChange }) => (
         type="text"
         value={props.name || ''}
         onChange={(e) => onChange('name', e.target.value)}
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -50,7 +50,7 @@ export const ProductInfoEditor = ({ props = {}, onChange }) => (
         type="text"
         value={props.category || ''}
         onChange={(e) => onChange('category', e.target.value)}
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
   </>

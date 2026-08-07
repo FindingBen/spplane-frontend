@@ -34,7 +34,7 @@ export const ProductDetailsEditor = ({ props = {}, onChange }) => (
         value={props.price || ''}
         onChange={(e) => onChange('price', e.target.value)}
         placeholder="$29.99"
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -43,7 +43,7 @@ export const ProductDetailsEditor = ({ props = {}, onChange }) => (
         type="text"
         value={props.brand || ''}
         onChange={(e) => onChange('brand', e.target.value)}
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -52,7 +52,7 @@ export const ProductDetailsEditor = ({ props = {}, onChange }) => (
         type="text"
         value={props.location || ''}
         onChange={(e) => onChange('location', e.target.value)}
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
   </>

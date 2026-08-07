@@ -4,10 +4,10 @@ import { getContactLists } from '../service/api/segments'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
 const inputCls =
-  'w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-[#CAC4CF]/50 focus:border-[#3e6ff4]'
+  'w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-xs text-white outline-none transition-colors placeholder:text-[#CAC4CF]/50 focus:border-[#3e6ff4]'
 
 const selectCls =
-  'w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-sm text-white outline-none transition-colors focus:border-[#3e6ff4]'
+  'w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-xs text-white outline-none transition-colors focus:border-[#3e6ff4]'
 
 const INITIAL_FORM = { campaign: '', contactList: '', sender: '', body: '' }
 
@@ -29,7 +29,7 @@ function SectionLabel({ number, children, note }) {
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#3e6ff4]/50 bg-[#3e6ff4]/20 text-xs font-bold text-[#60a5fa]">
         {number}
       </span>
-      <span className="text-sm font-medium text-white">{children}</span>
+      <span className="text-xs font-medium text-white">{children}</span>
       {note && <span className="ml-auto text-xs text-[#CAC4CF]/50">{note}</span>}
     </div>
   )
@@ -144,7 +144,7 @@ function CreateSmsModal({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h2 className="text-lg font-bold text-white">{title}</h2>
+            <h2 className="text-base font-bold text-white">{title}</h2>
           </div>
           <button
             onClick={onClose}
@@ -165,13 +165,13 @@ function CreateSmsModal({
                 Select a campaign to connect the content link page used by <code className="text-[#60a5fa]">{'{{page_link}}'}</code>.
               </p>
               {lockedCampaign ? (
-                <div className="rounded-lg border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white">
+                <div className="rounded-lg border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-xs text-white">
                   {lockedCampaign.name || `Campaign #${lockedCampaign.id}`}
                 </div>
               ) : loading ? (
                 <div className="flex items-center gap-2 rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5">
                   <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4]" />
-                  <span className="text-sm text-[#CAC4CF]/50">Loading...</span>
+                  <span className="text-xs text-[#CAC4CF]/50">Loading...</span>
                 </div>
               ) : (
                 <select
@@ -203,7 +203,7 @@ function CreateSmsModal({
                 {loading ? (
                   <div className="flex items-center gap-2 rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5">
                     <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4]" />
-                    <span className="text-sm text-[#CAC4CF]/50">Loading...</span>
+                    <span className="text-xs text-[#CAC4CF]/50">Loading...</span>
                   </div>
                 ) : (
                   <select
@@ -320,14 +320,14 @@ function CreateSmsModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#3e6ff4]/30 py-2.5 text-sm font-medium text-[#CAC4CF] transition-all hover:border-[#3e6ff4]/60 hover:text-white"
+              className="flex-1 rounded-lg border border-[#3e6ff4]/30 py-2.5 text-xs font-medium text-[#CAC4CF] transition-all hover:border-[#3e6ff4]/60 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? (
                 <>

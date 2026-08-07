@@ -18,11 +18,11 @@ const SidebarNav = () => {
   const isActive = (path) => location.pathname === path
 
   return (
-    <nav className="w-full px-4 flex-1 flex flex-col">
+    <nav className="w-full px-4 flex-1 flex flex-col bg-[linear-gradient(90deg,rgba(17,24,39,0.94),rgba(17,24,39,0.78))]">
       {/* Home */}
       <button
         onClick={() => navigate('/dashboard')}
-        className="w-full text-left px-3 py-3 mt-6 text-[#CAC4CF] hover:bg-[#3e6ff4]/20 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium"
+        className="w-full text-left px-3 py-3 mt-6 cursor-pointer text-[#CAC4CF] hover:bg-[#3e6ff4]/20 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 11l4-10m0 0l4 10" />
@@ -37,7 +37,7 @@ const SidebarNav = () => {
           navigate('/campaigns')
         }}
         data-guide-id="nav-campaigns"
-        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg cursor-pointer transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/campaigns')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
             : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -56,7 +56,7 @@ const SidebarNav = () => {
           navigate('/audience')
         }}
         data-guide-id="nav-audience"
-        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+        className={`w-full text-left px-3 py-3 mt-2 cursor-pointer rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/audience')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
             : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -75,7 +75,7 @@ const SidebarNav = () => {
           navigate('/customers')
         }}
         data-guide-id="nav-customers"
-        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+        className={`w-full text-left px-3 py-3 mt-2 cursor-pointer rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/customers')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
             : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -94,7 +94,7 @@ const SidebarNav = () => {
           navigate('/sms')
         }}
         data-guide-id="nav-sms"
-        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+        className={`w-full text-left px-3 py-3 mt-2 cursor-pointer rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/sms')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
             : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -108,7 +108,7 @@ const SidebarNav = () => {
 
       <button
         onClick={() => navigate('/automations')}
-        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+        className={`w-full text-left px-3 py-3 mt-2 rounded-lg cursor-pointer transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/automations')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
             : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -123,7 +123,7 @@ const SidebarNav = () => {
 
       <button
         onClick={() => navigate('/sms-plans')}
-        className={`w-full text-left px-3 py-3 mt-2 rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
+        className={`w-full text-left px-3 py-3 mt-2 cursor-pointer rounded-lg transition-colors duration-200 flex items-center gap-3 font-medium ${
           isActive('/sms-plans')
             ? 'bg-[#3e6ff4]/30 text-[#60a5fa]'
             : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -139,7 +139,7 @@ const SidebarNav = () => {
       <div className="mt-4">
         <button
           onClick={() => setIsContentOpen(!isContentOpen)}
-          className="w-full text-left px-3 py-3 text-[#CAC4CF] hover:bg-[#3e6ff4]/20 rounded-lg transition-colors duration-200 flex items-center justify-between font-medium group"
+          className="w-full text-left px-3 py-3 cursor-pointer text-[#CAC4CF] hover:bg-[#3e6ff4]/20 rounded-lg transition-colors duration-200 flex items-center justify-between font-medium group"
         >
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +162,7 @@ const SidebarNav = () => {
           <div className="ml-6 mt-2 space-y-2">
             <button
               onClick={() => navigate('/content/mine')}
-              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors duration-200 flex items-center gap-2 ${
                 isActive('/content/mine')
                   ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
                   : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -177,7 +177,7 @@ const SidebarNav = () => {
                 navigate('/content/builder')
               }}
               data-guide-id="nav-content-builder"
-              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors duration-200 flex items-center gap-2 ${
                 isActive('/content/builder')
                   ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
                   : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -188,7 +188,7 @@ const SidebarNav = () => {
             </button>
             <button
               onClick={() => navigate('/content/templates')}
-              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors duration-200 flex items-center gap-2 ${
                 isActive('/content/templates')
                   ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
                   : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'
@@ -199,7 +199,7 @@ const SidebarNav = () => {
             </button>
             <button
               onClick={() => navigate('/content/products')}
-              className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center gap-2 ${
+              className={`w-full text-left px-3 py-2 text-xs rounded-lg transition-colors duration-200 flex items-center gap-2 ${
                 isActive('/content/products')
                   ? 'bg-[#3e6ff4]/30 text-[#60a5fa] font-semibold'
                   : 'text-[#CAC4CF] hover:bg-[#3e6ff4]/20'

@@ -31,22 +31,22 @@ const SmsOptOutPage = () => {
 
           {!token ? (
             <>
-              <h1 className="mt-4 text-3xl font-semibold text-white">Invalid unsubscribe link</h1>
-              <p className="mt-3 text-sm leading-6 text-[#CAC4CF]">
+              <h1 className="mt-4 text-2xl font-semibold text-white">Invalid unsubscribe link</h1>
+              <p className="mt-3 text-xs leading-6 text-[#CAC4CF]">
                 This opt-out link is missing a token. Please use the unsubscribe link from your SMS message.
               </p>
             </>
           ) : completed ? (
             <>
-              <h1 className="mt-4 text-3xl font-semibold text-white">You are unsubscribed</h1>
-              <p className="mt-3 text-sm leading-6 text-[#CAC4CF]">
+              <h1 className="mt-4 text-2xl font-semibold text-white">You are unsubscribed</h1>
+              <p className="mt-3 text-xs leading-6 text-[#CAC4CF]">
                 You will no longer receive SMS messages from this sender.
               </p>
             </>
           ) : (
             <>
-              <h1 className="mt-4 text-3xl font-semibold text-white">Unsubscribe from SMS?</h1>
-              <p className="mt-3 text-sm leading-6 text-[#CAC4CF]">
+              <h1 className="mt-4 text-2xl font-semibold text-white">Unsubscribe from SMS?</h1>
+              <p className="mt-3 text-xs leading-6 text-[#CAC4CF]">
                 Are you sure you want to unsubscribe?
               </p>
 
@@ -55,7 +55,7 @@ const SmsOptOutPage = () => {
                   type="button"
                   onClick={handleUnsubscribe}
                   disabled={isSubmitting}
-                  className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-6 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isSubmitting ? 'Unsubscribing...' : 'Yes, unsubscribe me'}
                 </button>

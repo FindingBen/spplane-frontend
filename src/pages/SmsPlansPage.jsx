@@ -185,13 +185,22 @@ const SmsPlansPage = () => {
       <div className="flex flex-1">
         <Header />
 
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col">
-          <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 xl:p-8 2xl:p-5">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 xl:p-8 2xl:p-5">
             <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
               <section>
                 <div>
                   
-                  <h1 className="mt-3 text-2xl text-left font-bold text-white md:text-3xl xl:text-4xl 2xl:text-4xl">
+                  <h1 className="mt-3 text-xl text-left font-bold text-white md:text-2xl xl:text-3xl 2xl:text-3xl">
                     Choose an SMS package that matches your next send.
                   </h1>
                  
@@ -201,15 +210,15 @@ const SmsPlansPage = () => {
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-left text-[#93c5fd]">Billing check</p>
                         {billingLoading ? (
-                          <p className="mt-1 text-sm text-white">Checking whether this shop can purchase SMS credits...</p>
+                          <p className="mt-1 text-xs text-white">Checking whether this shop can purchase SMS credits...</p>
                         ) : billingError ? (
-                          <p className="mt-1 text-sm text-white">{billingError}</p>
+                          <p className="mt-1 text-xs text-white">{billingError}</p>
                         ) : isBillable ? (
-                          <p className="mt-1 text-sm text-white">
+                          <p className="mt-1 text-xs text-white">
                             Billing is active{billingStatus?.plan_public_name ? ` on ${billingStatus.plan_public_name}` : ''}. This shop can purchase SMS credits.
                           </p>
                         ) : (
-                          <p className="mt-1 text-sm text-white">
+                          <p className="mt-1 text-xs text-white">
                             This shop cannot buy SMS credits right now{billingStatus?.reason ? `: ${billingStatus.reason}` : '.'}
                           </p>
                         )}
@@ -243,13 +252,13 @@ const SmsPlansPage = () => {
                   </div>
 
                   {purchaseMessage && (
-                    <div className="mt-3 max-w-2xl rounded-xl border border-[#3e6ff4]/25 bg-[#3e6ff4]/10 px-4 py-3 text-sm text-[#dbeafe]">
+                    <div className="mt-3 max-w-2xl rounded-xl border border-[#3e6ff4]/25 bg-[#3e6ff4]/10 px-4 py-3 text-xs text-[#dbeafe]">
                       {purchaseMessage}
                     </div>
                   )}
 
                   {purchaseError && (
-                    <div className="mt-3 max-w-2xl rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                    <div className="mt-3 max-w-2xl rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-xs text-red-100">
                       {purchaseError}
                     </div>
                   )}
@@ -258,19 +267,19 @@ const SmsPlansPage = () => {
 
               <section className="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
                 {plansLoading && (
-                  <div className="rounded-[24px] border border-[#3e6ff4]/20 bg-[#0f172a]/75 p-5 text-sm text-[#dbeafe] lg:col-span-2 2xl:col-span-3">
+                  <div className="rounded-[24px] border border-[#3e6ff4]/20 bg-[#0f172a]/75 p-5 text-xs text-[#dbeafe] lg:col-span-2 2xl:col-span-3">
                     Loading SMS packages...
                   </div>
                 )}
 
                 {!plansLoading && plansError && (
-                  <div className="rounded-[24px] border border-red-500/25 bg-red-500/10 p-5 text-sm text-red-100 lg:col-span-2 2xl:col-span-3">
+                  <div className="rounded-[24px] border border-red-500/25 bg-red-500/10 p-5 text-xs text-red-100 lg:col-span-2 2xl:col-span-3">
                     {plansError}
                   </div>
                 )}
 
                 {!plansLoading && !plansError && smsPackages.length === 0 && (
-                  <div className="rounded-[24px] border border-[#3e6ff4]/20 bg-[#0f172a]/75 p-5 text-sm text-[#dbeafe] lg:col-span-2 2xl:col-span-3">
+                  <div className="rounded-[24px] border border-[#3e6ff4]/20 bg-[#0f172a]/75 p-5 text-xs text-[#dbeafe] lg:col-span-2 2xl:col-span-3">
                     No active SMS packages are available for this shop yet.
                   </div>
                 )}
@@ -297,9 +306,9 @@ const SmsPlansPage = () => {
                         <div className="flex items-start justify-between gap-4">
                           <div>
                             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">SMS package</p>
-                            <h2 className="mt-2 text-xl font-semibold text-white">{plan.name}</h2>
+                            <h2 className="mt-2 text-lg font-semibold text-white">{plan.name}</h2>
                             {packageTitle && (
-                              <p className="mt-2 text-sm text-[#CAC4CF]">{packageTitle}</p>
+                              <p className="mt-2 text-xs text-[#CAC4CF]">{packageTitle}</p>
                             )}
                           </div>
                           {isFeatured && (
@@ -310,19 +319,19 @@ const SmsPlansPage = () => {
                         </div>
 
                         <div className="mt-6 flex items-end gap-2.5">
-                          <p className="text-3xl font-bold text-white">{formatPrice(plan.price, plan.currency)}</p>
+                          <p className="text-2xl font-bold text-white">{formatPrice(plan.price, plan.currency)}</p>
                           <p className="mb-1 text-xs text-[#93c5fd]">one-time package</p>
                         </div>
 
                         <div className={`mt-5 inline-flex text-left rounded-full bg-gradient-to-r ${appearance.accent} p-[1px]`}>
-                          <div className="rounded-full bg-[#0f172a] px-3.5 py-1.5 text-sm font-semibold text-white">
+                          <div className="rounded-full bg-[#0f172a] px-3.5 py-1.5 text-xs font-semibold text-white">
                             {numberFormatter.format(plan.sms_count)} SMS
                           </div>
                         </div>
 
                         <ul className="mt-5 space-y-2.5">
                           {getPlanHighlights(plan).map((feature) => (
-                            <li key={feature} className="flex items-start gap-3 text-sm text-[#d1d5db]">
+                            <li key={feature} className="flex items-start gap-3 text-xs text-[#d1d5db]">
                               <span className="mt-0.5 inline-flex h-4.5 w-4.5 items-center justify-center rounded-full border border-[#3e6ff4]/35 bg-[#3e6ff4]/10 text-[#93c5fd]">
                                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -336,13 +345,13 @@ const SmsPlansPage = () => {
                         <div className="mt-6 flex items-center justify-between gap-4 border-t border-white/10 pt-4">
                           <div>
                             <p className="text-[11px] uppercase tracking-[0.18em] text-[#93c5fd]">Effective rate</p>
-                            <p className="mt-1 text-sm font-medium text-white">{getUnitCostLabel(plan.price, plan.sms_count, plan.currency)}</p>
+                            <p className="mt-1 text-xs font-medium text-white">{getUnitCostLabel(plan.price, plan.sms_count, plan.currency)}</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleTopup(plan)}
                             disabled={isPurchaseBlocked || Boolean(purchasingPlanId) || !plan.package_id}
-                            className={`inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all ${
+                            className={`inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-xs font-semibold transition-all ${
                               isPurchaseBlocked || purchasingPlanId || !plan.package_id
                                 ? 'cursor-not-allowed bg-white/5 text-white/40'
                                 : 'bg-[#3e6ff4]/15 text-[#dbeafe] hover:bg-[#3e6ff4]/25 hover:text-white'

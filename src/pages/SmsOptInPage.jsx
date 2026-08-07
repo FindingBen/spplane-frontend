@@ -71,27 +71,27 @@ const SmsOptInPage = () => {
               Sendperplane SMS
             </div> */}
 {/* 
-            <h1 className="mt-6 max-w-2xl text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 max-w-2xl text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl">
               Turn subscribers into first-to-know customers.
             </h1> */}
 
-            {/* <p className="mt-5 max-w-xl text-base leading-7 text-[#CAC4CF] sm:text-lg">
+            {/* <p className="mt-5 max-w-xl text-sm leading-7 text-[#CAC4CF] sm:text-base">
               Invite shoppers to join your SMS list with a clean, high-converting opt-in flow that matches the rest of your Sendperplane experience.
             </p> */}
 
 {/* 
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                <p className="text-2xl font-semibold text-white">98%</p>
-                <p className="mt-2 text-sm text-[#CAC4CF]">Average open rates compared to crowded inboxes.</p>
+                <p className="text-xl font-semibold text-white">98%</p>
+                <p className="mt-2 text-xs text-[#CAC4CF]">Average open rates compared to crowded inboxes.</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                <p className="text-2xl font-semibold text-white">Instant</p>
-                <p className="mt-2 text-sm text-[#CAC4CF]">Promotions, restocks, and launch reminders in real time.</p>
+                <p className="text-xl font-semibold text-white">Instant</p>
+                <p className="mt-2 text-xs text-[#CAC4CF]">Promotions, restocks, and launch reminders in real time.</p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                <p className="text-2xl font-semibold text-white">Branded</p>
-                <p className="mt-2 text-sm text-[#CAC4CF]">Designed to feel native to your current storefront theme.</p>
+                <p className="text-xl font-semibold text-white">Branded</p>
+                <p className="mt-2 text-xs text-[#CAC4CF]">Designed to feel native to your current storefront theme.</p>
               </div>
             </div> */}
 {/* 
@@ -100,10 +100,10 @@ const SmsOptInPage = () => {
               <div className="mt-5 space-y-4">
                 {audienceHighlights.map((highlight) => (
                   <div key={highlight} className="flex items-start gap-3">
-                    <span className="mt-1 inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[#3e6ff4] to-[#4937BA] text-sm font-semibold text-white">
+                    <span className="mt-1 inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-gradient-to-br from-[#3e6ff4] to-[#4937BA] text-xs font-semibold text-white">
                       ✓
                     </span>
-                    <p className="text-sm leading-6 text-[#E5E7EB] sm:text-base">{highlight}</p>
+                    <p className="text-xs leading-6 text-[#E5E7EB] sm:text-sm">{highlight}</p>
                   </div>
                 ))}
               </div>
@@ -117,15 +117,15 @@ const SmsOptInPage = () => {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#93c5fd]">Sign up</p>
-                  <h2 className="mt-3 text-3xl font-semibold text-white">Stay in the loop by SMS</h2>
-                  <p className="mt-3 text-sm leading-6 text-[#9CA3AF]">
+                  <h2 className="mt-3 text-2xl font-semibold text-white">Stay in the loop by SMS</h2>
+                  <p className="mt-3 text-xs leading-6 text-[#9CA3AF]">
                     Exclusive updates, quick reminders, and limited-time offers sent straight to your phone.
                   </p>
                 </div>
 
                 {/* <div className="rounded-2xl border border-[#3e6ff4]/20 bg-[#3e6ff4]/10 px-3 py-2 text-right">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#93c5fd]">Secure</p>
-                  <p className="mt-1 text-sm text-white">TCPA-ready</p>
+                  <p className="mt-1 text-xs text-white">TCPA-ready</p>
                 </div> */}
               </div>
 
@@ -134,7 +134,7 @@ const SmsOptInPage = () => {
                   <div
                     role={feedback.type === 'error' ? 'alert' : 'status'}
                     aria-live="polite"
-                    className={`rounded-2xl px-4 py-3 text-sm ${
+                    className={`rounded-2xl px-4 py-3 text-xs ${
                       feedback.type === 'success'
                         ? 'border border-emerald-400/30 bg-emerald-400/10 text-emerald-100'
                         : 'border border-red-500/30 bg-red-500/10 text-red-100'
@@ -146,7 +146,7 @@ const SmsOptInPage = () => {
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <label className="block text-left">
-                    <span className="mb-2 block text-sm font-medium text-[#E5E7EB]">First name</span>
+                    <span className="mb-2 block text-xs font-medium text-[#E5E7EB]">First name</span>
                     <input
                       type="text"
                       placeholder="Jordan"
@@ -162,7 +162,7 @@ const SmsOptInPage = () => {
                   </label>
 
                   <label className="block text-left">
-                    <span className="mb-2 block text-sm font-medium text-[#E5E7EB]">Last name</span>
+                    <span className="mb-2 block text-xs font-medium text-[#E5E7EB]">Last name</span>
                     <input
                       type="text"
                       placeholder="Miles"
@@ -179,7 +179,7 @@ const SmsOptInPage = () => {
                 </div>
 
                 <label className="block text-left">
-                  <span className="mb-2 block text-sm font-medium text-[#E5E7EB]">Mobile number</span>
+                  <span className="mb-2 block text-xs font-medium text-[#E5E7EB]">Mobile number</span>
                   <PhoneInput
                     defaultCountry="DK"
                     countryCallingCodeEditable={false}
@@ -212,7 +212,7 @@ const SmsOptInPage = () => {
                     type="checkbox"
                     className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent text-[#3e6ff4] focus:ring-[#3e6ff4]"
                   />
-                  <span className="text-sm leading-6 text-[#D1D5DB]">
+                  <span className="text-xs leading-6 text-[#D1D5DB]">
                     I agree to receive recurring automated marketing text messages at the phone number provided. Consent is not a condition of purchase. Message and data rates may apply.
                   </span>
                 </label>
@@ -220,17 +220,17 @@ const SmsOptInPage = () => {
                 <button
                   type="submit"
                   disabled={!optIn || isSubmitting}
-                  className="w-full rounded-2xl bg-gradient-to-r from-[#3e6ff4] via-[#4f7cf7] to-[#4937BA] px-5 py-3.5 text-base font-semibold text-white shadow-[0_18px_40px_rgba(62,111,244,0.35)] transition hover:scale-[0.995] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-2xl bg-gradient-to-r from-[#3e6ff4] via-[#4f7cf7] to-[#4937BA] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(62,111,244,0.35)] transition hover:scale-[0.995] hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isSubmitting ? 'Joining...' : 'Join SMS list'}
                 </button>
               </form>
 
               <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-6 text-left sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-[#9CA3AF]">
+                <p className="text-xs text-[#9CA3AF]">
                   By signing up, you agree to our terms and privacy policy.
                 </p>
-                <div className="flex items-center gap-2 text-sm text-[#E5E7EB]">
+                <div className="flex items-center gap-2 text-xs text-[#E5E7EB]">
                   <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)]" />
                   Average response time: under 5 minutes
                 </div>

@@ -57,7 +57,7 @@ export const TextBlockEditor = ({ props = {}, onChange }) => {
         value={props.text || ''}
         onChange={handleChange}
         placeholder="Write your message here..."
-        className="w-full resize-y rounded border border-[#3e6ff4]/20 bg-[#111827] px-3 py-2 text-sm text-white focus:border-[#3e6ff4]/60 focus:outline-none"
+        className="w-full resize-y rounded border border-[#3e6ff4]/20 bg-[#111827] px-3 py-2 text-xs text-white focus:border-[#3e6ff4]/60 focus:outline-none"
       />
       <p className="mt-2 text-[10px] text-[#CAC4CF]/60">Line breaks are preserved in the preview and public page.</p>
     </div>

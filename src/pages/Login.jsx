@@ -56,8 +56,8 @@ export default function Login() {
       <header className="text-center px-5 py-6 bg-[#1B2233]">
         {/* Optional Logo */}
         {/* <img src={require("../assets/logoSpp.PNG")} alt="Logo" className="w-16 h-16 mx-auto mb-3 rounded-full border-2 border-gray-800" /> */}
-        <h3 className="text-2xl font-semibold text-white mb-1">Login</h3>
-        <p className="text-gray-400 text-sm">
+        <h3 className="text-xl font-semibold text-white mb-1">Login</h3>
+        <p className="text-gray-400 text-xs">
           Enter your credentials below to continue
         </p>
       </header>
@@ -65,19 +65,19 @@ export default function Login() {
       {/* Form */}
       <div className="px-6 py-6 bg-[#111827]">
         {error && (
-          <div className="text-red-500 text-sm mb-4 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
+          <div className="text-red-500 text-xs mb-4 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
             {error}
           </div>
         )}
         {success && (
-          <div className="text-green-500 text-sm mb-4 bg-green-500/10 border border-green-500/50 rounded-lg p-3">
+          <div className="text-green-500 text-xs mb-4 bg-green-500/10 border border-green-500/50 rounded-lg p-3">
             {success}
           </div>
         )}
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Email */}
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">Email</label>
+            <label className="block text-gray-300 text-xs font-medium mb-2">Email</label>
             <input
               type="email"
               name="email"
@@ -91,7 +91,7 @@ export default function Login() {
 
           {/* Password */}
           <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
+            <label className="block text-gray-300 text-xs font-medium mb-2">Password</label>
             <input
               type="password"
               name="password"
@@ -119,11 +119,11 @@ export default function Login() {
     <div className="flex flex-col items-center gap-2 mt-4">
       {/* <a
         href="#reset_password"
-        className="text-sm text-white hover:text-[#3e6ff4] transition-colors"
+        className="text-xs text-white hover:text-[#3e6ff4] transition-colors"
       >
         Forgot password?
       </a> */}
-      <p className="text-sm text-gray-400">
+      <p className="text-xs text-gray-400">
         Don't have an account?{" "}
         {/* <Link to="/register" className="text-[#3e6ff4] font-semibold hover:underline">
           Register
@@ -132,7 +132,7 @@ export default function Login() {
     </div>
 
     {/* Footer */}
-    <footer className="flex justify-center items-center gap-2 mt-6 text-sm text-white/70">
+    <footer className="flex justify-center items-center gap-2 mt-6 text-xs text-white/70">
       <p>© 2026 by Sendperplane</p>
       <a href="#privacy-policy" className="underline hover:text-[#3e6ff4]">
         Privacy

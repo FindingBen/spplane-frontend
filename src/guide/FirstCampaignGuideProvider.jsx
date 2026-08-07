@@ -310,8 +310,8 @@ function GuideIntroModal({ active, completed, currentStep, onClose, onConfirm, o
           First Campaign Guide
         </div>
 
-        <h2 className="text-2xl font-semibold text-white">Create your first full SMS send flow</h2>
-        <p className="mt-3 text-sm leading-6 text-[#d1d5db]">
+        <h2 className="text-xl font-semibold text-white">Create your first full SMS send flow</h2>
+        <p className="mt-3 text-xs leading-6 text-[#d1d5db]">
           This walkthrough takes you through the whole path: content creation, campaign setup, customer creation,
           audience segment setup, SMS creation, cost review, and the final send action.
         </p>
@@ -319,13 +319,13 @@ function GuideIntroModal({ active, completed, currentStep, onClose, onConfirm, o
         {currentStep && active && (
           <div className="mt-5 rounded-2xl border border-[#60a5fa]/20 bg-[#0f172a]/70 p-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]/80">Continue from</p>
-            <p className="mt-2 text-base font-semibold text-white">{currentStep.title}</p>
-            <p className="mt-1 text-sm text-[#cbd5e1]">{currentStep.description}</p>
+            <p className="mt-2 text-sm font-semibold text-white">{currentStep.title}</p>
+            <p className="mt-1 text-xs text-[#cbd5e1]">{currentStep.description}</p>
           </div>
         )}
 
         {completed && !active && (
-          <div className="mt-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+          <div className="mt-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-xs text-emerald-100">
             You already completed the walkthrough once. You can restart it any time.
           </div>
         )}
@@ -334,7 +334,7 @@ function GuideIntroModal({ active, completed, currentStep, onClose, onConfirm, o
           <button
             type="button"
             onClick={onConfirm}
-            className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             {confirmLabel}
           </button>
@@ -342,7 +342,7 @@ function GuideIntroModal({ active, completed, currentStep, onClose, onConfirm, o
             <button
               type="button"
               onClick={onRestart}
-              className="inline-flex items-center justify-center rounded-xl border border-[#60a5fa]/25 bg-[#111827]/70 px-4 py-2.5 text-sm font-medium text-[#dbeafe] transition-colors hover:border-[#60a5fa]/45 hover:text-white"
+              className="inline-flex items-center justify-center rounded-xl border border-[#60a5fa]/25 bg-[#111827]/70 px-4 py-2.5 text-xs font-medium text-[#dbeafe] transition-colors hover:border-[#60a5fa]/45 hover:text-white"
             >
               Restart from the beginning
             </button>
@@ -351,7 +351,7 @@ function GuideIntroModal({ active, completed, currentStep, onClose, onConfirm, o
             <button
               type="button"
               onClick={onCancelGuide}
-              className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-[#d1d5db] transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
+              className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-medium text-[#d1d5db] transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
             >
               Stop guide
             </button>
@@ -359,7 +359,7 @@ function GuideIntroModal({ active, completed, currentStep, onClose, onConfirm, o
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-transparent px-4 py-2.5 text-sm font-medium text-[#9ca3af] transition-colors hover:border-white/20 hover:text-white"
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-transparent px-4 py-2.5 text-xs font-medium text-[#9ca3af] transition-colors hover:border-white/20 hover:text-white"
           >
             Not now
           </button>
@@ -379,8 +379,8 @@ function GuideCompletionToast({ onDismiss }) {
           </svg>
         </div>
         <div className="min-w-0 flex-1 text-left">
-          <p className="text-sm font-semibold text-white">First campaign guide complete</p>
-          <p className="mt-1 text-sm leading-5 text-emerald-50/85">
+          <p className="text-xs font-semibold text-white">First campaign guide complete</p>
+          <p className="mt-1 text-xs leading-5 text-emerald-50/85">
             You have completed the full content-to-send flow. You can restart the guide from the dashboard any time.
           </p>
         </div>
@@ -659,8 +659,8 @@ function GuideOverlay({ active, currentStep, currentTargetId, currentStepIndex, 
           </button>
         </div>
 
-        <h3 className={`font-semibold text-white ${isContentBuilderStep ? 'mt-2 text-sm' : 'mt-4 text-lg'}`}>{currentStep.title}</h3>
-        <p className={`text-[#d1d5db] ${isContentBuilderStep ? 'mt-1 text-xs leading-5' : 'mt-2 text-sm leading-6'}`}>{stepDescription}</p>
+        <h3 className={`font-semibold text-white ${isContentBuilderStep ? 'mt-2 text-xs' : 'mt-4 text-base'}`}>{currentStep.title}</h3>
+        <p className={`text-[#d1d5db] ${isContentBuilderStep ? 'mt-1 text-xs leading-5' : 'mt-2 text-xs leading-6'}`}>{stepDescription}</p>
         {!isContentBuilderStep && (
           <p className="mt-3 text-xs leading-5 text-[#93c5fd]/80">
             Only the highlighted area stays interactive during this walkthrough.

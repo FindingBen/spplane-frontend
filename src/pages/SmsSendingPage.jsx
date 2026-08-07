@@ -94,29 +94,38 @@ export default function SmsSendingPage() {
       <div className="flex flex-1 overflow-hidden">
         <Header />
 
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-4xl mx-auto">
               <div className="flex items-center justify-between gap-3 mb-6">
                 <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">SMS Sending</h1>
-                  <p className="text-[#CAC4CF] text-sm mt-1">Review the estimated cost before queuing this SMS for sending.</p>
+                  <h1 className="text-xl md:text-2xl font-bold text-white">SMS Sending</h1>
+                  <p className="text-[#CAC4CF] text-xs mt-1">Review the estimated cost before queuing this SMS for sending.</p>
                 </div>
                 <button
                   onClick={() => navigate('/sms')}
-                  className="px-4 py-2 rounded-lg border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white hover:border-[#3e6ff4]/60 text-sm transition-colors"
+                  className="px-4 py-2 rounded-lg border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white hover:border-[#3e6ff4]/60 text-xs transition-colors"
                 >
                   Back
                 </button>
               </div>
 
               {smsLoading ? (
-                <div className="mb-4 flex items-center gap-2 text-sm text-[#CAC4CF]/70">
+                <div className="mb-4 flex items-center gap-2 text-xs text-[#CAC4CF]/70">
                   <div className="w-4 h-4 border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4] rounded-full animate-spin" />
                   Loading SMS...
                 </div>
               ) : smsError ? (
-                <div className="mb-4 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-sm">
+                <div className="mb-4 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-xs">
                   {smsError}
                 </div>
               ) : (
@@ -125,7 +134,7 @@ export default function SmsSendingPage() {
                     <span className="text-xs px-2 py-1 rounded-full bg-[#3e6ff4]/15 border border-[#3e6ff4]/40 text-[#60a5fa]">SMS #{sms?.id}</span>
                     <span className="text-xs px-2 py-1 rounded-full bg-[#CAC4CF]/10 border border-[#CAC4CF]/20 text-[#CAC4CF]">Status: {sms?.status ?? '—'}</span>
                   </div>
-                  <p className="text-[#CAC4CF] text-sm leading-relaxed">{sms?.body || 'No body provided.'}</p>
+                  <p className="text-[#CAC4CF] text-xs leading-relaxed">{sms?.body || 'No body provided.'}</p>
                 </div>
               )}
 
@@ -141,12 +150,12 @@ export default function SmsSendingPage() {
                 </div>
 
                 {estimateLoading ? (
-                  <div className="flex items-center gap-2 text-sm text-[#CAC4CF]/70">
+                  <div className="flex items-center gap-2 text-xs text-[#CAC4CF]/70">
                     <div className="w-4 h-4 border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4] rounded-full animate-spin" />
                     Calculating estimate...
                   </div>
                 ) : estimateError ? (
-                  <div className="bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-sm">
+                  <div className="bg-red-500/10 border border-red-500/40 text-red-400 rounded-lg px-4 py-3 text-xs">
                     {estimateError}
                   </div>
                 ) : estimateRows.length > 0 ? (
@@ -154,23 +163,23 @@ export default function SmsSendingPage() {
                     {estimateRows.map(([key, value]) => (
                       <div key={key} className="bg-[#111827]/60 border border-[#3e6ff4]/10 rounded-lg px-3 py-2.5">
                         <p className="text-[11px] uppercase tracking-wide text-[#CAC4CF]/50 mb-1">{key.replace(/_/g, ' ')}</p>
-                        <p className="text-white text-sm font-medium">{formatValue(value)}</p>
+                        <p className="text-white text-xs font-medium">{formatValue(value)}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-[#CAC4CF]/70">No estimate data available.</p>
+                  <p className="text-xs text-[#CAC4CF]/70">No estimate data available.</p>
                 )}
               </div>
 
               {sendError && (
-                <div className="mt-4 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-sm">
+                <div className="mt-4 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-xs">
                   {sendError}
                 </div>
               )}
 
               {!canSend && !smsLoading && !smsError && (
-                <div className="mt-4 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-xl px-4 py-3 text-sm">
+                <div className="mt-4 bg-amber-500/10 border border-amber-500/40 text-amber-300 rounded-xl px-4 py-3 text-xs">
                   This SMS cannot be sent in its current status.
                 </div>
               )}
@@ -178,7 +187,7 @@ export default function SmsSendingPage() {
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   onClick={() => navigate('/sms')}
-                  className="px-4 py-2.5 rounded-lg border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white hover:border-[#3e6ff4]/60 text-sm font-medium transition-colors"
+                  className="px-4 py-2.5 rounded-lg border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white hover:border-[#3e6ff4]/60 text-xs font-medium transition-colors"
                 >
                   Cancel
                 </button>
@@ -186,7 +195,7 @@ export default function SmsSendingPage() {
                   onClick={handleSend}
                   disabled={sending || !canSend || smsLoading || estimateLoading}
                   data-guide-id="sms-send-confirm"
-                  className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   {sending ? 'Sending...' : 'Send SMS'}
                 </button>

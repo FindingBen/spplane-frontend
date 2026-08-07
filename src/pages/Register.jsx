@@ -49,19 +49,19 @@ export default function Register() {
         <div className="bg-[#111827] border-2 border-gray-800 rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
           <header className="text-center px-5 py-6 bg-[#1B2233]">
-            <h3 className="text-2xl font-semibold text-white mb-1">Create an Account</h3>
-            <p className="text-gray-400 text-sm">Fill in the details below to get started</p>
+            <h3 className="text-xl font-semibold text-white mb-1">Create an Account</h3>
+            <p className="text-gray-400 text-xs">Fill in the details below to get started</p>
           </header>
 
           {/* Form */}
           <div className="px-6 py-6 bg-[#111827]">
             {error && (
-              <div className="text-red-500 text-sm mb-4 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
+              <div className="text-red-500 text-xs mb-4 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
                 {error}
               </div>
             )}
             {success && (
-              <div className="text-green-500 text-sm mb-4 bg-green-500/10 border border-green-500/50 rounded-lg p-3">
+              <div className="text-green-500 text-xs mb-4 bg-green-500/10 border border-green-500/50 rounded-lg p-3">
                 {success}
               </div>
             )}
@@ -69,7 +69,7 @@ export default function Register() {
             <form className="space-y-4" onSubmit={handleSubmit}>
               {/* Email */}
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Email</label>
+                <label className="block text-gray-300 text-xs font-medium mb-2">Email</label>
                 <input
                   type="email"
                   name="email"
@@ -83,7 +83,7 @@ export default function Register() {
 
               {/* Password */}
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                <label className="block text-gray-300 text-xs font-medium mb-2">Password</label>
                 <input
                   type="password"
                   name="password"
@@ -97,7 +97,7 @@ export default function Register() {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
+                <label className="block text-gray-300 text-xs font-medium mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -125,7 +125,7 @@ export default function Register() {
 
         {/* Links */}
         <div className="flex flex-col items-center gap-2 mt-4">
-          <p className="text-sm text-gray-400">
+          <p className="text-xs text-gray-400">
             Already have an account?{' '}
             <Link to="/login" className="text-[#3e6ff4] font-semibold hover:underline">
               Login
@@ -134,7 +134,7 @@ export default function Register() {
         </div>
 
         {/* Footer */}
-        <footer className="flex justify-center items-center gap-2 mt-6 text-sm text-white/70">
+        <footer className="flex justify-center items-center gap-2 mt-6 text-xs text-white/70">
           <p>© 2026 by Sendperplane</p>
           <a href="#privacy-policy" className="underline hover:text-[#3e6ff4]">
             Privacy

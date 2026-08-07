@@ -19,7 +19,7 @@ const SearchBar = () => {
           placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-3 py-1.5 pl-8 bg-[#111827] border border-[#3e6ff4]/30 rounded-lg text-sm text-[#CAC4CF] placeholder-[#23253a] focus:outline-none focus:ring-2 focus:ring-[#3e6ff4] focus:border-transparent transition-all duration-200"
+          className="w-full px-3 py-1.5 pl-8 bg-[#111827] border border-[#3e6ff4]/30 rounded-lg text-xs text-[#CAC4CF] placeholder-[#23253a] focus:outline-none focus:ring-2 focus:ring-[#3e6ff4] focus:border-transparent transition-all duration-200"
         />
         <svg
           className="absolute left-2 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-[#23253a]"

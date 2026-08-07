@@ -58,7 +58,7 @@ function SmsTableRow({ sms, onDelete, onSend }) {
     <tr className="text-left transition-colors hover:bg-[#3e6ff4]/5">
       <td className="px-4 py-4 align-top">
         <div className="max-w-[360px]">
-          <p className="text-sm font-medium leading-6 text-white line-clamp-2">
+          <p className="text-xs font-medium leading-6 text-white line-clamp-2">
             {sms.body || <span className="italic opacity-40">No body</span>}
           </p>
           <div className="mt-2 flex items-center gap-2 text-xs text-[#CAC4CF]/55">
@@ -76,7 +76,7 @@ function SmsTableRow({ sms, onDelete, onSend }) {
               List #{sms.contact_list}
             </span>
           ) : (
-            <span className="text-sm text-[#CAC4CF]/40">No list assigned</span>
+            <span className="text-xs text-[#CAC4CF]/40">No list assigned</span>
           )}
           <span className="text-xs text-[#CAC4CF]/60">
             {segs} segment{segs !== 1 ? 's' : ''}
@@ -86,14 +86,14 @@ function SmsTableRow({ sms, onDelete, onSend }) {
 
       <td className="px-4 py-4 align-top">
         {sms.sender ? (
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-sm text-white">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-xs text-white">
             <svg className="h-3.5 w-3.5 shrink-0 text-[#60a5fa]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
             {sms.sender}
           </div>
         ) : (
-          <span className="text-sm text-[#CAC4CF]/40">—</span>
+          <span className="text-xs text-[#CAC4CF]/40">—</span>
         )}
       </td>
 
@@ -103,7 +103,7 @@ function SmsTableRow({ sms, onDelete, onSend }) {
         </span>
       </td>
 
-      <td className="px-4 py-4 align-top text-sm text-[#CAC4CF]/75">
+      <td className="px-4 py-4 align-top text-xs text-[#CAC4CF]/75">
         <div className="flex min-w-[150px] items-center gap-2 leading-5">
           <svg className="h-3.5 w-3.5 shrink-0 text-[#CAC4CF]/45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -152,10 +152,10 @@ function EmptyState({ tab, onCreateClick }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       </div>
-      <h3 className="text-white font-semibold text-lg">
+      <h3 className="text-white font-semibold text-base">
         {tab === 'all' ? 'No SMS messages yet' : `No ${tab} messages`}
       </h3>
-      <p className="text-[#CAC4CF] text-sm max-w-xs">
+      <p className="text-[#CAC4CF] text-xs max-w-xs">
         {tab === 'all'
           ? 'Create your first SMS to start reaching your audience.'
           : `You have no ${tab} SMS messages.`}
@@ -163,7 +163,7 @@ function EmptyState({ tab, onCreateClick }) {
       {tab === 'all' && (
         <button
           onClick={onCreateClick}
-          className="mt-2 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+          className="mt-2 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-xs font-semibold hover:opacity-90 transition-opacity"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -248,15 +248,24 @@ export default function SmsPage() {
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
         <Header />
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
 
               {/* Page Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 2xl:mb-5">
                 <div>
-                  <h1 className="text-2xl md:text-3xl 2xl:text-2xl font-bold text-white">SMS</h1>
-                  <p className="text-[#CAC4CF] text-sm 2xl:text-xs mt-1">
+                  <h1 className="text-xl md:text-2xl 2xl:text-xl font-bold text-white">SMS</h1>
+                  <p className="text-[#CAC4CF] text-xs 2xl:text-xs mt-1">
                     Create and manage SMS messages with trackable landing pages.
                   </p>
                 </div>
@@ -266,7 +275,7 @@ export default function SmsPage() {
                     trackAction('sms:open')
                   }}
                   data-guide-id="sms-new"
-                  className="flex items-center gap-2 px-5 py-2.5 2xl:px-4 2xl:py-2 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-sm hover:opacity-90 transition-opacity shrink-0 self-start"
+                  className="flex items-center gap-2 px-5 py-2.5 2xl:px-4 2xl:py-2 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white font-semibold text-xs hover:opacity-90 transition-opacity shrink-0 self-start"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -277,7 +286,7 @@ export default function SmsPage() {
 
               {/* Error banner */}
               {error && (
-                <div className="mb-4 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-sm">
+                <div className="mb-4 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-xs">
                   <span>{error}</span>
                   <button onClick={fetchSms} className="text-xs underline hover:no-underline shrink-0">Retry</button>
                 </div>
@@ -294,7 +303,7 @@ export default function SmsPage() {
                   ].map(({ label, value, color }) => (
                     <div key={label} className="bg-[#1f2937]/60 border border-[#3e6ff4]/20 rounded-xl p-4 2xl:p-3">
                       <p className="text-[#CAC4CF] text-xs font-medium mb-1">{label}</p>
-                      <p className={`text-2xl 2xl:text-xl font-bold ${color}`}>{value}</p>
+                      <p className={`text-xl 2xl:text-lg font-bold ${color}`}>{value}</p>
                     </div>
                   ))}
                 </div>
@@ -306,7 +315,7 @@ export default function SmsPage() {
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-all whitespace-nowrap ${
+                    className={`px-4 py-2 text-xs font-medium rounded-t-lg transition-all whitespace-nowrap ${
                       activeTab === tab.key
                         ? 'text-[#60a5fa] border-b-2 border-[#3e6ff4]'
                         : 'text-[#CAC4CF] hover:text-white'
@@ -333,7 +342,7 @@ export default function SmsPage() {
                 <div className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937]/60 shadow-[0_24px_60px_rgba(15,23,42,0.24)]">
                   <div className="flex items-center justify-between gap-3 border-b border-[#3e6ff4]/15 bg-[linear-gradient(135deg,rgba(17,24,39,0.96),rgba(31,41,55,0.92))] px-4 py-3">
                     <div>
-                      <p className="text-sm text-left font-semibold text-white">SMS Queue</p>
+                      <p className="text-xs text-left font-semibold text-white">SMS Queue</p>
                       <p className="text-xs text-[#CAC4CF]/60">Review drafts, scheduled sends, and delivery status in one compact list.</p>
                     </div>
                     <span className="rounded-full border border-[#3e6ff4]/20 bg-[#3e6ff4]/10 px-2.5 py-1 text-[11px] font-medium uppercase tracking-[0.16em] text-[#60a5fa]">
@@ -342,7 +351,7 @@ export default function SmsPage() {
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="min-w-[860px] w-full text-sm">
+                    <table className="min-w-[860px] w-full text-xs">
                       <thead className="bg-[#111827]/55">
                         <tr className="border-b border-[#3e6ff4]/15 text-left">
                           <th className="px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#CAC4CF]">Message</th>

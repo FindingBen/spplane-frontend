@@ -93,7 +93,7 @@ function SmsPageContentView({ slug, token }) {
       <div className="min-h-[100svh] bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Loading…</p>
+          <p className="text-xs text-gray-500">Loading…</p>
         </div>
       </div>
     )
@@ -109,7 +109,7 @@ function SmsPageContentView({ slug, token }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <p className="text-gray-800 font-semibold text-sm mb-1">Unable to load page</p>
+          <p className="text-gray-800 font-semibold text-xs mb-1">Unable to load page</p>
           <p className="text-gray-500 text-xs">{error}</p>
         </div>
       </div>
@@ -134,7 +134,7 @@ function SmsPageContentView({ slug, token }) {
 
         <main className="flex-1">
           {blocks.length === 0 ? (
-            <div className="flex items-center justify-center px-6 py-24 text-gray-400 text-sm">
+            <div className="flex items-center justify-center px-6 py-24 text-gray-400 text-xs">
               No content available.
             </div>
           ) : (

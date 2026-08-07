@@ -11,7 +11,7 @@ export const ProductImagePreview = ({ props = {}, uploads = {}, variant = 'build
         <img src={previewImage} alt={altText} className="w-full h-auto" />
       ) : (
         <div className={isPublic ? 'flex min-h-40 items-center justify-center bg-gray-100' : 'flex min-h-28 items-center justify-center bg-gray-100'}>
-          <span className={isPublic ? 'text-sm text-gray-400' : 'text-xs text-gray-400'}>Image block</span>
+          <span className={isPublic ? 'text-xs text-gray-400' : 'text-xs text-gray-400'}>Image block</span>
         </div>
       )}
     </div>
@@ -26,7 +26,7 @@ export const ProductImageEditor = ({ props = {}, uploads = {}, onChange, onUploa
         type="file"
         accept="image/*"
         onChange={(e) => onUploadChange('imageFile', e.target.files?.[0] ?? null)}
-        className="w-full text-sm text-[#CAC4CF] file:mr-3 file:rounded file:border-0 file:bg-[#111827] file:px-3 file:py-2 file:text-white"
+        className="w-full text-xs text-[#CAC4CF] file:mr-3 file:rounded file:border-0 file:bg-[#111827] file:px-3 file:py-2 file:text-white"
       />
       {uploads.imagePreviewUrl && (
         <div className="mt-2 space-y-2">
@@ -48,7 +48,7 @@ export const ProductImageEditor = ({ props = {}, uploads = {}, onChange, onUploa
         value={props.image || ''}
         onChange={(e) => onChange('image', e.target.value)}
         placeholder="https://..."
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -58,7 +58,7 @@ export const ProductImageEditor = ({ props = {}, uploads = {}, onChange, onUploa
         value={props.alt || ''}
         onChange={(e) => onChange('alt', e.target.value)}
         placeholder="Describe the image"
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
   </div>

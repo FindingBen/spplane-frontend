@@ -54,8 +54,8 @@ const SOURCE_OPTS = [
   { value: 'keyword', label: 'Keyword Opt-In' },
 ]
 
-const inputCls  = 'w-full bg-[#111827] border border-[#3e6ff4]/30 text-white rounded-lg px-3 py-2.5 text-sm placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4] transition-colors'
-const selectCls = 'w-full bg-[#111827] border border-[#3e6ff4]/30 text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#3e6ff4] transition-colors'
+const inputCls  = 'w-full bg-[#111827] border border-[#3e6ff4]/30 text-white rounded-lg px-3 py-2.5 text-xs placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4] transition-colors'
+const selectCls = 'w-full bg-[#111827] border border-[#3e6ff4]/30 text-white rounded-lg px-3 py-2.5 text-xs focus:outline-none focus:border-[#3e6ff4] transition-colors'
 const PAGE_SIZE = 10
 
 const getVisiblePages = (currentPage, totalPages) => {
@@ -147,13 +147,13 @@ function ImportErrorBanner({ notice, retrying, onRetry, onDismiss }) {
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-semibold text-red-100">Shopify Import Failed</p>
+              <p className="text-xs font-semibold text-red-100">Shopify Import Failed</p>
               <span className="rounded-full border border-red-400/25 bg-red-500/10 px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-[0.18em] text-red-200/80">
                 Needs Attention
               </span>
             </div>
 
-            <p className="mt-1 text-sm font-medium text-white">{notice.headline}</p>
+            <p className="mt-1 text-xs font-medium text-white">{notice.headline}</p>
             <p className="mt-1 text-xs leading-5 text-red-100/75">{notice.description}</p>
 
             {notice.details.length > 0 && (
@@ -227,7 +227,7 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
             </div>
-            <h2 className="text-lg font-bold text-white">New Customer</h2>
+            <h2 className="text-base font-bold text-white">New Customer</h2>
           </div>
           <button onClick={onClose} disabled={submitting || isGuideLocked} className="text-[#CAC4CF] hover:text-white transition-colors p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,16 +239,16 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-[#CAC4CF] mb-1.5 font-medium">First Name</label>
+              <label className="block text-xs text-[#CAC4CF] mb-1.5 font-medium">First Name</label>
               <input type="text" value={form.first_name} onChange={set('first_name')} placeholder="Alice" maxLength={100} className={inputCls} />
             </div>
             <div>
-              <label className="block text-sm text-[#CAC4CF] mb-1.5 font-medium">Last Name</label>
+              <label className="block text-xs text-[#CAC4CF] mb-1.5 font-medium">Last Name</label>
               <input type="text" value={form.last_name} onChange={set('last_name')} placeholder="Johnson" maxLength={100} className={inputCls} />
             </div>
           </div>
           <div>
-            <label className="block text-sm text-[#CAC4CF] mb-1.5 font-medium">
+            <label className="block text-xs text-[#CAC4CF] mb-1.5 font-medium">
               Phone <span className="text-red-400">*</span>
               <span className="ml-1 text-[#CAC4CF]/50 font-normal">E.164 format</span>
             </label>
@@ -256,13 +256,13 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm text-[#CAC4CF] mb-1.5 font-medium">Status</label>
+              <label className="block text-xs text-[#CAC4CF] mb-1.5 font-medium">Status</label>
               <select value={form.status} onChange={set('status')} className={selectCls}>
                 {STATUS_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm text-[#CAC4CF] mb-1.5 font-medium">Source</label>
+              <label className="block text-xs text-[#CAC4CF] mb-1.5 font-medium">Source</label>
               <select value={form.source} onChange={set('source')} className={selectCls}>
                 {SOURCE_OPTS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
@@ -271,11 +271,11 @@ function CreateCustomerModal({ onClose, onCreate, submitting }) {
           {error && <p className="text-red-400 text-xs">{error}</p>}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white text-sm font-medium transition-colors disabled:opacity-50">
+              className="flex-1 py-2.5 rounded-xl border border-[#3e6ff4]/30 text-[#CAC4CF] hover:text-white text-xs font-medium transition-colors disabled:opacity-50">
               Cancel
             </button>
             <button type="submit" disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-60">
+              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-60">
               {submitting ? 'Creating…' : 'Create Customer'}
             </button>
           </div>
@@ -301,8 +301,8 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#60a5fa]">In-Store Signup</p>
-            <h2 id="customer-signup-qr-title" className="mt-1 text-2xl font-bold text-white">Customer Signup QR</h2>
-            <p className="mt-2 max-w-md text-sm leading-6 text-[#CAC4CF]">
+            <h2 id="customer-signup-qr-title" className="mt-1 text-xl font-bold text-white">Customer Signup QR</h2>
+            <p className="mt-2 max-w-md text-xs leading-6 text-[#CAC4CF]">
               Scan this code to open your customer signup flow. Print it and place it near checkout or inside your store.
             </p>
           </div>
@@ -324,8 +324,8 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
             <div className="flex min-h-[360px] flex-col items-center justify-center gap-4 text-center">
               <div className="h-12 w-12 rounded-full border-4 border-[#3e6ff4]/25 border-t-[#60a5fa] animate-spin" />
               <div>
-                <p className="text-base font-semibold text-white">Preparing your signup QR</p>
-                <p className="mt-1 text-sm text-[#CAC4CF]">We are creating or retrieving the latest code for this account.</p>
+                <p className="text-sm font-semibold text-white">Preparing your signup QR</p>
+                <p className="mt-1 text-xs text-[#CAC4CF]">We are creating or retrieving the latest code for this account.</p>
               </div>
             </div>
           ) : qrCodeUrl ? (
@@ -337,7 +337,7 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
                   className="mx-auto aspect-square w-full max-w-[300px] object-contain"
                 />
               </div>
-              <p className="max-w-md text-center text-sm leading-6 text-[#CAC4CF]">
+              <p className="max-w-md text-center text-xs leading-6 text-[#CAC4CF]">
                 Test scan it once on your phone, then print it for walk-in visitors to join your customer list.
               </p>
             </div>
@@ -348,8 +348,8 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v4m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z" />
                 </svg>
               </div>
-              <p className="mt-4 text-base font-semibold text-white">We could not load the signup QR code.</p>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-red-100/85">
+              <p className="mt-4 text-sm font-semibold text-white">We could not load the signup QR code.</p>
+              <p className="mt-2 max-w-sm text-xs leading-6 text-red-100/85">
                 {error || 'Try again in a moment. If the problem continues, confirm that the QR code endpoint is available.'}
               </p>
             </div>
@@ -357,7 +357,7 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
         </div>
 
         {error && qrCodeUrl && (
-          <div className="mt-4 rounded-2xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          <div className="mt-4 rounded-2xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
             {error}
           </div>
         )}
@@ -366,7 +366,7 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl border border-[#3e6ff4]/25 px-4 py-2.5 text-sm font-medium text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white"
+            className="rounded-xl border border-[#3e6ff4]/25 px-4 py-2.5 text-xs font-medium text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white"
           >
             Close
           </button>
@@ -375,7 +375,7 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
             <button
               type="button"
               onClick={onRetry}
-              className="rounded-xl border border-red-300/25 bg-red-500/12 px-4 py-2.5 text-sm font-semibold text-red-100 transition-colors hover:bg-red-500/18"
+              className="rounded-xl border border-red-300/25 bg-red-500/12 px-4 py-2.5 text-xs font-semibold text-red-100 transition-colors hover:bg-red-500/18"
             >
               Retry
             </button>
@@ -385,7 +385,7 @@ function CustomerSignupQrModal({ qrCodeUrl, loading, error, onClose, onPrint, on
             <button
               type="button"
               onClick={onPrint}
-              className="rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_35px_rgba(62,111,244,0.3)] transition-opacity hover:opacity-90"
+              className="rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-xs font-semibold text-white shadow-[0_16px_35px_rgba(62,111,244,0.3)] transition-opacity hover:opacity-90"
             >
               Print QR
             </button>
@@ -645,24 +645,33 @@ export default function CustomersPage() {
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
         <Header />
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
 
               {/* Page Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8 2xl:mb-5">
                 <div>
-                  <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                  <h1 className="text-xl md:text-2xl xl:text-3xl 2xl:text-2xl font-bold text-white mb-1">
                     <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Customers</span>
                   </h1>
-                  <p className="text-sm md:text-base text-[#CAC4CF]">All imported and manually added contacts.</p>
+                  <p className="text-xs md:text-sm text-[#CAC4CF]">All imported and manually added contacts.</p>
                 </div>
                 <div className='flex flex-row gap-2'>
                   <button
                     type="button"
                     onClick={handleOpenQrModal}
                     disabled={qrLoading || qrStatusLoading}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-xs hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {qrLoading || qrStatusLoading ? (
                       <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -679,7 +688,7 @@ export default function CustomersPage() {
                   <button
                     onClick={handleShopifyImport}
                     disabled={importing}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-xs hover:bg-[#3e6ff4]/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {importing ? (
                       <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -699,7 +708,7 @@ export default function CustomersPage() {
                       trackAction('customer:open')
                     }}
                     data-guide-id="customer-create"
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-sm hover:bg-[#3e6ff4]/20 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 text-[#60a5fa] font-semibold text-xs hover:bg-[#3e6ff4]/20 transition-colors"
                   >
                     Create
                   </button>
@@ -724,7 +733,7 @@ export default function CustomersPage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-2xl 2xl:text-xl font-bold text-white">{contacts.length.toLocaleString()}</div>
+                    <div className="text-xl 2xl:text-lg font-bold text-white">{contacts.length.toLocaleString()}</div>
                     <div className="text-[#CAC4CF] text-xs">Total Customers</div>
                   </div>
                 </div>
@@ -735,7 +744,7 @@ export default function CustomersPage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-2xl 2xl:text-xl font-bold text-emerald-400">{subscribedCount.toLocaleString()}</div>
+                    <div className="text-xl 2xl:text-lg font-bold text-emerald-400">{subscribedCount.toLocaleString()}</div>
                     <div className="text-[#CAC4CF] text-xs">Subscribed</div>
                   </div>
                 </div>
@@ -746,7 +755,7 @@ export default function CustomersPage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-2xl 2xl:text-xl font-bold text-green-400">{shopifyCount.toLocaleString()}</div>
+                    <div className="text-xl 2xl:text-lg font-bold text-green-400">{shopifyCount.toLocaleString()}</div>
                     <div className="text-[#CAC4CF] text-xs">From Shopify</div>
                   </div>
                 </div>
@@ -765,13 +774,13 @@ export default function CustomersPage() {
                     setSearch(e.target.value)
                     setCurrentPage(1)
                   }}
-                  className="w-full pl-9 pr-4 py-2.5 bg-[#1f2937] border border-[#3e6ff4]/20 text-white rounded-xl text-sm placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4] transition-colors"
+                  className="w-full pl-9 pr-4 py-2.5 bg-[#1f2937] border border-[#3e6ff4]/20 text-white rounded-xl text-xs placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4] transition-colors"
                 />
               </div>
 
               {/* Error Banner */}
               {error && (
-                <div className="mb-5 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-sm">
+                <div className="mb-5 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/40 text-red-400 rounded-xl px-4 py-3 text-xs">
                   <span>{error}</span>
                   <button onClick={fetchContacts} className="text-xs underline hover:no-underline shrink-0">Retry</button>
                 </div>
@@ -790,13 +799,13 @@ export default function CustomersPage() {
                     </svg>
                   </div>
                   <p className="text-white font-semibold mb-1">{search ? 'No customers found' : 'No customers yet'}</p>
-                  <p className="text-[#CAC4CF] text-sm mb-4">
+                  <p className="text-[#CAC4CF] text-xs mb-4">
                     {search ? 'Try a different search term' : 'Add your first customer to get started'}
                   </p>
                   {!search && (
                     <button
                       onClick={() => setShowCreateModal(true)}
-                      className="px-4 py-2 rounded-lg bg-[#3e6ff4]/20 hover:bg-[#3e6ff4]/30 text-[#60a5fa] text-sm font-medium border border-[#3e6ff4]/30 transition-colors"
+                      className="px-4 py-2 rounded-lg bg-[#3e6ff4]/20 hover:bg-[#3e6ff4]/30 text-[#60a5fa] text-xs font-medium border border-[#3e6ff4]/30 transition-colors"
                     >
                       New Customer
                     </button>
@@ -804,7 +813,7 @@ export default function CustomersPage() {
                 </div>
               ) : (
                 <div className="bg-[#1f2937]/60 border border-[#3e6ff4]/20 rounded-xl overflow-hidden">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-xs">
                     <thead>
                       <tr className="border-b border-[#3e6ff4]/20 bg-[#111827]/40">
                         <th className="text-left py-3 px-4 text-xs font-semibold text-[#CAC4CF] uppercase tracking-wider">Name</th>

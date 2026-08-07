@@ -12,9 +12,9 @@ const Loader = ({ message = 'Processing...', detail = '' }) => {
         </div>
 
         <div>
-          <p className="text-base font-semibold tracking-wide text-white">{message}</p>
+          <p className="text-sm font-semibold tracking-wide text-white">{message}</p>
           {detail && (
-            <p className="mt-2 max-w-sm text-sm leading-6 text-[#CAC4CF]">{detail}</p>
+            <p className="mt-2 max-w-sm text-xs leading-6 text-[#CAC4CF]">{detail}</p>
           )}
         </div>
 

@@ -127,7 +127,7 @@ function FlowStep({ label, status, onClick, optional = false, lockedByActivation
       <button
         type="button"
         onClick={onClick}
-        className={`relative flex h-[88px] min-w-[160px] items-center justify-center rounded-2xl border px-4 text-center text-sm font-semibold leading-6 transition-all sm:min-w-[188px] ${toneClasses[status]} ${lockedByActivation ? 'cursor-not-allowed border-amber-400/25 bg-amber-500/10 text-amber-50' : ''}`}
+        className={`relative flex h-[88px] min-w-[160px] items-center justify-center rounded-2xl border px-4 text-center text-xs font-semibold leading-6 transition-all sm:min-w-[188px] ${toneClasses[status]} ${lockedByActivation ? 'cursor-not-allowed border-amber-400/25 bg-amber-500/10 text-amber-50' : ''}`}
       >
         <span className="whitespace-pre-line">{label}</span>
         {lockedByActivation && (
@@ -158,8 +158,8 @@ function SegmentSelectionModal({ segments, selectedSegmentId, onSelect, onClose,
         <div className="flex items-start justify-between gap-4">
           <div className="text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">Recourring sms</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">Select segment list</h2>
-            <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
+            <h2 className="mt-3 text-xl font-semibold text-white">Select segment list</h2>
+            <p className="mt-2 text-xs leading-6 text-[#CAC4CF]">
               Choose the segment that should receive the recourring sms automation.
             </p>
           </div>
@@ -177,11 +177,11 @@ function SegmentSelectionModal({ segments, selectedSegmentId, onSelect, onClose,
 
         <div className="mt-6 rounded-3xl border border-[#3e6ff4]/20 bg-[#0f172a]/70 p-5 text-left">
           <label className="block">
-            <span className="text-sm font-medium text-[#E5E7EB]">Segment list</span>
+            <span className="text-xs font-medium text-[#E5E7EB]">Segment list</span>
             <select
               value={selectedSegmentId}
               onChange={(event) => onSelect(event.target.value)}
-              className="mt-4 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#60a5fa]"
+              className="mt-4 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-xs text-white outline-none transition-colors focus:border-[#60a5fa]"
             >
               {segments.map((segment) => (
                 <option key={segment.id} value={segment.id}>
@@ -196,14 +196,14 @@ function SegmentSelectionModal({ segments, selectedSegmentId, onSelect, onClose,
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
+            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onSave}
-            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             Save segment
           </button>
@@ -242,8 +242,8 @@ function OccurrenceScheduleModal({ initialEvery, initialPeriod, onClose, onSave 
         <div className="flex items-start justify-between gap-4">
           <div className="text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">Recurring sms</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">Select occurrence</h2>
-            <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
+            <h2 className="mt-3 text-xl font-semibold text-white">Select occurrence</h2>
+            <p className="mt-2 text-xs leading-6 text-[#CAC4CF]">
               Configure how often this automation runs for Celery beat.
             </p>
           </div>
@@ -261,7 +261,7 @@ function OccurrenceScheduleModal({ initialEvery, initialPeriod, onClose, onSave 
 
         <div className="mt-6 grid gap-4 rounded-3xl border border-[#3e6ff4]/20 bg-[#0f172a]/70 p-5 md:grid-cols-[1fr_1.3fr]">
           <label className="block text-left">
-            <span className="text-sm font-medium text-[#E5E7EB]">Every</span>
+            <span className="text-xs font-medium text-[#E5E7EB]">Every</span>
             <input
               type="number"
               min={1}
@@ -271,20 +271,20 @@ function OccurrenceScheduleModal({ initialEvery, initialPeriod, onClose, onSave 
                 setEvery(event.target.value)
                 setError('')
               }}
-              className="mt-3 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#60a5fa]"
+              className="mt-3 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-xs text-white outline-none transition-colors focus:border-[#60a5fa]"
               placeholder="1"
             />
           </label>
 
           <label className="block text-left">
-            <span className="text-sm font-medium text-[#E5E7EB]">Time frame</span>
+            <span className="text-xs font-medium text-[#E5E7EB]">Time frame</span>
             <select
               value={period}
               onChange={(event) => {
                 setPeriod(event.target.value)
                 setError('')
               }}
-              className="mt-3 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-sm text-white outline-none transition-colors focus:border-[#60a5fa]"
+              className="mt-3 w-full rounded-2xl border border-[#3e6ff4]/25 bg-[#111827] px-4 py-3 text-xs text-white outline-none transition-colors focus:border-[#60a5fa]"
             >
               {PERIOD_OPTIONS.map((option) => (
                 <option key={option} value={option}>{formatPeriodLabel(option)}</option>
@@ -294,7 +294,7 @@ function OccurrenceScheduleModal({ initialEvery, initialPeriod, onClose, onSave 
         </div>
 
         {error && (
-          <div className="mt-4 rounded-2xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-100">
+          <div className="mt-4 rounded-2xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-xs text-red-100">
             {error}
           </div>
         )}
@@ -303,14 +303,14 @@ function OccurrenceScheduleModal({ initialEvery, initialPeriod, onClose, onSave 
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
+            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90"
           >
             Save occurrence
           </button>
@@ -334,8 +334,8 @@ function FlowStatusConfirmModal({ flowId, mode, onClose, onConfirm }) {
         <div className="flex items-start justify-between gap-4">
           <div className="text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#93c5fd]">{flowLabel}</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">{isDeactivate ? 'Deactivate this flow?' : 'Activate this flow?'}</h2>
-            <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
+            <h2 className="mt-3 text-xl font-semibold text-white">{isDeactivate ? 'Deactivate this flow?' : 'Activate this flow?'}</h2>
+            <p className="mt-2 text-xs leading-6 text-[#CAC4CF]">
               {isDeactivate
                 ? `Once deactivated, this ${flowName} automation will stop sending messages.`
                 : `Once activated, this ${flowName} automation will start sending messages automatically.`}
@@ -365,8 +365,8 @@ function FlowStatusConfirmModal({ flowId, mode, onClose, onConfirm }) {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-white">{isDeactivate ? 'This turns the automation off immediately.' : 'This turns on the automation immediately.'}</p>
-              <p className="mt-1 text-sm leading-6 text-[#CAC4CF]">
+              <p className="text-xs font-medium text-white">{isDeactivate ? 'This turns the automation off immediately.' : 'This turns on the automation immediately.'}</p>
+              <p className="mt-1 text-xs leading-6 text-[#CAC4CF]">
                 {isDeactivate
                   ? `The ${flowName} automation will remain saved, but it will not send messages until you activate it again.`
                   : `You can only activate after saving the message template. Future sends will use the message currently saved in this automation.`}
@@ -379,14 +379,14 @@ function FlowStatusConfirmModal({ flowId, mode, onClose, onConfirm }) {
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
+            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-medium text-[#E5E7EB] transition-colors hover:bg-white/10"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`inline-flex items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 ${
+            className={`inline-flex items-center justify-center rounded-2xl px-5 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 ${
               isDeactivate ? 'bg-gradient-to-r from-amber-500 to-orange-500' : 'bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa]'
             }`}
           >
@@ -850,12 +850,21 @@ const AutomationPage = () => {
       <div className="flex min-h-0 flex-1">
         <Header />
 
-        <div className="m-4 flex flex-1 flex-col overflow-hidden rounded-2xl bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827]">
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8">
+        <div className="relative m-4 flex flex-1 flex-col overflow-hidden rounded-2xl border border-[#3e6ff4]/20">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 overflow-y-auto p-4 md:p-6 xl:p-8">
             <div className="w-full">
               <div className="rounded-[28px] border border-[#3e6ff4]/20 bg-[linear-gradient(180deg,rgba(17,24,39,0.94),rgba(17,24,39,0.78))] p-6 shadow-[0_30px_80px_rgba(2,6,23,0.28)] md:p-8 xl:p-10">
                 <div className="max-w-3xl text-left">
-                  <h1 className="mt-1 text-3xl font-bold text-white md:text-3xl xl:text-4xl">Automation flow</h1>
+                  <h1 className="mt-1 text-2xl font-bold text-white md:text-2xl xl:text-3xl">Automation flow</h1>
                  
                 </div>
 
@@ -872,9 +881,9 @@ const AutomationPage = () => {
                       >
                         <div className="flex flex-col gap-4 text-left sm:flex-row sm:items-start sm:justify-between">
                           <div>
-                            <h2 className="text-2xl font-semibold text-white">{flow.heading}</h2>
+                            <h2 className="text-xl font-semibold text-white">{flow.heading}</h2>
                             {flow.id === 'welcome_user' && (
-                              <p className="mt-2 max-w-xl text-sm leading-6 text-[#CAC4CF]">
+                              <p className="mt-2 max-w-xl text-xs leading-6 text-[#CAC4CF]">
                                 {isLoadingAutomations
                                   ? 'Checking whether a welcome automation already exists for this account.'
                                   : currentFlow.automation?.is_active
@@ -899,7 +908,7 @@ const AutomationPage = () => {
                                   || (flow.id === 'recurring' && !currentFlow.automation?.is_active && !currentFlow.segment)
                                   || activatingFlowId === flow.id
                                 )}
-                                className={`inline-flex min-w-[124px] items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold transition-opacity ${
+                                className={`inline-flex min-w-[124px] items-center justify-center rounded-2xl px-5 py-2.5 text-xs font-semibold transition-opacity ${
                                   currentFlow.automation?.is_active
                                     ? 'bg-amber-500/20 text-amber-100 hover:bg-amber-500/30'
                                     : 'bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
@@ -919,7 +928,7 @@ const AutomationPage = () => {
                         </div>
 
                         {isFlowLocked && (
-                          <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                          <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
                             {flow.id === 'welcome_user'
                               ? 'This automation is locked while active. Deactivate it to edit the sender or message template.'
                               : 'This automation is locked while active. Deactivate it to edit the sender or message template.'}
@@ -967,7 +976,7 @@ const AutomationPage = () => {
 
                         {feedback?.message && (
                           <div
-                            className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${
+                            className={`mt-4 rounded-2xl border px-4 py-3 text-xs ${
                               feedback.type === 'success'
                                 ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-100'
                                 : feedback.type === 'error'

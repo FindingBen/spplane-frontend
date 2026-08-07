@@ -652,8 +652,8 @@ function BuilderNotice({ notice, onDismiss }) {
   return (
     <div className={`flex items-start justify-between gap-4 rounded-2xl border px-4 py-3 ${toneStyles}`}>
       <div>
-        <p className="text-sm font-semibold">{notice.title}</p>
-        <p className="mt-1 text-sm opacity-85">{notice.description}</p>
+        <p className="text-xs font-semibold">{notice.title}</p>
+        <p className="mt-1 text-xs opacity-85">{notice.description}</p>
       </div>
       <button
         type="button"
@@ -1127,19 +1127,28 @@ const ContentBuilder = () => {
         <Header />
 
         {/* Main Content */}
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
           {/* Header */}
-          <div className="p-3 md:p-6 border-b border-[#3e6ff4]/20 flex items-center justify-between">
+          <div className="relative z-10 p-3 md:p-6 border-b border-[#3e6ff4]/20 flex items-center justify-between">
             <div>
-              <p className="text-xl md:text-2xl font-bold text-white mb-1 md:mb-2">{metadata.name}</p>
-              <p className="text-xs md:text-sm text-start text-[#CAC4CF]">Build your SMS landing page</p>
+              <p className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2">{metadata.name}</p>
+              <p className="text-xs md:text-xs text-start text-[#CAC4CF]">Build your SMS landing page</p>
             </div>
             <div className="flex gap-2 md:gap-3">
               <button
                 onClick={handleSaveDraft}
                 disabled={loading || blocks.length === 0}
                 title={blocks.length === 0 ? 'Add at least one block before saving' : undefined}
-                className="px-3 md:px-4 py-1.5 md:py-2 text-sm bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 md:px-4 py-1.5 md:py-2 text-xs bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Save Draft
               </button>
@@ -1148,7 +1157,7 @@ const ContentBuilder = () => {
                 disabled={loading || blocks.length === 0}
                 title={blocks.length === 0 ? 'Add at least one block before publishing' : undefined}
                 data-guide-id="content-publish"
-                className="px-3 md:px-4 py-1.5 md:py-2 text-sm bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 md:px-4 py-1.5 md:py-2 text-xs bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Publish
               </button>
@@ -1156,17 +1165,17 @@ const ContentBuilder = () => {
           </div>
 
           {builderNotice && (
-            <div className="px-3 pt-3 md:px-6 md:pt-6">
+            <div className="relative z-10 px-3 pt-3 md:px-6 md:pt-6">
               <BuilderNotice notice={builderNotice} onDismiss={() => setBuilderNotice(null)} />
             </div>
           )}
 
           {/* Builder Area */}
-          <div className="flex-1 flex gap-2 md:gap-4 p-3 md:p-6 overflow-hidden">
+          <div className="relative z-10 flex-1 flex gap-2 md:gap-4 p-3 md:p-6 overflow-hidden">
             {/* Left Sidebar - Component Library */}
             <div className="w-48 md:w-64 bg-[#1f2937] rounded-xl border border-[#3e6ff4]/20 flex flex-col overflow-hidden">
               <div className="p-2 md:p-4 border-b border-[#3e6ff4]/20">
-                <h2 className="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Blocks</h2>
+                <h2 className="text-xs md:text-xs font-bold text-white uppercase tracking-wider">Blocks</h2>
               </div>
 
               <div className="flex-1 overflow-y-auto p-2 md:p-4 space-y-2 md:space-y-3">
@@ -1193,7 +1202,7 @@ const ContentBuilder = () => {
                     className="w-full p-2 md:p-3 bg-[#111827] hover:bg-[#1f2937] border border-[#3e6ff4]/20 hover:border-[#3e6ff4]/60 rounded-lg transition-all text-left"
                   >
                     <div className="flex items-center gap-2 md:gap-3">
-                      <span className="text-base md:text-lg">{block.icon}</span>
+                      <span className="text-sm md:text-base">{block.icon}</span>
                       <div>
                         <p className="text-xs font-semibold text-white">{block.label}</p>
                       </div>
@@ -1221,7 +1230,7 @@ const ContentBuilder = () => {
                   {blocks.length === 0 ? (
                     <div className="flex-1 flex items-center justify-center text-center p-4">
                       <div>
-                        <p className="text-gray-400 text-sm">Add blocks to get started</p>
+                        <p className="text-gray-400 text-xs">Add blocks to get started</p>
                       </div>
                     </div>
                   ) : (
@@ -1264,7 +1273,7 @@ const ContentBuilder = () => {
             {/* Right Sidebar - Component Editor */}
             <div className="w-56 md:w-72 bg-[#1f2937] rounded-xl border border-[#3e6ff4]/20 flex flex-col overflow-hidden">
               <div className="p-2 md:p-4 border-b border-[#3e6ff4]/20">
-                <h2 className="text-xs md:text-sm font-bold text-white uppercase tracking-wider">
+                <h2 className="text-xs md:text-xs font-bold text-white uppercase tracking-wider">
                   {selectedBlockId !== null ? 'Edit Block' : 'Select Block'}
                 </h2>
               </div>
@@ -1279,7 +1288,7 @@ const ContentBuilder = () => {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full">
-                    <p className="text-[#CAC4CF] text-sm">Click a block to edit</p>
+                    <p className="text-[#CAC4CF] text-xs">Click a block to edit</p>
                   </div>
                 )}
               </div>

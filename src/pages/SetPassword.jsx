@@ -23,7 +23,7 @@ export default function SetPassword() {
         <div className="w-full max-w-[360px]">
           <div className="bg-[#111827] border-2 border-red-800 rounded-2xl shadow-lg p-6 text-center">
             <p className="text-red-400 font-semibold mb-2">Invalid Setup Link</p>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-xs">
               This link is missing required parameters. Please reinstall the Shopify app to get a
               new link.
             </p>
@@ -71,8 +71,8 @@ export default function SetPassword() {
         <div className="bg-[#111827] border-2 border-gray-800 rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
           <header className="text-center px-5 py-6 bg-[#1B2233]">
-            <h3 className="text-2xl font-semibold text-white mb-1">Set Your Password</h3>
-            <p className="text-gray-400 text-sm">
+            <h3 className="text-xl font-semibold text-white mb-1">Set Your Password</h3>
+            <p className="text-gray-400 text-xs">
               {shop ? `Completing setup for ${shop}` : 'Complete your account setup'}
             </p>
           </header>
@@ -80,7 +80,7 @@ export default function SetPassword() {
           {/* Form */}
           <div className="px-6 py-6 bg-[#111827]">
             {/* Shop info banner */}
-            <div className="text-blue-400 text-sm mb-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+            <div className="text-blue-400 text-xs mb-4 bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
               Signing in as <span className="font-semibold">{email}</span>
               {shop && (
                 <>
@@ -90,7 +90,7 @@ export default function SetPassword() {
             </div>
 
             {error && (
-              <div className="text-red-500 text-sm mb-4 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
+              <div className="text-red-500 text-xs mb-4 bg-red-500/10 border border-red-500/50 rounded-lg p-3">
                 {error}
               </div>
             )}
@@ -98,7 +98,7 @@ export default function SetPassword() {
             <form className="space-y-4" onSubmit={handleSubmit}>
               {/* Email — read-only, autofilled from URL */}
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Email</label>
+                <label className="block text-gray-300 text-xs font-medium mb-2">Email</label>
                 <input
                   type="email"
                   value={email}
@@ -109,7 +109,7 @@ export default function SetPassword() {
 
               {/* Password */}
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                <label className="block text-gray-300 text-xs font-medium mb-2">Password</label>
                 <input
                   type="password"
                   name="password"
@@ -123,7 +123,7 @@ export default function SetPassword() {
 
               {/* Confirm Password */}
               <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
+                <label className="block text-gray-300 text-xs font-medium mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -150,7 +150,7 @@ export default function SetPassword() {
         </div>
 
         {/* Footer */}
-        <footer className="flex justify-center items-center gap-2 mt-6 text-sm text-white/70">
+        <footer className="flex justify-center items-center gap-2 mt-6 text-xs text-white/70">
           <p>© 2026 by Sendperplane</p>
           <a href="#privacy-policy" className="underline hover:text-[#3e6ff4]">
             Privacy

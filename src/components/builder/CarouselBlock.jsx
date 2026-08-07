@@ -55,7 +55,7 @@ export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder' 
     return (
       <div className={isPublic ? 'w-full bg-white px-5 py-5' : 'w-full bg-white px-3 py-3'}>
         <div className={isPublic ? 'flex min-h-48 items-center justify-center rounded-3xl bg-gray-100' : 'flex min-h-28 items-center justify-center rounded-xl bg-gray-100'}>
-          <span className={isPublic ? 'text-sm text-gray-400' : 'text-xs text-gray-400'}>Carousel block</span>
+          <span className={isPublic ? 'text-xs text-gray-400' : 'text-xs text-gray-400'}>Carousel block</span>
         </div>
       </div>
     )
@@ -78,7 +78,7 @@ export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder' 
             className={isPublic ? 'h-[280px] w-full object-cover' : 'h-40 w-full object-cover'}
           />
         ) : (
-          <div className={isPublic ? 'flex h-[280px] items-center justify-center text-sm text-gray-400' : 'flex h-40 items-center justify-center text-xs text-gray-400'}>
+          <div className={isPublic ? 'flex h-[280px] items-center justify-center text-xs text-gray-400' : 'flex h-40 items-center justify-center text-xs text-gray-400'}>
             Add an image to this slide.
           </div>
         )}
@@ -88,14 +88,14 @@ export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder' 
             <button
               type="button"
               onClick={(event) => moveSlide(event, -1)}
-              className={isPublic ? 'absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-lg font-semibold text-white' : 'absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-sm font-semibold text-white'}
+              className={isPublic ? 'absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-base font-semibold text-white' : 'absolute left-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-xs font-semibold text-white'}
             >
               {'<'}
             </button>
             <button
               type="button"
               onClick={(event) => moveSlide(event, 1)}
-              className={isPublic ? 'absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-lg font-semibold text-white' : 'absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-sm font-semibold text-white'}
+              className={isPublic ? 'absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-base font-semibold text-white' : 'absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/65 text-xs font-semibold text-white'}
             >
               {'>'}
             </button>
@@ -195,7 +195,7 @@ export const CarouselEditor = ({ props = {}, uploads = {}, onChange, onUploadCha
                 type="file"
                 accept="image/*"
                 onChange={(event) => onUploadChange('carouselImageFile', event.target.files?.[0] ?? null, { index })}
-                className="w-full text-sm text-[#CAC4CF] file:mr-3 file:rounded file:border-0 file:bg-[#1f2937] file:px-3 file:py-2 file:text-white"
+                className="w-full text-xs text-[#CAC4CF] file:mr-3 file:rounded file:border-0 file:bg-[#1f2937] file:px-3 file:py-2 file:text-white"
               />
               {previewUrls[index] && (
                 <div className="mt-2 space-y-2">
@@ -218,7 +218,7 @@ export const CarouselEditor = ({ props = {}, uploads = {}, onChange, onUploadCha
                 value={image.url || ''}
                 onChange={(event) => updateImage(index, 'url', event.target.value)}
                 placeholder="https://..."
-                className="w-full rounded border border-[#3e6ff4]/20 bg-[#1f2937] px-3 py-2 text-sm text-white focus:border-[#3e6ff4]/60 focus:outline-none"
+                className="w-full rounded border border-[#3e6ff4]/20 bg-[#1f2937] px-3 py-2 text-xs text-white focus:border-[#3e6ff4]/60 focus:outline-none"
               />
             </div>
 
@@ -229,7 +229,7 @@ export const CarouselEditor = ({ props = {}, uploads = {}, onChange, onUploadCha
                 value={image.alt || ''}
                 onChange={(event) => updateImage(index, 'alt', event.target.value)}
                 placeholder="Describe this slide"
-                className="w-full rounded border border-[#3e6ff4]/20 bg-[#1f2937] px-3 py-2 text-sm text-white focus:border-[#3e6ff4]/60 focus:outline-none"
+                className="w-full rounded border border-[#3e6ff4]/20 bg-[#1f2937] px-3 py-2 text-xs text-white focus:border-[#3e6ff4]/60 focus:outline-none"
               />
             </div>
           </div>

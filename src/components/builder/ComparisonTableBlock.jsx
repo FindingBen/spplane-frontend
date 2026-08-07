@@ -5,7 +5,7 @@ export const ComparisonTablePreview = ({ props = {}, variant = 'builder' }) => {
 
   return (
     <div className={isPublic ? 'w-full px-5 py-5 bg-white' : 'w-full px-3 py-3 bg-white'}>
-      {props.title && <h3 className={isPublic ? 'text-lg font-bold text-black text-left mb-3' : 'text-xs font-bold text-black mb-2'}>{props.title}</h3>}
+      {props.title && <h3 className={isPublic ? 'text-base font-bold text-black text-left mb-3' : 'text-xs font-bold text-black mb-2'}>{props.title}</h3>}
       <div className={isPublic ? 'w-full overflow-hidden rounded-2xl border border-gray-200 shadow-sm' : 'w-full overflow-hidden rounded border border-gray-200'}>
         <table className={isPublic ? 'w-full text-xs' : 'w-full text-[9px]'}>
           <thead>
@@ -50,7 +50,7 @@ export const ComparisonTableEditor = ({ props = {}, onChange }) => {
       <div>
         <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Title</label>
         <input type="text" value={props.title || ''} onChange={(e) => onChange('title', e.target.value)}
-          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60" />
       </div>
       <div>
         <div className="flex items-center justify-between mb-2">

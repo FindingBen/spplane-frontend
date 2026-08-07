@@ -46,7 +46,7 @@ export const AddToCartEditor = ({ props = {}, onChange }) => (
         value={props.text || ''}
         onChange={(e) => onChange('text', e.target.value)}
         placeholder="Add to Cart"
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <div>
@@ -56,7 +56,7 @@ export const AddToCartEditor = ({ props = {}, onChange }) => (
         value={props.checkoutUrl || ''}
         onChange={(e) => onChange('checkoutUrl', e.target.value)}
         placeholder="https://checkout.yourstore.com/..."
-        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60"
+        className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60"
       />
     </div>
     <p className="text-xs text-[#CAC4CF]/60">User will be redirected to this URL immediately on tap.</p>

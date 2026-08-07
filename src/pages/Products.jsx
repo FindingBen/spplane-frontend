@@ -246,8 +246,8 @@ function NoticeBanner({ notice, onDismiss }) {
   return (
     <div className={`mb-5 flex items-start justify-between gap-4 rounded-2xl border px-4 py-3 ${toneStyles}`}>
       <div>
-        <p className="text-sm font-semibold">{notice.title}</p>
-        <p className="mt-1 text-sm opacity-85">{notice.description}</p>
+        <p className="text-xs font-semibold">{notice.title}</p>
+        <p className="mt-1 text-xs opacity-85">{notice.description}</p>
       </div>
       <button
         type="button"
@@ -291,9 +291,9 @@ function ProductGenerationModal({ product, isOpen, onClose, onConfirm }) {
           onClick={(event) => event.stopPropagation()}
         >
           <div className="border-b border-white/10 px-6 py-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#60a5fa]/80">Generate Content</p>
-            <h2 className="mt-2 text-2xl font-bold text-white">Continue with this product?</h2>
-            <p className="mt-2 max-w-xl text-sm text-[#CAC4CF]">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#60a5fa]/80">Generate Content</p>
+            <h2 className="mt-2 text-xl font-bold text-white">Continue with this product?</h2>
+            <p className="mt-2 max-w-xl text-xs text-[#CAC4CF]">
               We will open the content builder, generate a landing page structure from this product, and keep the result fully editable.
             </p>
           </div>
@@ -312,8 +312,8 @@ function ProductGenerationModal({ product, isOpen, onClose, onConfirm }) {
             </div>
 
             <div className="min-w-0">
-              <p className="text-lg font-semibold text-white">{product.title}</p>
-              <div className="mt-4 grid gap-3 text-sm text-[#CAC4CF] sm:grid-cols-2">
+              <p className="text-base font-semibold text-white">{product.title}</p>
+              <div className="mt-4 grid gap-3 text-xs text-[#CAC4CF] sm:grid-cols-2">
                 <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/55">Vendor</p>
                   <p className="mt-2 font-medium text-white">{product.vendor}</p>
@@ -338,14 +338,14 @@ function ProductGenerationModal({ product, isOpen, onClose, onConfirm }) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={() => onConfirm(product)}
-              className="rounded-xl border border-[#3e6ff4]/40 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-xl border border-[#3e6ff4]/40 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90"
             >
               Continue to Builder
             </button>
@@ -396,7 +396,7 @@ function ProductTable({ products, selectedProductId, onGenerateProduct }) {
                       </div>
 
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-white">{product.title}</p>
+                        <p className="truncate text-xs font-semibold text-white">{product.title}</p>
                         <p className="mt-1 truncate text-xs text-[#CAC4CF]">{product.vendor}</p>
                         {product.handle && (
                           <p className="mt-1 truncate text-xs text-[#CAC4CF]/60">/{product.handle}</p>
@@ -414,16 +414,16 @@ function ProductTable({ products, selectedProductId, onGenerateProduct }) {
                  
 
                   <td className="px-4 py-3.5 align-middle">
-                    <p className="text-sm font-semibold text-[#60a5fa]">{product.price}</p>
+                    <p className="text-xs font-semibold text-[#60a5fa]">{product.price}</p>
                   </td>
 
                   <td className="px-4 py-3.5 align-middle">
-                    <p className="text-sm text-white">{inventoryValue}</p>
+                    <p className="text-xs text-white">{inventoryValue}</p>
                     <p className="mt-1 text-xs text-[#CAC4CF]/60">{product.variantCount || 0} variants</p>
                   </td>
 
                   <td className="px-4 py-3.5 align-middle">
-                    <p className="text-sm text-white">{product.updatedAt}</p>
+                    <p className="text-xs text-white">{product.updatedAt}</p>
                   </td>
                   <td className="px-4 py-3.5 align-middle">
                     <button
@@ -568,15 +568,24 @@ export default function Products() {
       <div className="flex flex-1 overflow-hidden">
         <Header />
 
-        <div className="flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
-          <main className="flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
+        <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col h-full">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-7xl mx-auto">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                  <h1 className="text-xl md:text-2xl xl:text-3xl 2xl:text-2xl font-bold text-white mb-1">
                     <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Products</span>
                   </h1>
-                  <p className="text-sm md:text-base text-[#CAC4CF]">
+                  <p className="text-xs md:text-sm text-[#CAC4CF]">
                     Import Shopify products and browse the latest 50 synced items.
                   </p>
                 </div>
@@ -585,7 +594,7 @@ export default function Products() {
                   type="button"
                   onClick={handleImport}
                   disabled={importing}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-4 py-2.5 text-sm font-semibold text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-4 py-2.5 text-xs font-semibold text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/20 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {importing ? (
                     <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -604,7 +613,7 @@ export default function Products() {
               <NoticeBanner notice={importNotice} onDismiss={() => setImportNotice(null)} />
 
               {selectedProduct && (
-                <p className="mb-5 text-sm text-[#CAC4CF]">
+                <p className="mb-5 text-xs text-[#CAC4CF]">
                   Selected product: <span className="font-semibold text-white">{selectedProduct.title}</span>
                 </p>
               )}
@@ -612,17 +621,17 @@ export default function Products() {
               <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937] p-4">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-[#CAC4CF]/60">Loaded Products</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{totalProducts.toLocaleString()}</p>
+                  <p className="mt-2 text-2xl font-bold text-white">{totalProducts.toLocaleString()}</p>
                   <p className="mt-1 text-xs text-[#CAC4CF]">Showing up to {PRODUCT_FETCH_LIMIT} Shopify products.</p>
                 </div>
                 <div className="rounded-2xl border border-emerald-500/20 bg-[#1f2937] p-4">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-300/70">Active Products</p>
-                  <p className="mt-2 text-3xl font-bold text-emerald-300">{activeProducts.toLocaleString()}</p>
+                  <p className="mt-2 text-2xl font-bold text-emerald-300">{activeProducts.toLocaleString()}</p>
                   <p className="mt-1 text-xs text-[#CAC4CF]">Products currently marked active in Shopify.</p>
                 </div>
                 <div className="rounded-2xl border border-[#60a5fa]/20 bg-[#1f2937] p-4">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-[#60a5fa]/75">Vendors</p>
-                  <p className="mt-2 text-3xl font-bold text-[#60a5fa]">{vendorCount.toLocaleString()}</p>
+                  <p className="mt-2 text-2xl font-bold text-[#60a5fa]">{vendorCount.toLocaleString()}</p>
                   <p className="mt-1 text-xs text-[#CAC4CF]">Distinct vendors in the current result set.</p>
                 </div>
               </div>
@@ -636,14 +645,14 @@ export default function Products() {
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="Search Shopify products by title, handle, or vendor…"
-                  className="w-full rounded-xl border border-[#3e6ff4]/20 bg-[#1f2937] py-2.5 pl-9 pr-4 text-sm text-white placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4]"
+                  className="w-full rounded-xl border border-[#3e6ff4]/20 bg-[#1f2937] py-2.5 pl-9 pr-4 text-xs text-white placeholder-[#CAC4CF]/40 focus:outline-none focus:border-[#3e6ff4]"
                 />
               </div>
 
              
 
               {!loading && products.length > 0 && (
-                <div className="mb-5 flex flex-col gap-2 text-sm text-[#CAC4CF] sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-5 flex flex-col gap-2 text-xs text-[#CAC4CF] sm:flex-row sm:items-center sm:justify-between">
                   <p>
                     Showing {pageStart + 1}-{Math.min(pageEnd, totalProducts)} of {totalProducts.toLocaleString()} products
                   </p>
@@ -654,7 +663,7 @@ export default function Products() {
               )}
 
               {error && (
-                <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+                <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs text-red-300">
                   <span>{error}</span>
                   <button
                     type="button"
@@ -677,10 +686,10 @@ export default function Products() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
                   </div>
-                  <h2 className="mt-5 text-lg font-semibold text-white">
+                  <h2 className="mt-5 text-base font-semibold text-white">
                     {search ? 'No products matched your search' : 'No Shopify products loaded yet'}
                   </h2>
-                  <p className="mx-auto mt-2 max-w-md text-sm text-[#CAC4CF]">
+                  <p className="mx-auto mt-2 max-w-md text-xs text-[#CAC4CF]">
                     {search
                       ? 'Try a broader search term or clear the filter to see recently synced products.'
                       : 'Run a Shopify import to pull your catalog into this workspace and start using those products in the builder.'}
@@ -690,7 +699,7 @@ export default function Products() {
                       <button
                         type="button"
                         onClick={() => setSearch('')}
-                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white"
                       >
                         Clear Search
                       </button>
@@ -699,7 +708,7 @@ export default function Products() {
                       type="button"
                       onClick={handleImport}
                       disabled={importing}
-                      className="rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-4 py-2 text-sm font-semibold text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="rounded-xl border border-[#3e6ff4]/40 bg-[#3e6ff4]/10 px-4 py-2 text-xs font-semibold text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/20 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {importing ? 'Importing…' : 'Import All Shopify Products'}
                     </button>
@@ -719,7 +728,7 @@ export default function Products() {
                         type="button"
                         onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
                         disabled={currentPage === 1}
-                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         Previous
                       </button>
@@ -730,7 +739,7 @@ export default function Products() {
                             key={pageNumber}
                             type="button"
                             onClick={() => setCurrentPage(pageNumber)}
-                            className={`h-9 min-w-9 rounded-lg border px-3 text-sm font-semibold transition-colors ${pageNumber === currentPage
+                            className={`h-9 min-w-9 rounded-lg border px-3 text-xs font-semibold transition-colors ${pageNumber === currentPage
                               ? 'border-[#3e6ff4] bg-[#3e6ff4] text-white'
                               : 'border-white/10 bg-white/5 text-[#CAC4CF] hover:bg-white/10 hover:text-white'
                               }`}
@@ -744,7 +753,7 @@ export default function Products() {
                         type="button"
                         onClick={() => setCurrentPage((page) => Math.min(page + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-[#CAC4CF] transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         Next
                       </button>

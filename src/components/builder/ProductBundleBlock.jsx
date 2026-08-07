@@ -5,8 +5,8 @@ export const ProductBundlePreview = ({ props = {}, variant = 'builder' }) => {
 
   return (
     <div className={isPublic ? 'w-full px-5 py-5 bg-white' : 'w-full px-3 py-3 bg-white'}>
-      {props.title && <h3 className={isPublic ? 'text-lg font-bold text-black text-left mb-1' : 'text-xs font-bold text-black mb-0.5'}>{props.title}</h3>}
-      {props.subtitle && <p className={isPublic ? 'text-sm text-gray-500 text-left mb-4' : 'text-[10px] text-gray-500 mb-2'}>{props.subtitle}</p>}
+      {props.title && <h3 className={isPublic ? 'text-base font-bold text-black text-left mb-1' : 'text-xs font-bold text-black mb-0.5'}>{props.title}</h3>}
+      {props.subtitle && <p className={isPublic ? 'text-xs text-gray-500 text-left mb-4' : 'text-[10px] text-gray-500 mb-2'}>{props.subtitle}</p>}
       <div className={isPublic ? 'flex gap-3 overflow-x-auto pb-2' : 'flex gap-2 overflow-x-auto pb-1'}>
         {(props.products || []).map((product, idx) => (
           <div key={idx} className={isPublic ? 'flex-shrink-0 w-36 bg-gray-50 rounded-2xl overflow-hidden border border-gray-200 shadow-sm' : 'flex-shrink-0 w-24 bg-gray-50 rounded-lg overflow-hidden border border-gray-200'}>
@@ -18,8 +18,8 @@ export const ProductBundlePreview = ({ props = {}, variant = 'builder' }) => {
               </div>
             )}
             <div className={isPublic ? 'p-3 text-left' : 'p-1'}>
-              <p className={isPublic ? 'text-sm font-semibold text-black truncate' : 'text-[10px] font-semibold text-black truncate'}>{product.name}</p>
-              <p className={isPublic ? 'text-sm text-green-700 font-semibold mt-1' : 'text-[10px] text-green-700 font-medium'}>{product.price}</p>
+              <p className={isPublic ? 'text-xs font-semibold text-black truncate' : 'text-[10px] font-semibold text-black truncate'}>{product.name}</p>
+              <p className={isPublic ? 'text-xs text-green-700 font-semibold mt-1' : 'text-[10px] text-green-700 font-medium'}>{product.price}</p>
             </div>
           </div>
         ))}
@@ -28,7 +28,7 @@ export const ProductBundlePreview = ({ props = {}, variant = 'builder' }) => {
         <a
           href={props.bundleCtaLink || '#'}
           {...(isPublic ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          className={isPublic ? 'block w-full mt-4 py-3.5 bg-black text-white text-sm font-bold text-center rounded-2xl' : 'block w-full mt-2 py-2 bg-black text-white text-[10px] font-bold text-center rounded-lg'}
+          className={isPublic ? 'block w-full mt-4 py-3.5 bg-black text-white text-xs font-bold text-center rounded-2xl' : 'block w-full mt-2 py-2 bg-black text-white text-[10px] font-bold text-center rounded-lg'}
           onClick={(e) => {
             e.stopPropagation()
             if (!isPublic) {
@@ -63,12 +63,12 @@ export const ProductBundleEditor = ({ props = {}, onChange }) => {
       <div>
         <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Title</label>
         <input type="text" value={props.title || ''} onChange={(e) => onChange('title', e.target.value)}
-          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60" />
       </div>
       <div>
         <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">Subtitle</label>
         <input type="text" value={props.subtitle || ''} onChange={(e) => onChange('subtitle', e.target.value)}
-          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60" />
       </div>
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -100,13 +100,13 @@ export const ProductBundleEditor = ({ props = {}, onChange }) => {
         <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">CTA Text</label>
         <input type="text" value={props.bundleCtaText || ''} onChange={(e) => onChange('bundleCtaText', e.target.value)}
           placeholder="Buy the Look"
-          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60" />
       </div>
       <div>
         <label className="block text-xs font-semibold text-[#CAC4CF] mb-2">CTA Link</label>
         <input type="text" value={props.bundleCtaLink || ''} onChange={(e) => onChange('bundleCtaLink', e.target.value)}
           placeholder="https://checkout.shopify.com/bundle"
-          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-sm focus:outline-none focus:border-[#3e6ff4]/60" />
+          className="w-full px-3 py-2 bg-[#111827] border border-[#3e6ff4]/20 rounded text-white text-xs focus:outline-none focus:border-[#3e6ff4]/60" />
       </div>
     </>
   )

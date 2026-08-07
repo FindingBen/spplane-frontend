@@ -29,7 +29,7 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-3 border-b border-[#3e6ff4]/20">
             <div>
-              <h2 className="text-2xl font-bold text-white">{template.name}</h2>
+              <h2 className="text-xl font-bold text-white">{template.name}</h2>
             </div>
             <button
               onClick={onClose}
@@ -76,13 +76,13 @@ const TemplateModal = ({ template, isOpen, onClose, onConfirm }) => {
           <div className="border-t border-[#3e6ff4]/20 p-4 flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-3 py-2 bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors font-medium text-sm"
+              className="flex-1 px-3 py-2 bg-[#1f2937] border border-[#3e6ff4]/30 text-white rounded-lg hover:bg-[#111827] transition-colors font-medium text-xs"
             >
               Cancel
             </button>
             <button
               onClick={() => onConfirm(template)}
-              className="flex-1 px-3 py-2 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm"
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-xs"
             >
               Use This Template
             </button>
@@ -304,7 +304,7 @@ const TemplateBlock = ({ block }) => {
       return (
         <div className="w-full bg-black px-3 py-3 text-center">
           <p className="text-[8px] font-semibold uppercase tracking-[0.18em] text-white/60">Price</p>
-          <p className="mt-1 text-lg font-bold text-white">{formattedPrice}</p>
+          <p className="mt-1 text-base font-bold text-white">{formattedPrice}</p>
         </div>
       )
     }

@@ -59,7 +59,7 @@ function CreateCampaignModal({
 
       <div data-guide-id="campaign-form" className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-[#3e6ff4]/30 bg-gradient-to-br from-[#1f2937] to-[#1D1A22] shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#3e6ff4]/20 px-6 py-4">
-          <h2 className="text-lg font-bold text-white">{title}</h2>
+          <h2 className="text-base font-bold text-white">{title}</h2>
           <button
             onClick={onClose}
             disabled={isGuideLocked}
@@ -73,7 +73,7 @@ function CreateCampaignModal({
 
         <form onSubmit={handleSubmit} className="max-h-[75vh] space-y-5 overflow-y-auto p-6">
           <div>
-            <label className="mb-1 block text-sm text-[#CAC4CF]">Campaign Name</label>
+            <label className="mb-1 block text-xs text-[#CAC4CF]">Campaign Name</label>
             <input
               type="text"
               placeholder="e.g. Summer Flash Sale"
@@ -82,26 +82,26 @@ function CreateCampaignModal({
                 field('name', event.target.value)
                 setErrors((prev) => ({ ...prev, name: '' }))
               }}
-              className="w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-[#CAC4CF]/50 focus:border-[#3e6ff4]"
+              className="w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-xs text-white outline-none transition-colors placeholder:text-[#CAC4CF]/50 focus:border-[#3e6ff4]"
             />
             {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-[#CAC4CF]">
+            <label className="mb-1 block text-xs text-[#CAC4CF]">
               Content
               <span className="ml-2 text-xs text-[#3e6ff4]/70">Optional - link an existing content</span>
             </label>
             {contentsLoading ? (
               <div className="flex w-full items-center gap-2 rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5">
                 <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#3e6ff4]/30 border-t-[#3e6ff4]" />
-                <span className="text-sm text-[#CAC4CF]/50">Loading content...</span>
+                <span className="text-xs text-[#CAC4CF]/50">Loading content...</span>
               </div>
             ) : (
               <select
                 value={form.content}
                 onChange={(event) => field('content', event.target.value)}
-                className="w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-sm text-white outline-none transition-colors focus:border-[#3e6ff4]"
+                className="w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-xs text-white outline-none transition-colors focus:border-[#3e6ff4]"
               >
                 <option value="">None</option>
                 {contents.map((content) => (
@@ -114,7 +114,7 @@ function CreateCampaignModal({
           </div>
 
           <div>
-            <label className="mb-1 block text-sm text-[#CAC4CF]">Description</label>
+            <label className="mb-1 block text-xs text-[#CAC4CF]">Description</label>
             <textarea
               rows={4}
               placeholder="Describe the goal and audience of this campaign..."
@@ -123,7 +123,7 @@ function CreateCampaignModal({
                 field('description', event.target.value)
                 setErrors((prev) => ({ ...prev, description: '' }))
               }}
-              className="w-full resize-none rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-[#CAC4CF]/50 focus:border-[#3e6ff4]"
+              className="w-full resize-none rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-xs text-white outline-none transition-colors placeholder:text-[#CAC4CF]/50 focus:border-[#3e6ff4]"
             />
             <div className="mt-1 flex justify-between">
               {errors.description ? <p className="text-xs text-red-400">{errors.description}</p> : <span />}
@@ -135,14 +135,14 @@ function CreateCampaignModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-[#3e6ff4]/30 py-2.5 text-sm font-medium text-[#CAC4CF] transition-all duration-200 hover:border-[#3e6ff4]/60 hover:text-white"
+              className="flex-1 rounded-lg border border-[#3e6ff4]/30 py-2.5 text-xs font-medium text-[#CAC4CF] transition-all duration-200 hover:border-[#3e6ff4]/60 hover:text-white"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="flex-1 rounded-lg bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {submitting ? 'Saving...' : submitLabel}
             </button>

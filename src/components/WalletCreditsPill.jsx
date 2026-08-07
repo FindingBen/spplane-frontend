@@ -60,13 +60,13 @@ const WalletCreditsPill = () => {
     <button
       type="button"
       onClick={() => fetchWallet(true)}
-      className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#3e6ff4]/20 to-[#60a5fa]/20 border border-[#3e6ff4]/40 text-[#dbeafe] shadow-[0_0_0_1px_rgba(62,111,244,0.1)] hover:from-[#3e6ff4]/30 hover:to-[#60a5fa]/30 hover:border-[#60a5fa]/70 transition-all duration-200 cursor-pointer"
+      className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0B1619] border border-[#3e6ff4]/40 text-[#dbeafe] shadow-[0_0_0_1px_rgba(62,111,244,0.1)] hover:from-[#3e6ff4]/30 hover:to-[#60a5fa]/30 hover:border-[#60a5fa]/70 transition-all duration-200 cursor-pointer"
       title="Credits available. Click to refresh."
       aria-label="Credits available. Click to refresh"
     >
       <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
       <span className="text-[11px] uppercase tracking-wide text-[#bfdbfe]/90">Credits</span>
-      <span className="text-sm font-semibold text-white min-w-[3.2rem] text-right">
+      <span className="text-xs font-semibold text-white min-w-[3.2rem] text-right">
         {label}
       </span>
 

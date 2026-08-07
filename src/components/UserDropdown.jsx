@@ -29,7 +29,7 @@ const UserDropdown = () => {
       {/* Dropdown Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#3e6ff4]/20 to-[#60a5fa]/20 border text-[#dbeafe] shadow-[0_0_0_1px_rgba(62,111,244,0.1)] transition-all duration-200 cursor-pointer ${
+        className={`group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0B1619] border text-[#dbeafe] shadow-[0_0_0_1px_rgba(62,111,244,0.1)] transition-all duration-200 cursor-pointer ${
           isOpen
             ? 'border-[#60a5fa]/80 from-[#3e6ff4]/30 to-[#60a5fa]/30'
             : 'border-[#3e6ff4]/40 hover:border-[#60a5fa]/70 hover:from-[#3e6ff4]/30 hover:to-[#60a5fa]/30'

@@ -24,7 +24,7 @@ const ComponentEditor = ({ component, uploads, onUpdate, onUploadChange }) => {
     <div className="space-y-4">
       <div>
         <label className="block text-xs font-semibold text-[#CAC4CF] mb-2 uppercase">Block Type</label>
-        <div className="text-sm text-white bg-[#111827] p-2 rounded border border-[#3e6ff4]/20">
+        <div className="text-xs text-white bg-[#111827] p-2 rounded border border-[#3e6ff4]/20">
           {type.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
         </div>
       </div>

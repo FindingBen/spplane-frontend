@@ -146,7 +146,7 @@ function InfoPill({ label, value }) {
   return (
     <div className="rounded-xl border border-[#3e6ff4]/15 bg-[#111827]/70 px-3 py-2">
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]/75">{label}</p>
-      <p className="mt-1 text-sm text-white">{value}</p>
+      <p className="mt-1 text-xs text-white">{value}</p>
     </div>
   )
 }
@@ -169,21 +169,21 @@ function DeleteConfirmationModal({ content, deleting, error, onCancel, onConfirm
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-200/70">Delete content</p>
-              <h2 className="mt-1 text-xl font-semibold text-white">Remove this content?</h2>
+              <h2 className="mt-1 text-lg font-semibold text-white">Remove this content?</h2>
             </div>
           </div>
         </div>
 
         <div className="px-6 py-5">
-          <p className="text-sm leading-6 text-[#CAC4CF]">
+          <p className="text-xs leading-6 text-[#CAC4CF]">
             <span className="font-semibold text-white">{content.title}</span> will be permanently deleted from your content list.
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#CAC4CF]/85">
+          <p className="mt-3 text-xs leading-6 text-[#CAC4CF]/85">
             This action cannot be undone.
           </p>
 
           {error && (
-            <div className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+            <div className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs text-red-100">
               {error}
             </div>
           )}
@@ -193,7 +193,7 @@ function DeleteConfirmationModal({ content, deleting, error, onCancel, onConfirm
               type="button"
               onClick={onCancel}
               disabled={deleting}
-              className="flex-1 rounded-xl border border-[#3e6ff4]/20 bg-[#111827]/70 px-4 py-3 text-sm font-semibold text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-xl border border-[#3e6ff4]/20 bg-[#111827]/70 px-4 py-3 text-xs font-semibold text-[#CAC4CF] transition-colors hover:border-[#3e6ff4]/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               Cancel
             </button>
@@ -201,7 +201,7 @@ function DeleteConfirmationModal({ content, deleting, error, onCancel, onConfirm
               type="button"
               onClick={onConfirm}
               disabled={deleting}
-              className="flex-1 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-4 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 rounded-xl bg-gradient-to-r from-red-500 to-red-600 px-4 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {deleting ? 'Deleting...' : 'Yes, delete'}
             </button>
@@ -235,8 +235,8 @@ function ContentCard({ content, deleting, onDeleteClick }) {
                   </span>
                 )}
               </div>
-              <h2 className="mt-3 text-2xl font-bold text-white">{content.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-[#CAC4CF]">
+              <h2 className="mt-3 text-xl font-bold text-white">{content.title}</h2>
+              <p className="mt-2 text-xs leading-6 text-[#CAC4CF]">
                 {content.description || 'No description was provided for this content yet.'}
               </p>
             </div>
@@ -265,11 +265,11 @@ function ContentCard({ content, deleting, onDeleteClick }) {
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <div className="rounded-2xl border border-[#3e6ff4]/15 bg-[#111827]/70 px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]/75">Created</p>
-              <p className="mt-1 text-sm text-white">{formatDateTime(content.createdAt)}</p>
+              <p className="mt-1 text-xs text-white">{formatDateTime(content.createdAt)}</p>
             </div>
             <div className="rounded-2xl border border-[#3e6ff4]/15 bg-[#111827]/70 px-4 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]/75">Updated</p>
-              <p className="mt-1 text-sm text-white">{formatDateTime(content.updatedAt)}</p>
+              <p className="mt-1 text-xs text-white">{formatDateTime(content.updatedAt)}</p>
             </div>
           </div>
         </div>
@@ -286,14 +286,14 @@ function EmptyState({ onCreate }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M12 4v16m8-8H4" />
         </svg>
       </div>
-      <h2 className="mt-5 text-2xl font-semibold text-white">No content created yet</h2>
-      <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-[#CAC4CF]">
+      <h2 className="mt-5 text-xl font-semibold text-white">No content created yet</h2>
+      <p className="mx-auto mt-3 max-w-xl text-xs leading-6 text-[#CAC4CF]">
         Once you publish or save content, it will appear here with a live preview and all saved metadata.
       </p>
       <button
         type="button"
         onClick={onCreate}
-        className="mt-6 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        className="mt-6 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90"
       >
         Create content
       </button>
@@ -390,14 +390,23 @@ export default function MyContents() {
       <div className="flex flex-1 overflow-hidden">
         <Header />
 
-        <div className="flex-1 m-4 overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] flex flex-col">
-          <main className="flex-1 overflow-y-auto p-4 md:p-6 xl:p-8">
+        <div className="relative flex-1 m-4 overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] flex flex-col">
+          {/* Subtle notebook-style grid, confined to this panel only */}
+          <div
+            className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+            }}
+          />
+          <main className="relative z-10 flex-1 overflow-y-auto p-4 md:p-6 xl:p-8">
             <div className="mx-auto w-full max-w-7xl">
               <div className="flex flex-col gap-4 border-b border-[#3e6ff4]/15 pb-6 md:flex-row md:items-end md:justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">Content</p>
-                  <h1 className="mt-2 text-3xl font-bold text-white md:text-4xl">My Content</h1>
-                  <p className="mt-3 max-w-2xl text-sm leading-6 text-[#CAC4CF]">
+                  <h1 className="mt-2 text-2xl font-bold text-white md:text-3xl">My Content</h1>
+                  <p className="mt-3 max-w-2xl text-xs leading-6 text-[#CAC4CF]">
                     Review every content asset you created, including live block previews, status, timestamps, and saved structure details.
                   </p>
                 </div>
@@ -405,7 +414,7 @@ export default function MyContents() {
                 <button
                   type="button"
                   onClick={() => navigate('/content/builder')}
-                  className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] px-5 py-3 text-xs font-semibold text-white transition-opacity hover:opacity-90"
                 >
                   Create new content
                 </button>
@@ -416,15 +425,15 @@ export default function MyContents() {
                   <div className="flex items-center justify-center py-20">
                     <div className="text-center">
                       <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#3e6ff4]/20 border-t-[#60a5fa]" />
-                      <p className="mt-4 text-sm text-[#CAC4CF]">Loading your content...</p>
+                      <p className="mt-4 text-xs text-[#CAC4CF]">Loading your content...</p>
                     </div>
                   </div>
                 )}
 
                 {!loading && error && (
                   <div className="rounded-2xl border border-red-500/35 bg-red-500/10 px-5 py-4 text-red-100">
-                    <p className="text-sm font-semibold">Unable to load content</p>
-                    <p className="mt-1 text-sm opacity-85">{error}</p>
+                    <p className="text-xs font-semibold">Unable to load content</p>
+                    <p className="mt-1 text-xs opacity-85">{error}</p>
                   </div>
                 )}
 
