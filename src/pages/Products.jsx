@@ -581,10 +581,10 @@ export default function Products() {
           <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-7xl mx-auto">
               <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <h1 className="text-xl md:text-2xl xl:text-3xl 2xl:text-2xl font-bold text-white mb-1">
+                <div className='text-left'>
+                   <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
                     <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Products</span>
-                  </h1>
+                  </span>
                   <p className="text-xs md:text-sm text-[#CAC4CF]">
                     Import Shopify products and browse the latest 50 synced items.
                   </p>

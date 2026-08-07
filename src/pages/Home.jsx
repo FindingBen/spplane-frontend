@@ -73,9 +73,9 @@ const Home = () => {
             <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
             <div className="text-left max-w-2xl 2xl:max-w-xl">
               {/* Welcome Title */}
-              <h1 className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-6">
+              <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-6">
                 Welcome to <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Sendperplane</span>
-              </h1>
+              </span>
 
               {/* Subtitle */}
               <p className="text-xs md:text-base lg:text-lg 2xl:text-sm text-[#CAC4CF] mb-8 md:mb-12 2xl:mb-8">

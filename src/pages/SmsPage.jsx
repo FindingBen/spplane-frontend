@@ -263,8 +263,10 @@ export default function SmsPage() {
 
               {/* Page Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 2xl:mb-5">
-                <div>
-                  <h1 className="text-xl md:text-2xl 2xl:text-xl font-bold text-white">SMS</h1>
+                <div className='text-left'>
+                   <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Sms</span>
+                  </span>
                   <p className="text-[#CAC4CF] text-xs 2xl:text-xs mt-1">
                     Create and manage SMS messages with trackable landing pages.
                   </p>

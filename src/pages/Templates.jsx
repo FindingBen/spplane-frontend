@@ -90,10 +90,10 @@ const Templates = () => {
           <main className="relative z-10 flex-1 flex flex-col p-4 md:p-6 xl:p-8 2xl:p-5 overflow-y-auto overflow-x-hidden">
             <div className="w-full max-w-6xl 2xl:max-w-5xl mx-auto">
               {/* Header */}
-              <div className="mb-4 md:mb-8 2xl:mb-5">
-                <h1 className="text-xl md:text-2xl xl:text-3xl 2xl:text-2xl font-bold text-white mb-2">
-                  <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">SMS Templates</span>
-                </h1>
+              <div className="mb-4 md:mb-8 2xl:mb-5 text-left">
+                 <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Sms templates</span>
+                  </span>
                 <p className="text-xs md:text-base 2xl:text-xs text-[#CAC4CF]">
                   Choose from our predefined templates to create your SMS landing pages
                 </p>

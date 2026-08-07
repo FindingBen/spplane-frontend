@@ -403,9 +403,10 @@ export default function MyContents() {
           <main className="relative z-10 flex-1 overflow-y-auto p-4 md:p-6 xl:p-8">
             <div className="mx-auto w-full max-w-7xl">
               <div className="flex flex-col gap-4 border-b border-[#3e6ff4]/15 pb-6 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#93c5fd]">Content</p>
-                  <h1 className="mt-2 text-2xl font-bold text-white md:text-3xl">My Content</h1>
+                <div className='text-left'>
+                   <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Contents</span>
+                  </span>
                   <p className="mt-3 max-w-2xl text-xs leading-6 text-[#CAC4CF]">
                     Review every content asset you created, including live block previews, status, timestamps, and saved structure details.
                   </p>

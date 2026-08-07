@@ -432,10 +432,11 @@ const AudiencePage = () => {
 
                 {/* Segment Header */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 2xl:mb-5">
-                  <div>
-                    <h1 className="text-xl md:text-2xl 2xl:text-xl font-bold text-white mb-1 text-left">
-                      {selectedSegment.segment_name}
-                    </h1>
+                  <div className='text-left'>
+                     <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">{selectedSegment.segment_name}</span>
+                  </span>
+                   
                     <div className="flex items-center gap-3 mt-1">
                       <span className="inline-flex items-center gap-1.5 text-xs text-[#60a5fa] bg-[#3e6ff4]/10 border border-[#3e6ff4]/30 px-2.5 py-1 rounded-full">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -587,10 +588,10 @@ const AudiencePage = () => {
 
               {/* Page Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8 2xl:mb-5">
-                <div>
-                  <h1 className="text-xl md:text-2xl xl:text-3xl 2xl:text-2xl font-bold text-white mb-1">
-                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Audience</span>
-                  </h1>
+                <div className='text-left'>
+                   <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white mb-1">
+                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Segments</span>
+                  </span>
                   <p className="text-xs md:text-sm text-[#CAC4CF]">Manage your contact segments and recipient lists.</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">

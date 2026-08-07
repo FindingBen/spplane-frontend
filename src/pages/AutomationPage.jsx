@@ -850,8 +850,11 @@ const AutomationPage = () => {
       <div className="flex min-h-0 flex-1">
         <Header />
 
-        <div className="relative m-4 flex flex-1 flex-col overflow-hidden rounded-2xl border border-[#3e6ff4]/20">
-          {/* Subtle notebook-style grid, confined to this panel only */}
+       
+          <div className="relative flex-1 m-4 bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827] rounded-2xl border border-[#3e6ff4]/20 overflow-hidden flex flex-col">
+          
+          <main className="relative z-10 flex-1 overflow-y-auto">
+            {/* Subtle notebook-style grid, confined to this panel only */}
           <div
             className="pointer-events-none absolute inset-0 z-0 opacity-[0.03]"
             style={{
@@ -860,12 +863,12 @@ const AutomationPage = () => {
               backgroundSize: '28px 28px',
             }}
           />
-          <main className="relative z-10 flex-1 overflow-y-auto p-4 md:p-6 xl:p-8">
             <div className="w-full">
-              <div className="rounded-[28px] border border-[#3e6ff4]/20 bg-[linear-gradient(180deg,rgba(17,24,39,0.94),rgba(17,24,39,0.78))] p-6 shadow-[0_30px_80px_rgba(2,6,23,0.28)] md:p-8 xl:p-10">
+              <div className="md:p-8 xl:p-10">
                 <div className="max-w-3xl text-left">
-                  <h1 className="mt-1 text-2xl font-bold text-white md:text-2xl xl:text-3xl">Automation flow</h1>
-                 
+                   <span className="text-2xl md:text-3xl xl:text-4xl 2xl:text-3xl font-bold text-white text-left mb-1">
+                    <span className="bg-gradient-to-r from-[#3e6ff4] to-[#60a5fa] bg-clip-text text-transparent">Automation Flow</span>
+                  </span>
                 </div>
 
                 <div className="mt-8 space-y-6 xl:mt-10">
@@ -877,7 +880,7 @@ const AutomationPage = () => {
                     return (
                       <section
                         key={flow.id}
-                        className={`rounded-[28px] border bg-[linear-gradient(180deg,rgba(2,6,23,0.26),rgba(15,23,42,0.22))] p-5 shadow-[0_20px_50px_rgba(2,6,23,0.18)] md:p-6 ${isFlowLocked ? 'border-amber-400/30' : 'border-white/10'}`}
+                        className={`rounded-[28px] border border-[#3e6ff4]/25 bg-[#0f172a]/65 p-5 shadow-[0_20px_50px_rgba(2,6,23,0.18)] md:p-6 ${isFlowLocked ? 'border-amber-400/30' : 'border-white/10'}`}
                       >
                         <div className="flex flex-col gap-4 text-left sm:flex-row sm:items-start sm:justify-between">
                           <div>
@@ -993,8 +996,10 @@ const AutomationPage = () => {
                 </div>
               </div>
             </div>
-          </main>
-        </div>
+          </main> 
+          </div>
+         
+
       </div>
 
       {modalState?.type === 'sms' && modalFlow && (
