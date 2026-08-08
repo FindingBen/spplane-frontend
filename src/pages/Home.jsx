@@ -51,7 +51,6 @@ const Home = () => {
     navigate('/login')
   }
 
-  console.log(campaignAnalytics)
   return (
     <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827]">
       {/* Top Bar - Full Width */}
