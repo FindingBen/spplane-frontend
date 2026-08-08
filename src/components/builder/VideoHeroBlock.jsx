@@ -1,11 +1,21 @@
 // VideoHeroBlock — Video hero with fallback image and play overlay
 
-export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder' }) => {
+import { useRef } from 'react'
+
+export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder', onInteract }) => {
   const isPublic = variant === 'public'
   const videoUrl = typeof props.videoUrl === 'string' ? props.videoUrl.trim() : ''
   const previewImage = uploads.heroVideoPosterPreviewUrl || uploads.heroImagePreviewUrl || props.posterImage || props.fallbackImage
   const shouldRenderVideo = Boolean(videoUrl)
   const emptyStateLabel = uploads.heroVideoFileName ? `Selected video: ${uploads.heroVideoFileName}` : 'No preview image set'
+  const hasTrackedPlay = useRef(false)
+
+  const handlePlay = () => {
+    if (isPublic && !hasTrackedPlay.current) {
+      hasTrackedPlay.current = true
+      onInteract?.()
+    }
+  }
 
   return (
     <div className="w-full relative bg-white">
@@ -19,6 +29,7 @@ export const VideoHeroPreview = ({ props = {}, uploads = {}, variant = 'builder'
           poster={previewImage || undefined}
           preload="metadata"
           className="w-full h-auto bg-black"
+          onPlay={handlePlay}
         >
           <source src={videoUrl} type={props.mimeType || undefined} />
         </video>

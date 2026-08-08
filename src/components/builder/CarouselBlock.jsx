@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const MAX_CAROUSEL_IMAGES = 5
 
@@ -42,10 +42,18 @@ const syncImages = (onChange, images) => {
   onChange('items', images)
 }
 
-export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder' }) => {
+export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder', onInteract }) => {
   const isPublic = variant === 'public'
   const images = getPreviewImages(props, uploads)
   const [activeIndex, setActiveIndex] = useState(0)
+  const hasTrackedTap = useRef(false)
+
+  const trackTap = () => {
+    if (isPublic && !hasTrackedTap.current) {
+      hasTrackedTap.current = true
+      onInteract?.()
+    }
+  }
 
   useEffect(() => {
     setActiveIndex((currentIndex) => Math.min(currentIndex, Math.max(images.length - 1, 0)))
@@ -65,6 +73,7 @@ export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder' 
 
   const moveSlide = (event, direction) => {
     event.stopPropagation()
+    trackTap()
     setActiveIndex((currentIndex) => (currentIndex + direction + images.length) % images.length)
   }
 
@@ -111,6 +120,7 @@ export const CarouselPreview = ({ props = {}, uploads = {}, variant = 'builder' 
               type="button"
               onClick={(event) => {
                 event.stopPropagation()
+                trackTap()
                 setActiveIndex(index)
               }}
               className={`${isPublic ? 'h-16 w-16 rounded-2xl' : 'h-11 w-11 rounded-lg'} shrink-0 overflow-hidden border ${index === activeIndex ? 'border-black shadow-[0_0_0_1px_rgba(17,24,39,0.12)]' : 'border-gray-200'}`}

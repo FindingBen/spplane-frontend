@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { getSmsPublicPage } from '../service/api/sms'
+import { getSmsPublicPage, createOrUpdateSmsPageAction } from '../service/api/sms'
 import PreviewComponent from '../components/builder/PreviewComponent'
 
 // ── Action button styles ──────────────────────────────────────────────────────
@@ -85,6 +85,10 @@ function SmsPageContentView({ slug, token }) {
     }
   }, [slug, token])
 
+  const handleTrackAction = useCallback((blockType) => {
+    createOrUpdateSmsPageAction(slug, blockType, token).catch(() => {})
+  }, [slug, token])
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
   // ── Loading ──────────────────────────────────────────────────────────────
@@ -139,7 +143,7 @@ function SmsPageContentView({ slug, token }) {
             </div>
           ) : (
             blocks.map((block, idx) => (
-              <PreviewComponent key={block.id ?? idx} component={block} variant="public" />
+              <PreviewComponent key={block.id ?? idx} component={block} variant="public" onTrackAction={handleTrackAction} />
             ))
           )}
         </main>

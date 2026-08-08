@@ -22,7 +22,7 @@ const PUBLIC_SIZE_CLASSES = {
   large: 'py-4 text-sm',
 }
 
-export const CtaPreview = ({ props = {}, variant = 'builder' }) => {
+export const CtaPreview = ({ props = {}, variant = 'builder', onInteract }) => {
   const isPublic = variant === 'public'
   const sizeClass = isPublic
     ? (PUBLIC_SIZE_CLASSES[props.size] || PUBLIC_SIZE_CLASSES.large)
@@ -42,6 +42,8 @@ export const CtaPreview = ({ props = {}, variant = 'builder' }) => {
           e.stopPropagation()
           if (!isPublic) {
             e.preventDefault()
+          } else {
+            onInteract?.()
           }
         }}
       >

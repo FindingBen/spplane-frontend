@@ -98,14 +98,17 @@ const normalizeInventoryProps = (props = {}) => ({
   forceUrgent: props.forceUrgent ?? Boolean(pickFirstString(props.text, props.message, props.customMessage)),
 })
 
-const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
+const PreviewComponent = ({ component, uploads, variant = 'builder', onTrackAction }) => {
   const { type, props = {} } = component
+  const onInteract = variant === 'public' && typeof onTrackAction === 'function'
+    ? () => onTrackAction(type)
+    : undefined
 
   switch (type) {
     case 'video-hero':
-      return <VideoHeroPreview props={props} uploads={uploads} variant={variant} />
+      return <VideoHeroPreview props={props} uploads={uploads} variant={variant} onInteract={onInteract} />
     case 'hero':
-      return <VideoHeroPreview props={normalizeHeroProps(props)} uploads={uploads} variant={variant} />
+      return <VideoHeroPreview props={normalizeHeroProps(props)} uploads={uploads} variant={variant} onInteract={onInteract} />
     case 'product-bundle':
       return <ProductBundlePreview props={normalizeBundleProps(props)} variant={variant} />
     case 'comparison-table':
@@ -118,7 +121,7 @@ const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
     case 'countdown-timer':
       return <CountdownTimerPreview props={props} variant={variant} />
     case 'cta':
-      return <CtaPreview props={normalizeCtaProps(props)} variant={variant} />
+      return <CtaPreview props={normalizeCtaProps(props)} variant={variant} onInteract={onInteract} />
     case 'text':
       return <TextBlockPreview props={props} variant={variant} />
     case 'description':
@@ -131,7 +134,7 @@ const PreviewComponent = ({ component, uploads, variant = 'builder' }) => {
       return <TaglinePreview props={normalizeTaglineProps(props)} variant={variant} />
     case 'carousel':
     case 'gallery':
-      return <CarouselPreview props={props} uploads={uploads} variant={variant} />
+      return <CarouselPreview props={props} uploads={uploads} variant={variant} onInteract={onInteract} />
     case 'list':
       return <ListBlockPreview props={props} variant={variant} />
     case 'image':

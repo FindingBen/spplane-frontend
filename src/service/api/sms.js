@@ -94,6 +94,7 @@ export async function deleteSmsPage(id) {
 
 // ── SMS Page Actions ──────────────────────────────────────────────────────────
 
+
 export async function getSmsPageActions(pageId) {
   const res = await axiosInstance.get(`${BASE}/sms-page-actions/`, {
     params: { page: pageId },
@@ -128,6 +129,14 @@ export async function getSmsEvents(smsId) {
 export async function getSmsPublicPage(slug, token) {
   const params = token ? { t: token } : {}
   const res = await axios.get(`${API_URL}/api/sms/public/page/${slug}/`, { params })
+  return res.data
+}
+
+export async function createOrUpdateSmsPageAction(slug, blockType, token) {
+  const res = await axios.post(`${API_URL}/api/sms/public/page/${slug}/`, {
+    block_type: blockType,
+    token,
+  })
   return res.data
 }
 
