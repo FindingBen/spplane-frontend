@@ -9,11 +9,13 @@ import CampaignTracker from '../components/charts/CampaignTracker'
 import CampaignSpendChart from '../components/charts/CampaignSpendChart'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 import { getStatistics } from '../service/api/account'
+import { getCampaignAnalytics } from '../service/api/campaign'
 
 const Home = () => {
   const navigate = useNavigate()
   const [user, setUser] = useState({})
   const [stats, setStats] = useState({ active_campaigns: 0, sms_sent: 0, contacts: 0 })
+  const [campaignAnalytics, setCampaignAnalytics] = useState()
   const { active, completed, currentStep, openIntro } = useFirstCampaignGuide()
 
   const guideButtonLabel = active
@@ -31,6 +33,7 @@ const Home = () => {
     getStatistics()
       .then((data) => setStats(data))
       .catch(() => {})
+    getCampaignAnalytics().then((data)=> setCampaignAnalytics(data.data)).catch(() => {})
   }, [])
 
   const fetchUserData = async () => {
@@ -42,11 +45,13 @@ const Home = () => {
     }
   }
 
+
   const handleLogout = () => {
     tokenService.clear()
     navigate('/login')
   }
 
+  console.log(campaignAnalytics)
   return (
     <div className="w-screen h-screen flex flex-col bg-gradient-to-br from-[#111827] via-[#1D1A22] to-[#111827]">
       {/* Top Bar - Full Width */}
@@ -145,8 +150,8 @@ const Home = () => {
 
             {/* Right column: stacked report widgets */}
             <div className="flex flex-col gap-4">
-              {/* <SmsChart />
-              <CampaignTracker /> */}
+              {/* <SmsChart /> */}
+              <CampaignTracker campaign={campaignAnalytics} />
               {/* <CampaignSpendChart /> */}
             </div>
             </div>

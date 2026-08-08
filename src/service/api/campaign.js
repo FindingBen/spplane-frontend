@@ -31,3 +31,8 @@ export async function createCampaign({ name, description, content, status }) {
 export async function deleteCampaign(id) {
   await axiosInstance.delete(`/api/campaign/v1/${id}/`)
 }
+
+export async function getCampaignAnalytics(){
+  const response = await axiosInstance.get('/api/campaign/v1/get_campaign_analytics/')
+  return response.data
+}
