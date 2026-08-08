@@ -8,7 +8,7 @@ const TopBar = () => {
   const navigate = useNavigate()
 
   return (
-    <nav className="w-full h-14 md:h-16 border border-[#3e6ff4]/35 bg-[linear-gradient(180deg,rgba(17,24,39,0.94),rgba(17,24,39,0.78))] flex items-center justify-between px-4 sm:px-6 lg:px-8 gap-3 sm:gap-4 lg:gap-8 flex-shrink-0">
+    <nav className="w-full h-14 md:h-16 border-b border-[#3e6ff4]/35 bg-[linear-gradient(180deg,rgba(17,24,39,0.94),rgba(17,24,39,0.78))] flex items-center justify-between px-4 sm:px-6 lg:px-8 gap-3 sm:gap-4 lg:gap-8 flex-shrink-0">
       {/* Logo and Title - Left side */}
       <div className="flex items-center gap-2 sm:gap-3">
         <img 
