@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { getSmsList, createSms, deleteSms } from '../service/api/sms'
@@ -179,6 +179,7 @@ function EmptyState({ tab, onCreateClick }) {
 
 export default function SmsPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { active, currentStepId, trackAction } = useFirstCampaignGuide()
   const [smsList, setSmsList] = useState([])
   const [loading, setLoading] = useState(true)
@@ -186,6 +187,7 @@ export default function SmsPage() {
   const [activeTab, setActiveTab] = useState('all')
   const [showModal, setShowModal] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [lockedCampaign, setLockedCampaign] = useState(null)
 
   const fetchSms = async () => {
     try {
@@ -206,6 +208,14 @@ export default function SmsPage() {
     }
   }, [active, currentStepId])
 
+  useEffect(() => {
+    if (location.state?.lockedCampaign) {
+      setLockedCampaign(location.state.lockedCampaign)
+      setShowModal(true)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, location.pathname, navigate])
+
   const handleCreate = async ({ campaign, contact_list, sender, body }) => {
     setSubmitting(true)
     try {
@@ -213,6 +223,7 @@ export default function SmsPage() {
       
       setSmsList(prev => [newSms, ...prev])
       setShowModal(false)
+      setLockedCampaign(null)
       trackAction('sms:created', { sms: newSms })
     } catch {
       // keep modal open so user can retry
@@ -273,6 +284,7 @@ export default function SmsPage() {
                 </div>
                 <button
                   onClick={() => {
+                    setLockedCampaign(null)
                     setShowModal(true)
                     trackAction('sms:open')
                   }}
@@ -339,7 +351,7 @@ export default function SmsPage() {
                   <div className="w-10 h-10 border-4 border-[#3e6ff4]/30 border-t-[#3e6ff4] rounded-full animate-spin" />
                 </div>
               ) : filtered.length === 0 ? (
-                <EmptyState tab={activeTab} onCreateClick={() => setShowModal(true)} />
+                <EmptyState tab={activeTab} onCreateClick={() => { setLockedCampaign(null); setShowModal(true) }} />
               ) : (
                 <div className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937]/60 shadow-[0_24px_60px_rgba(15,23,42,0.24)]">
                   <div className="flex items-center justify-between gap-3 border-b border-[#3e6ff4]/15 bg-[linear-gradient(135deg,rgba(17,24,39,0.96),rgba(31,41,55,0.92))] px-4 py-3">
@@ -380,9 +392,13 @@ export default function SmsPage() {
 
       {showModal && (
         <CreateSmsModal
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false)
+            setLockedCampaign(null)
+          }}
           onCreate={handleCreate}
           submitting={submitting}
+          lockedCampaign={lockedCampaign}
         />
       )}
     </div>

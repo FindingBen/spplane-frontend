@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getContents } from '../service/api/campaign'
 import { useFirstCampaignGuide } from '../guide/FirstCampaignGuideProvider'
 
@@ -6,6 +6,45 @@ const INITIAL_FORM = {
   name: '',
   description: '',
   content: '',
+}
+
+const pickFirstString = (...values) => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value.trim()
+  }
+  return ''
+}
+
+const IMAGE_PROP_KEYS = ['image', 'image_url', 'fallbackImage', 'posterImage', 'backgroundImage']
+
+const extractBlockImage = (block) => {
+  const props = block?.props || {}
+  const direct = pickFirstString(...IMAGE_PROP_KEYS.map((key) => props[key]))
+  if (direct) return direct
+
+  for (const arr of [props.images, props.products, props.items]) {
+    if (Array.isArray(arr)) {
+      for (const entry of arr) {
+        const nested = pickFirstString(typeof entry === 'string' ? entry : '', entry?.image, entry?.image_url)
+        if (nested) return nested
+      }
+    }
+  }
+
+  return ''
+}
+
+const normalizeContent = (item) => {
+  const structure = item?.structure || item?.content_snapshot || item?.snapshot || {}
+  const metadata = (structure?.metadata && typeof structure.metadata === 'object') ? structure.metadata : {}
+  const blocks = Array.isArray(structure?.blocks) ? structure.blocks : []
+
+  return {
+    id: item.id,
+    title: pickFirstString(item?.name, item?.title, metadata?.name, item?.id ? `Content #${item.id}` : 'Untitled content'),
+    imageUrl: blocks.map(extractBlockImage).find(Boolean) || '',
+    blockCount: blocks.length,
+  }
 }
 
 function CreateCampaignModal({
@@ -29,6 +68,8 @@ function CreateCampaignModal({
       .catch(() => setContents([]))
       .finally(() => setContentsLoading(false))
   }, [])
+
+  const normalizedContents = useMemo(() => contents.map(normalizeContent), [contents])
 
   const validate = () => {
     const nextErrors = {}
@@ -98,18 +139,63 @@ function CreateCampaignModal({
                 <span className="text-xs text-[#CAC4CF]/50">Loading content...</span>
               </div>
             ) : (
-              <select
-                value={form.content}
-                onChange={(event) => field('content', event.target.value)}
-                className="w-full rounded-lg border border-[#3e6ff4]/30 bg-[#111827] px-4 py-2.5 text-xs text-white outline-none transition-colors focus:border-[#3e6ff4]"
-              >
-                <option value="">None</option>
-                {contents.map((content) => (
-                  <option key={content.id} value={content.id}>
-                    {content.name || content.title || `Content #${content.id}`}
-                  </option>
-                ))}
-              </select>
+              <div className="max-h-56 space-y-1.5 overflow-y-auto rounded-lg border border-[#3e6ff4]/30 bg-[#111827] p-2">
+                <button
+                  type="button"
+                  onClick={() => field('content', '')}
+                  className={`flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                    !form.content
+                      ? 'border-[#3e6ff4] bg-[#3e6ff4]/20 text-white'
+                      : 'border-transparent text-[#CAC4CF] hover:bg-[#3e6ff4]/10'
+                  }`}
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-dashed border-[#3e6ff4]/30 text-[#CAC4CF]/40">
+                    —
+                  </div>
+                  No linked content
+                </button>
+
+                {normalizedContents.map((content) => {
+                  const selected = String(form.content) === String(content.id)
+                  return (
+                    <button
+                      key={content.id}
+                      type="button"
+                      onClick={() => field('content', String(content.id))}
+                      className={`flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                        selected
+                          ? 'border-[#3e6ff4] bg-[#3e6ff4]/20 text-white'
+                          : 'border-transparent text-[#CAC4CF] hover:bg-[#3e6ff4]/10'
+                      }`}
+                    >
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-[#1D1A22]">
+                        {content.imageUrl ? (
+                          <img src={content.imageUrl} alt={content.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[9px] text-[#CAC4CF]/40">
+                            No preview
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{content.title}</p>
+                        <p className="text-[10px] text-[#CAC4CF]/50">
+                          {content.blockCount} block{content.blockCount === 1 ? '' : 's'}
+                        </p>
+                      </div>
+                      {selected && (
+                        <svg className="h-4 w-4 shrink-0 text-[#3e6ff4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  )
+                })}
+
+                {normalizedContents.length === 0 && (
+                  <p className="px-3 py-2 text-xs text-[#CAC4CF]/50">No content available yet.</p>
+                )}
+              </div>
             )}
           </div>
 

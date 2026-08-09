@@ -36,6 +36,7 @@ const Home = () => {
     getCampaignAnalytics().then((data)=> setCampaignAnalytics(data.data)).catch(() => {})
   }, [])
 
+  console.log(campaignAnalytics)
   const fetchUserData = async () => {
     try {
       const response = await axiosInstance.get('/api/accounts/me/')

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import TopBar from '../components/TopBar'
 import { getCampaigns, createCampaign, deleteCampaign } from '../service/api/campaign'
@@ -29,7 +30,7 @@ function StatusBadge({ status }) {
 }
 
 // ─── Campaign Card — unified, uses model fields ────────────────────────────────
-function CampaignCard({ campaign, onDelete }) {
+function CampaignCard({ campaign, onDelete, onLinkToSms }) {
   const formattedDate = (iso) => {
     if (!iso) return '—'
     return new Date(iso).toLocaleString('en-GB', {
@@ -96,6 +97,16 @@ function CampaignCard({ campaign, onDelete }) {
           Updated: {formattedDate(campaign.updated_at)}
         </div>
       </div>
+
+      <button
+        onClick={() => onLinkToSms(campaign)}
+        className="flex items-center justify-center gap-2 rounded-lg border border-[#3e6ff4]/30 py-2 text-xs font-medium text-[#60a5fa] transition-colors hover:bg-[#3e6ff4]/10"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 010 5.656l-4 4a4 4 0 01-5.656-5.656l1.5-1.5M10.172 13.828a4 4 0 010-5.656l4-4a4 4 0 015.656 5.656l-1.5 1.5" />
+        </svg>
+        Link to Sms
+      </button>
     </div>
   )
 }
@@ -151,6 +162,7 @@ function EmptyState({ tab, onCreateClick }) {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 const CampaignPage = () => {
+  const navigate = useNavigate()
   const { active, currentStepId, trackAction } = useFirstCampaignGuide()
   const [activeTab, setActiveTab] = useState('active')
   // campaigns is a flat array matching the backend response list
@@ -214,6 +226,10 @@ const CampaignPage = () => {
     } catch (err) {
       console.error('Error deleting campaign:', err)
     }
+  }
+
+  const handleLinkToSms = (campaign) => {
+    navigate('/sms', { state: { lockedCampaign: campaign } })
   }
 
   const filtered = campaigns.filter(c => c.status === activeTab)
@@ -364,7 +380,7 @@ const CampaignPage = () => {
                   : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                       {filtered.map(c => (
-                        <CampaignCard key={c.id} campaign={c} onDelete={handleDelete} />
+                        <CampaignCard key={c.id} campaign={c} onDelete={handleDelete} onLinkToSms={handleLinkToSms} />
                       ))}
                     </div>
                   )
