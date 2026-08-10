@@ -119,16 +119,16 @@ function ContentStatusBadge({ status }) {
 
 function ContentPreviewCard({ blocks, smsOfferEnabled, smsOfferLabel }) {
   return (
-    <div className="mx-auto w-full max-w-[260px] rounded-[28px] border-[12px] border-gray-900 bg-gray-900 shadow-[0_25px_60px_rgba(15,23,42,0.35)]">
-      <div className="h-[340px] overflow-hidden rounded-[18px] bg-white">
+    <div className="mx-auto w-full max-w-[120px] rounded-[16px] border-[6px] border-gray-900 bg-gray-900 shadow-[0_12px_28px_rgba(15,23,42,0.35)]">
+      <div className="h-[150px] overflow-hidden rounded-[10px] bg-white">
         {smsOfferEnabled && (
-          <div className="bg-green-700 px-3 py-1 text-center text-[9px] font-semibold text-white">
+          <div className="bg-green-700 px-1.5 py-0.5 text-center text-[6px] font-semibold text-white">
             {smsOfferLabel || 'SMS Exclusive Offer Enabled'}
           </div>
         )}
         <div className="pointer-events-none h-full overflow-hidden">
           {blocks.length === 0 ? (
-            <div className="flex h-full items-center justify-center px-6 text-center text-xs text-gray-400">
+            <div className="flex h-full items-center justify-center px-3 text-center text-[9px] text-gray-400">
               No content blocks yet.
             </div>
           ) : (
@@ -214,63 +214,53 @@ function DeleteConfirmationModal({ content, deleting, error, onCancel, onConfirm
 
 function ContentCard({ content, deleting, onDeleteClick }) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-[#3e6ff4]/20 bg-[#1f2937] shadow-[0_18px_45px_rgba(2,6,23,0.22)]">
-      <div className="flex flex-col gap-0 xl:flex-row">
-        <div className="border-b border-[#3e6ff4]/15 bg-[#0f172a]/55 p-5 xl:w-[340px] xl:border-b-0 xl:border-r">
-          <ContentPreviewCard
-            blocks={content.blocks}
-            smsOfferEnabled={content.smsOfferEnabled}
-            smsOfferLabel={content.metadata?.smsExclusiveOffer?.barLabel}
-          />
+    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-[#3e6ff4]/20 bg-[#1f2937] shadow-[0_12px_30px_rgba(2,6,23,0.22)]">
+      <div className="border-b border-[#3e6ff4]/15 bg-[#0f172a]/55 p-3">
+        <ContentPreviewCard
+          blocks={content.blocks}
+          smsOfferEnabled={content.smsOfferEnabled}
+          smsOfferLabel={content.metadata?.smsExclusiveOffer?.barLabel}
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1">
+            <ContentStatusBadge status={content.status} />
+            {content.smsOfferEnabled && (
+              <span className="inline-flex rounded-full border border-green-500/30 bg-green-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-green-300">
+                SMS offer
+              </span>
+            )}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onDeleteClick(content)}
+            disabled={deleting}
+            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-red-500/25 bg-red-500/10 text-red-300 transition-colors hover:bg-red-500/18 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={`Delete ${content.title}`}
+            title="Delete content"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
 
-        <div className="flex-1 p-5 md:p-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <ContentStatusBadge status={content.status} />
-                {content.smsOfferEnabled && (
-                  <span className="inline-flex rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-xs font-semibold text-green-300">
-                    SMS offer enabled
-                  </span>
-                )}
-              </div>
-              <h2 className="mt-3 text-xl font-bold text-white">{content.title}</h2>
-              <p className="mt-2 text-xs leading-6 text-[#CAC4CF]">
-                {content.description || 'No description was provided for this content yet.'}
-              </p>
-            </div>
+        <h2 className="mt-1.5 truncate text-xs font-bold text-white">{content.title}</h2>
+        <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-[#CAC4CF]">
+          {content.description || 'No description was provided for this content yet.'}
+        </p>
 
-            <button
-              type="button"
-              onClick={() => onDeleteClick(content)}
-              disabled={deleting}
-              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-red-500/25 bg-red-500/10 text-red-300 transition-colors hover:bg-red-500/18 hover:text-red-200 disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label={`Delete ${content.title}`}
-              title="Delete content"
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
+        <div className="mt-auto grid grid-cols-2 gap-1.5 pt-2">
+          <div className="rounded-lg border border-[#3e6ff4]/15 bg-[#111827]/70 px-2 py-1.5">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#93c5fd]/75">Created</p>
+            <p className="mt-0.5 text-[9px] text-white">{formatDateTime(content.createdAt)}</p>
           </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <InfoPill label="Template" value={content.templateLabel} />
-            <InfoPill label="Blocks" value={String(content.blockCount)} />
-            <InfoPill label="Structure" value={content.structureType} />
-            <InfoPill label="Version" value={content.version} />
-          </div>
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-2xl border border-[#3e6ff4]/15 bg-[#111827]/70 px-4 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]/75">Created</p>
-              <p className="mt-1 text-xs text-white">{formatDateTime(content.createdAt)}</p>
-            </div>
-            <div className="rounded-2xl border border-[#3e6ff4]/15 bg-[#111827]/70 px-4 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#93c5fd]/75">Updated</p>
-              <p className="mt-1 text-xs text-white">{formatDateTime(content.updatedAt)}</p>
-            </div>
+          <div className="rounded-lg border border-[#3e6ff4]/15 bg-[#111827]/70 px-2 py-1.5">
+            <p className="text-[8px] font-semibold uppercase tracking-[0.12em] text-[#93c5fd]/75">Updated</p>
+            <p className="mt-0.5 text-[9px] text-white">{formatDateTime(content.updatedAt)}</p>
           </div>
         </div>
       </div>
@@ -443,7 +433,7 @@ export default function MyContents() {
                 )}
 
                 {!loading && !error && contents.length > 0 && (
-                  <div className="space-y-5">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
                     {contents.map((content) => (
                       <ContentCard
                         key={content.id ?? content.title}
