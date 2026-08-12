@@ -165,3 +165,12 @@ export async function createCustomerSignupQrCode() {
 
   return getCustomerSignupQrCode()
 }
+
+export async function getAnalyticsData() {
+  try {
+    const res = await axiosInstance.get(`${BASE}/v1/${id}/overall-sms-analytics/`)
+    return res.data
+  } catch (error) {
+    console.log(error)
+  }
+}
